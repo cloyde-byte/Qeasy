@@ -122,23 +122,105 @@ ns.Q:RegisterRoute({
         { label = "Hand of Gul'dan", elements = {
                 { kind = "turnin", quest = 10480, title = "Enraged Spirits of Water",
                   coords = { map = 1948, x = 42.2, y = 45.1 }, note = "Aflever hos Earthmender Torlok." },
+                { kind = "accept", quest = 10481, title = "Enraged Spirits of Air",
+                  coords = { map = 1948, x = 42.2, y = 45.1 }, note = "Fra Earthmender Torlok." },
+                { kind = "do", quest = 10481, title = "Enraged Spirits of Air",
+                  coords = { map = 1948, x = 44.0, y = 44.0 }, note = "Berolig Enraged Spirits of Air." },
+                { kind = "turnin", quest = 10481, title = "Enraged Spirits of Air",
+                  coords = { map = 1948, x = 42.2, y = 45.1 }, note = "Aflever hos Earthmender Torlok." },
         }},
-        { label = "The Cipher of Damnation og afslutning", elements = {
+        { label = "Ekstra: Deathforge-kæden (valgfri - god XP)", elements = {
+                { kind = "note", coords = { map = 1948, x = 30.5, y = 32.4 }, text = "Disse quests er valgfri",
+                  note = "God XP hvis du mangler op til level 70. Kæden fortsætter fra Blood Guard Gulmok mod Deathforge." },
+        }},
+        { label = "Ekstra: Deathforge-kæden (valgfri - god XP)", elements = {
+                { kind = "accept", quest = 10599, title = "The Deathforge",
+                  coords = { map = 1948, x = 30.5, y = 32.4 }, note = "Fra Blood Guard Gulmok." },
+        }},
+        { label = "Ekstra: Deathforge-kæden (valgfri - god XP)", elements = {
+                { kind = "turnin", quest = 10599, title = "The Deathforge",
+                  coords = { map = 1948, x = 38.6, y = 38.2 }, note = "Rejs til Scout Zagran ved Deathforge (øst)." },
+                { kind = "accept", quest = 10600, title = "Minions of the Shadow Council",
+                  coords = { map = 1948, x = 38.6, y = 38.2 }, note = "Fra Scout Zagran." },
+                { kind = "do", quest = 10600, title = "Minions of the Shadow Council",
+                  coords = { map = 1948, x = 39.2, y = 39.4 }, note = "Dræb Shadow Council-minions." },
+                { kind = "turnin", quest = 10600, title = "Minions of the Shadow Council",
+                  coords = { map = 1948, x = 38.6, y = 38.2 }, note = "Aflever hos Scout Zagran." },
+                { kind = "accept", quest = 10601, title = "The Fate of Kagrosh",
+                  coords = { map = 1948, x = 38.6, y = 38.2 }, note = "Fra Scout Zagran." },
+                { kind = "do", quest = 10601, title = "The Fate of Kagrosh",
+                  coords = { map = 1948, x = 38.6, y = 38.2 }, note = "Find Kagroshs skæbne." },
+                { kind = "turnin", quest = 10601, title = "The Fate of Kagrosh",
+                  coords = { map = 1948, x = 38.6, y = 38.2 }, note = "Aflever hos Scout Zagran." },
+                { kind = "accept", quest = 10602, title = "The Summoning Chamber",
+                  coords = { map = 1948, x = 38.6, y = 38.2 }, note = "Fra Scout Zagran." },
+        }},
+        { label = "Ekstra: Deathforge-kæden (valgfri - god XP)", elements = {
+                { kind = "do", quest = 10602, title = "The Summoning Chamber",
+                  coords = { map = 1948, x = 36.8, y = 41.7 }, note = "Undersøg besværgelseskammeret." },
+        }},
+        { label = "Ekstra: Deathforge-kæden (valgfri - god XP)", elements = {
+                { kind = "turnin", quest = 10602, title = "The Summoning Chamber",
+                  coords = { map = 1948, x = 38.6, y = 38.2 }, note = "Aflever hos Scout Zagran." },
+                { kind = "accept", quest = 10603, title = "Bring Down the Warbringer!",
+                  coords = { map = 1948, x = 38.6, y = 38.2 }, note = "Fra Scout Zagran." },
+        }},
+        { label = "Ekstra: Deathforge-kæden (valgfri - god XP)", elements = {
+                { kind = "do", quest = 10603, title = "Bring Down the Warbringer!",
+                  coords = { map = 1948, x = 39.0, y = 46.9 }, note = "Nedlæg Warbringeren." },
+        }},
+        { label = "Ekstra: Deathforge-kæden (valgfri - god XP)", elements = {
+                { kind = "turnin", quest = 10603, title = "Bring Down the Warbringer!",
+                  coords = { map = 1948, x = 30.5, y = 32.4 }, note = "Aflever hos Blood Guard Gulmok." },
+                { kind = "accept", quest = 10604, title = "Gaining Access",
+                  coords = { map = 1948, x = 30.5, y = 32.4 }, note = "Fra Blood Guard Gulmok." },
+        }},
+        { label = "Ekstra: Deathforge-kæden (valgfri - god XP)", elements = {
+                { kind = "do", quest = 10604, title = "Gaining Access",
+                  coords = { map = 1948, x = 23.6, y = 33.2 }, note = "Skaf adgang til Deathforge." },
+        }},
+        { label = "Ekstra: Deathforge-kæden (valgfri - god XP)", elements = {
+                { kind = "turnin", quest = 10604, title = "Gaining Access",
+                  coords = { map = 1948, x = 30.5, y = 32.4 }, note = "Aflever hos Blood Guard Gulmok." },
+        }},
+        { label = "Ekstra: Researcher Tiorus (valgfri)", elements = {
+                { kind = "accept", quest = 10672, title = "Frankly, It Makes No Sense...",
+                  coords = { map = 1948, x = 30.1, y = 28.3 }, note = "Fra Researcher Tiorus i Shadowmoon Village." },
+        }},
+        { label = "Ekstra: Researcher Tiorus (valgfri)", elements = {
+                { kind = "do", quest = 10672, title = "Frankly, It Makes No Sense...",
+                  coords = { map = 1948, x = 62.2, y = 40.1 }, note = "Skaf prøverne Tiorus mangler." },
+        }},
+        { label = "Ekstra: Researcher Tiorus (valgfri)", elements = {
+                { kind = "turnin", quest = 10672, title = "Frankly, It Makes No Sense...",
+                  coords = { map = 1948, x = 30.1, y = 28.3 }, note = "Aflever hos Researcher Tiorus." },
+                { kind = "accept", quest = 10673, title = "Felspine the Greater",
+                  coords = { map = 1948, x = 30.1, y = 28.3 }, note = "Fra Researcher Tiorus." },
+        }},
+        { label = "Ekstra: Researcher Tiorus (valgfri)", elements = {
+                { kind = "do", quest = 10673, title = "Felspine the Greater",
+                  coords = { map = 1948, x = 56.1, y = 44.3 }, note = "Dræb Felspine the Greater." },
+        }},
+        { label = "Ekstra: Researcher Tiorus (valgfri)", elements = {
+                { kind = "turnin", quest = 10673, title = "Felspine the Greater",
+                  coords = { map = 1948, x = 30.1, y = 28.3 }, note = "Aflever hos Researcher Tiorus." },
+        }},
+        { label = "The Cipher of Damnation (stor valgfri kæde)", elements = {
                 { kind = "accept", quest = 10513, title = "Oronok Torn-heart",
                   coords = { map = 1948, x = 42.2, y = 45.1 }, note = "Fra Earthmender Torlok - starter Oronok-kæden." },
         }},
-        { label = "The Cipher of Damnation og afslutning", elements = {
+        { label = "The Cipher of Damnation (stor valgfri kæde)", elements = {
                 { kind = "note", coords = { map = 1948, x = 54.0, y = 23.5 }, text = "Oronok Torn-heart (Cipher of Damnation)",
-                  note = "Aflever hos Oronok Torn-heart og følg zonens store kæde: du hjælper hans tre sønner (Grom'tor, Ar'tor, Borak) og samler cipher-fragmenterne. Fremragende XP og afslutning på dalens historie. Tryk 'Spring over', når kæden er færdig." },
+                  note = "Aflever hos Oronok Torn-heart og følg zonens store kæde: du hjælper hans tre sønner (Grom'tor, Ar'tor, Borak) og samler cipher-fragmenterne. Fremragende XP og afslutning på dalens historie - klart den bedste vej til level 70." },
         }},
-        { label = "The Cipher of Damnation og afslutning", elements = {
+        { label = "The Cipher of Damnation (stor valgfri kæde)", elements = {
                 { kind = "note", coords = { map = 1948, x = 56.0, y = 59.6 }, text = "Sanctum of the Stars / Altar of Sha'tar",
                   note = "Valgfrit: Scryers' Sanctum of the Stars (eller Aldors Altar of Sha'tar) har quests fra 69-70 og dailies - godt sted at starte dit endgame-ry." },
         }},
-        { label = "The Cipher of Damnation og afslutning", elements = {
-                { kind = "ding", level = 70 },
+        { label = "Mål: level 70", elements = {
+                { kind = "ding", level = 70, note = "Du skal være level 70. Mangler du XP: Cipher of Damnation-kæden (Oronok) er den mest effektive vej; ellers gør Deathforge-kæden færdig eller grind i dalen indtil du dinger." },
         }},
-        { label = "The Cipher of Damnation og afslutning", elements = {
+        { label = "Mål: level 70", elements = {
                 { kind = "note", coords = { map = 1948, x = 30.0, y = 27.7 }, text = "Tillykke med level 70!",
                   note = "Du er i mål! Herfra venter Netherwing-ry (Dragonmaw-kæderne i sydøst), dungeons, heroics og Karazhan-attunement. Tak fordi du levelede med Qeasy - tryk 'Spring over' for at afslutte ruten." },
         }},

@@ -284,14 +284,64 @@ ns.Q:RegisterRoute({
                 { kind = "note", coords = { map = 1944, x = 16.3, y = 65.1 }, text = "Dreghood-kæden",
                   note = "Følg Naladus kæde: A Traitor Among Us -> The Dreghood Elders -> Arzeth's Demise. Tryk 'Spring over', når kæden er afleveret." },
         }},
-        { label = "Afslutning", elements = {
-                { kind = "ding", level = 62 },
+        { label = "Ekstra: Warp Fields & Falcon Watch (valgfri - god XP)", elements = {
+                { kind = "note", coords = { map = 1944, x = 61.9, y = 81.5 }, text = "Disse quests er valgfri",
+                  note = "Ekstra XP hvis du mangler op til level 62. Spring over, hvis du hellere vil videre eller grinde." },
         }},
-        { label = "Afslutning", elements = {
-                { kind = "note", coords = { map = 1944, x = 55.3, y = 36.5 }, text = "Ryd op i Hellfire",
-                  note = "Valgfrit: ryd resterende quests i loggen (Void Ridge, The Mag'har-kæden, Expedition Armory) indtil ca. level 62." },
+        { label = "Ekstra: Warp Fields & Falcon Watch (valgfri - god XP)", elements = {
+                { kind = "accept", quest = 10278, title = "The Warp Rifts",
+                  coords = { map = 1944, x = 61.9, y = 81.5 }, note = "Fra Ogath the Mad ved Spinebreaker Post." },
+                { kind = "do", quest = 10278, title = "The Warp Rifts",
+                  coords = { map = 1944, x = 61.9, y = 81.5 }, note = "Luk warp rifts i Void Ridge nord for posten." },
+                { kind = "turnin", quest = 10278, title = "The Warp Rifts",
+                  coords = { map = 1944, x = 61.9, y = 81.5 }, note = "Aflever hos Ogath the Mad." },
+                { kind = "accept", quest = 10294, title = "Void Ridge",
+                  coords = { map = 1944, x = 61.9, y = 81.5 }, note = "Fra Ogath the Mad." },
         }},
-        { label = "Afslutning", elements = {
+        { label = "Ekstra: Warp Fields & Falcon Watch (valgfri - god XP)", elements = {
+                { kind = "do", quest = 10294, title = "Void Ridge",
+                  coords = { map = 1944, x = 78.1, y = 70.4 }, note = "Dræb voidwalkers i Void Ridge." },
+        }},
+        { label = "Ekstra: Warp Fields & Falcon Watch (valgfri - god XP)", elements = {
+                { kind = "turnin", quest = 10294, title = "Void Ridge",
+                  coords = { map = 1944, x = 61.9, y = 81.5 }, note = "Aflever hos Ogath the Mad." },
+                { kind = "accept", quest = 10220, title = "Make Them Listen",
+                  coords = { map = 1944, x = 61.8, y = 81.7 }, note = "Fra Emissary Mordiba ved Spinebreaker Post." },
+        }},
+        { label = "Ekstra: Warp Fields & Falcon Watch (valgfri - god XP)", elements = {
+                { kind = "do", quest = 10220, title = "Make Them Listen",
+                  coords = { map = 1944, x = 55.1, y = 79.8 }, note = "Fuldfør Mordibas opgave." },
+        }},
+        { label = "Ekstra: Warp Fields & Falcon Watch (valgfri - god XP)", elements = {
+                { kind = "turnin", quest = 10220, title = "Make Them Listen",
+                  coords = { map = 1944, x = 61.8, y = 81.7 }, note = "Aflever hos Emissary Mordiba." },
+        }},
+        { label = "Ekstra: Warp Fields & Falcon Watch (valgfri - god XP)", elements = {
+                { kind = "accept", quest = 9366, title = "In Need of Felblood",
+                  coords = { map = 1944, x = 27.0, y = 59.5 }, note = "Fra Ryathen the Somber i Falcon Watch." },
+        }},
+        { label = "Ekstra: Warp Fields & Falcon Watch (valgfri - god XP)", elements = {
+                { kind = "do", quest = 9366, title = "In Need of Felblood",
+                  coords = { map = 1944, x = 40.5, y = 33.3 }, note = "Saml felblood fra helboars/orcs." },
+        }},
+        { label = "Ekstra: Warp Fields & Falcon Watch (valgfri - god XP)", elements = {
+                { kind = "turnin", quest = 9366, title = "In Need of Felblood",
+                  coords = { map = 1944, x = 27.0, y = 59.5 }, note = "Aflever hos Ryathen the Somber." },
+                { kind = "accept", quest = 9370, title = "The Cleansing Must Be Stopped",
+                  coords = { map = 1944, x = 27.0, y = 59.5 }, note = "Fra Ryathen the Somber." },
+        }},
+        { label = "Ekstra: Warp Fields & Falcon Watch (valgfri - god XP)", elements = {
+                { kind = "do", quest = 9370, title = "The Cleansing Must Be Stopped",
+                  coords = { map = 1944, x = 39.4, y = 39.9 }, note = "Stop renselsen." },
+        }},
+        { label = "Ekstra: Warp Fields & Falcon Watch (valgfri - god XP)", elements = {
+                { kind = "turnin", quest = 9370, title = "The Cleansing Must Be Stopped",
+                  coords = { map = 1944, x = 27.0, y = 59.5 }, note = "Aflever hos Ryathen the Somber." },
+        }},
+        { label = "Videre", elements = {
+                { kind = "ding", level = 62, note = "Du skal være level 62. Mangler du XP: gør de valgfri quests ovenfor færdige, eller grind fel orcs ved Zeth'Gor (66,66) indtil du dinger." },
+        }},
+        { label = "Videre", elements = {
                 { kind = "travel", coords = { map = 1946, x = 78.5, y = 62.7 }, radius = 100,
                   text = "Mod Zangarmarsh", note = "Følg vejen vest/nordvest ud af Hellfire mod Zangarmarsh. Qeasy skifter automatisk rute." },
         }},

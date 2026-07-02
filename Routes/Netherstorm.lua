@@ -144,18 +144,86 @@ ns.Q:RegisterRoute({
                 { kind = "turnin", quest = 10290, title = "In Search of Farahlite",
                   coords = { map = 1953, x = 44.1, y = 36.0 }, note = "Aflever hos Zuben Elgenubi." },
         }},
-        { label = "Afslutning", elements = {
-                { kind = "note", coords = { map = 1953, x = 32.0, y = 64.1 }, text = "Manaforge-kæden fortsætter",
-                  note = "Consortium-kæden fortsætter: Coruu (10330) -> Duro (10338) -> Ara (10365). God XP og fører mod Voren'thal/Scryers-ry. Tryk 'Spring over', når du er klar." },
+        { label = "Ekstra: Kirin'Var - Nekromantens fald (valgfri)", elements = {
+                { kind = "note", coords = { map = 1953, x = 57.5, y = 86.3 }, text = "Disse quests er valgfri",
+                  note = "God XP hvis du mangler op til level 69. Kæden mod Naberius fortsætter fra Custodian Dieworth i Kirin'Var." },
         }},
-        { label = "Afslutning", elements = {
-                { kind = "ding", level = 69 },
+        { label = "Ekstra: Kirin'Var - Nekromantens fald (valgfri)", elements = {
+                { kind = "accept", quest = 10312, title = "The Annals of Kirin'Var",
+                  coords = { map = 1953, x = 57.5, y = 86.3 }, note = "Fra Custodian Dieworth i Kirin'Var Village." },
+                { kind = "do", quest = 10312, title = "The Annals of Kirin'Var",
+                  coords = { map = 1953, x = 60.4, y = 88.0 }, note = "Læs annalerne i biblioteket." },
+                { kind = "turnin", quest = 10312, title = "The Annals of Kirin'Var",
+                  coords = { map = 1953, x = 57.5, y = 86.3 }, note = "Aflever hos Custodian Dieworth." },
+                { kind = "accept", quest = 10316, title = "Searching for Evidence",
+                  coords = { map = 1953, x = 57.5, y = 86.3 }, note = "Fra Custodian Dieworth." },
         }},
-        { label = "Afslutning", elements = {
-                { kind = "note", coords = { map = 1953, x = 32.7, y = 65.0 }, text = "Ryd op i Netherstorm",
-                  note = "Valgfrit: ryd resterende quests (Protectorate ved Celestial Ridge, Ruins of Enkaat) indtil ca. level 69." },
+        { label = "Ekstra: Kirin'Var - Nekromantens fald (valgfri)", elements = {
+                { kind = "do", quest = 10316, title = "Searching for Evidence",
+                  coords = { map = 1953, x = 60.3, y = 78.0 }, note = "Find beviserne ved den nekromantiske fokus." },
+                { kind = "turnin", quest = 10316, title = "Searching for Evidence",
+                  coords = { map = 1953, x = 60.3, y = 78.0 }, note = "Aflever hos Necromantic Focus." },
         }},
-        { label = "Afslutning", elements = {
+        { label = "Ekstra: Kirin'Var - Nekromantens fald (valgfri)", elements = {
+                { kind = "accept", quest = 10319, title = "Capturing the Phylactery",
+                  coords = { map = 1953, x = 57.5, y = 86.3 }, note = "Fra Custodian Dieworth." },
+        }},
+        { label = "Ekstra: Kirin'Var - Nekromantens fald (valgfri)", elements = {
+                { kind = "do", quest = 10319, title = "Capturing the Phylactery",
+                  coords = { map = 1953, x = 59.9, y = 80.4 }, note = "Indfang Naberius' phylactery." },
+        }},
+        { label = "Ekstra: Kirin'Var - Nekromantens fald (valgfri)", elements = {
+                { kind = "turnin", quest = 10319, title = "Capturing the Phylactery",
+                  coords = { map = 1953, x = 57.5, y = 86.3 }, note = "Aflever hos Custodian Dieworth." },
+                { kind = "accept", quest = 10320, title = "Destroy Naberius!",
+                  coords = { map = 1953, x = 57.5, y = 86.3 }, note = "Fra Custodian Dieworth." },
+        }},
+        { label = "Ekstra: Kirin'Var - Nekromantens fald (valgfri)", elements = {
+                { kind = "do", quest = 10320, title = "Destroy Naberius!",
+                  coords = { map = 1953, x = 62.7, y = 78.8 }, note = "Ødelæg Naberius." },
+        }},
+        { label = "Ekstra: Kirin'Var - Nekromantens fald (valgfri)", elements = {
+                { kind = "turnin", quest = 10320, title = "Destroy Naberius!",
+                  coords = { map = 1953, x = 57.5, y = 86.3 }, note = "Aflever hos Custodian Dieworth." },
+        }},
+        { label = "Ekstra: Wheeler-goblinerne & eco-domes (valgfri)", elements = {
+                { kind = "accept", quest = 10232, title = "In A Scrap With The Legion",
+                  coords = { map = 1953, x = 33.0, y = 64.7 }, note = "Fra Papa Wheeler i Area 52." },
+        }},
+        { label = "Ekstra: Wheeler-goblinerne & eco-domes (valgfri)", elements = {
+                { kind = "do", quest = 10232, title = "In A Scrap With The Legion",
+                  coords = { map = 1953, x = 50.3, y = 58.6 }, note = "Kæmp mod Legionen for robot-delene." },
+        }},
+        { label = "Ekstra: Wheeler-goblinerne & eco-domes (valgfri)", elements = {
+                { kind = "turnin", quest = 10232, title = "In A Scrap With The Legion",
+                  coords = { map = 1953, x = 33.0, y = 64.7 }, note = "Aflever hos Papa Wheeler." },
+        }},
+        { label = "Ekstra: Wheeler-goblinerne & eco-domes (valgfri)", elements = {
+                { kind = "accept", quest = 10427, title = "Creatures of the Eco-Domes",
+                  coords = { map = 1953, x = 42.3, y = 32.6 }, note = "Fra Aurine Moonblaze ved eco-domes." },
+        }},
+        { label = "Ekstra: Wheeler-goblinerne & eco-domes (valgfri)", elements = {
+                { kind = "do", quest = 10427, title = "Creatures of the Eco-Domes",
+                  coords = { map = 1953, x = 43.8, y = 38.3 }, note = "Undersøg skabningerne i eco-domen." },
+        }},
+        { label = "Ekstra: Wheeler-goblinerne & eco-domes (valgfri)", elements = {
+                { kind = "turnin", quest = 10427, title = "Creatures of the Eco-Domes",
+                  coords = { map = 1953, x = 42.3, y = 32.6 }, note = "Aflever hos Aurine Moonblaze." },
+                { kind = "accept", quest = 10429, title = "When Nature Goes Too Far",
+                  coords = { map = 1953, x = 42.3, y = 32.6 }, note = "Fra Aurine Moonblaze." },
+        }},
+        { label = "Ekstra: Wheeler-goblinerne & eco-domes (valgfri)", elements = {
+                { kind = "do", quest = 10429, title = "When Nature Goes Too Far",
+                  coords = { map = 1953, x = 44.6, y = 28.4 }, note = "Håndtér naturen der er løbet løbsk." },
+        }},
+        { label = "Ekstra: Wheeler-goblinerne & eco-domes (valgfri)", elements = {
+                { kind = "turnin", quest = 10429, title = "When Nature Goes Too Far",
+                  coords = { map = 1953, x = 42.3, y = 32.6 }, note = "Aflever hos Aurine Moonblaze." },
+        }},
+        { label = "Videre", elements = {
+                { kind = "ding", level = 69, note = "Du skal være level 69. Mangler du XP: gør de valgfri kæder ovenfor færdige, eller fortsæt manaforge-nedlukningen (Coruu/Duro/Ara) fra Spymaster Thalodien, eller grind indtil du dinger." },
+        }},
+        { label = "Videre", elements = {
                 { kind = "travel", coords = { map = 1948, x = 30.0, y = 27.7 }, radius = 100,
                   text = "Mod Shadowmoon Valley", note = "Flyv til Shadowmoon Village i Shadowmoon Valley - sidste stop før level 70. Qeasy skifter automatisk rute." },
         }},

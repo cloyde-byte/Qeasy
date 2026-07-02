@@ -85,11 +85,14 @@ class Plan:
         self._add({"kind": "note", "coords": coords, "text": label,
                    "note": note, "optional": optional})
 
-    def ding(self, level):
-        self._add({"kind": "ding", "level": level})
+    def ding(self, level, note=None):
+        self._add({"kind": "ding", "level": level,
+                   "note": note or ("Du skal være level %d for at fortsætte. "
+                   "Mangler du XP: gør de valgfri quests ovenfor færdige, "
+                   "eller grind mobs i zonen indtil du dinger." % level)})
 
-    def grind(self, level, text=None):
-        self._add({"kind": "grind", "level": level, "text": text})
+    def grind(self, level, text=None, note=None):
+        self._add({"kind": "grind", "level": level, "text": text, "note": note})
 
     # -- quest-elementer --------------------------------------------
     def A(self, qid, note=None, optional=False):

@@ -154,22 +154,122 @@ ns.Q:RegisterRoute({
                 { kind = "turnin", quest = 9914, title = "A Head Full of Ivory",
                   coords = { map = 1951, x = 31.8, y = 56.8 }, note = "Aflever hos Shadrek." },
         }},
-        { label = "Mag'har-kæden og afslutning", elements = {
-                { kind = "note", coords = { map = 1951, x = 55.4, y = 37.6 }, text = "Garrosh og Greatmother Geyah",
-                  note = "Lore-kæden fra Garrosh (via Kil'sorrow, Warmaul og elementerne) fører til 'A Visit With the Greatmother' og senere Thralls ankomst. Tryk 'Spring over', når du har fulgt den." },
+        { label = "Ekstra: Mastery-opfølgere (valgfri - stor XP)", elements = {
+                { kind = "note", coords = { map = 1951, x = 71.5, y = 40.8 }, text = "Gør Nesingwary-kæderne færdige",
+                  note = "Du er allerede ved safarien - Mastery-kædernes tier 2 og 3 giver enorm XP for dyr du alligevel render forbi. Meget effektivt op til level 66-67." },
         }},
-        { label = "Mag'har-kæden og afslutning", elements = {
+        { label = "Ekstra: Mastery-opfølgere (valgfri - stor XP)", elements = {
+                { kind = "accept", quest = 9850, title = "Clefthoof Mastery",
+                  coords = { map = 1951, x = 71.5, y = 40.8 }, note = "Clefthoof Mastery tier 2 - fra Hemet Nesingwary." },
+        }},
+        { label = "Ekstra: Mastery-opfølgere (valgfri - stor XP)", elements = {
+                { kind = "do", quest = 9850, title = "Clefthoof Mastery",
+                  coords = { map = 1951, x = 51.3, y = 46.2 }, note = "Jag flere clefthoofs på sletterne." },
+        }},
+        { label = "Ekstra: Mastery-opfølgere (valgfri - stor XP)", elements = {
+                { kind = "turnin", quest = 9850, title = "Clefthoof Mastery",
+                  coords = { map = 1951, x = 71.5, y = 40.8 }, note = "Aflever hos Hemet Nesingwary." },
+                { kind = "accept", quest = 9851, title = "Clefthoof Mastery",
+                  coords = { map = 1951, x = 71.5, y = 40.8 }, note = "Clefthoof Mastery tier 3 - fra Hemet Nesingwary." },
+        }},
+        { label = "Ekstra: Mastery-opfølgere (valgfri - stor XP)", elements = {
+                { kind = "do", quest = 9851, title = "Clefthoof Mastery",
+                  coords = { map = 1951, x = 41.4, y = 61.6 }, note = "Jag de største clefthoofs." },
+        }},
+        { label = "Ekstra: Mastery-opfølgere (valgfri - stor XP)", elements = {
+                { kind = "turnin", quest = 9851, title = "Clefthoof Mastery",
+                  coords = { map = 1951, x = 71.5, y = 40.8 }, note = "Aflever hos Hemet Nesingwary." },
+                { kind = "accept", quest = 9855, title = "Windroc Mastery",
+                  coords = { map = 1951, x = 71.6, y = 40.5 }, note = "Windroc Mastery tier 2 - fra Shado 'Fitz' Farstrider." },
+        }},
+        { label = "Ekstra: Mastery-opfølgere (valgfri - stor XP)", elements = {
+                { kind = "do", quest = 9855, title = "Windroc Mastery",
+                  coords = { map = 1951, x = 48.5, y = 60.4 }, note = "Jag flere windrocs." },
+        }},
+        { label = "Ekstra: Mastery-opfølgere (valgfri - stor XP)", elements = {
+                { kind = "turnin", quest = 9855, title = "Windroc Mastery",
+                  coords = { map = 1951, x = 71.6, y = 40.5 }, note = "Aflever hos Shado 'Fitz' Farstrider." },
+                { kind = "accept", quest = 9856, title = "Windroc Mastery",
+                  coords = { map = 1951, x = 71.6, y = 40.5 }, note = "Windroc Mastery tier 3 - fra Shado." },
+        }},
+        { label = "Ekstra: Mastery-opfølgere (valgfri - stor XP)", elements = {
+                { kind = "do", quest = 9856, title = "Windroc Mastery",
+                  coords = { map = 1951, x = 31.0, y = 31.0 }, note = "Jag de største windrocs." },
+        }},
+        { label = "Ekstra: Mastery-opfølgere (valgfri - stor XP)", elements = {
+                { kind = "turnin", quest = 9856, title = "Windroc Mastery",
+                  coords = { map = 1951, x = 71.6, y = 40.5 }, note = "Aflever hos Shado 'Fitz' Farstrider." },
+                { kind = "accept", quest = 9858, title = "Talbuk Mastery",
+                  coords = { map = 1951, x = 71.4, y = 40.6 }, note = "Talbuk Mastery tier 2 - fra Harold Lane." },
+        }},
+        { label = "Ekstra: Mastery-opfølgere (valgfri - stor XP)", elements = {
+                { kind = "do", quest = 9858, title = "Talbuk Mastery",
+                  coords = { map = 1951, x = 49.8, y = 40.3 }, note = "Jag flere talbuks." },
+        }},
+        { label = "Ekstra: Mastery-opfølgere (valgfri - stor XP)", elements = {
+                { kind = "turnin", quest = 9858, title = "Talbuk Mastery",
+                  coords = { map = 1951, x = 71.4, y = 40.6 }, note = "Aflever hos Harold Lane." },
+                { kind = "accept", quest = 9859, title = "Talbuk Mastery",
+                  coords = { map = 1951, x = 71.4, y = 40.6 }, note = "Talbuk Mastery tier 3 - fra Harold Lane." },
+        }},
+        { label = "Ekstra: Mastery-opfølgere (valgfri - stor XP)", elements = {
+                { kind = "do", quest = 9859, title = "Talbuk Mastery",
+                  coords = { map = 1951, x = 26.1, y = 53.1 }, note = "Jag de største talbuks." },
+        }},
+        { label = "Ekstra: Mastery-opfølgere (valgfri - stor XP)", elements = {
+                { kind = "turnin", quest = 9859, title = "Talbuk Mastery",
+                  coords = { map = 1951, x = 71.4, y = 40.6 }, note = "Aflever hos Harold Lane." },
+        }},
+        { label = "Ekstra: Lantresor of the Blade (valgfri)", elements = {
+                { kind = "accept", quest = 9927, title = "Ruthless Cunning",
+                  coords = { map = 1951, x = 73.8, y = 62.6 }, note = "Fra Lantresor of the Blade ved Burning Blade Ruins (sydøst)." },
+        }},
+        { label = "Ekstra: Lantresor of the Blade (valgfri)", elements = {
+                { kind = "do", quest = 9927, title = "Ruthless Cunning",
+                  coords = { map = 1951, x = 70.7, y = 79.0 }, note = "Fuldfør Lantresors opgave." },
+        }},
+        { label = "Ekstra: Lantresor of the Blade (valgfri)", elements = {
+                { kind = "turnin", quest = 9927, title = "Ruthless Cunning",
+                  coords = { map = 1951, x = 73.8, y = 62.6 }, note = "Aflever hos Lantresor of the Blade." },
+                { kind = "accept", quest = 9931, title = "Returning the Favor",
+                  coords = { map = 1951, x = 73.8, y = 62.6 }, note = "Fra Lantresor." },
+        }},
+        { label = "Ekstra: Lantresor of the Blade (valgfri)", elements = {
+                { kind = "do", quest = 9931, title = "Returning the Favor",
+                  coords = { map = 1951, x = 45.8, y = 22.4 }, note = "Gengæld tjenesten." },
+        }},
+        { label = "Ekstra: Lantresor of the Blade (valgfri)", elements = {
+                { kind = "turnin", quest = 9931, title = "Returning the Favor",
+                  coords = { map = 1951, x = 73.8, y = 62.6 }, note = "Aflever hos Lantresor of the Blade." },
+                { kind = "accept", quest = 9932, title = "Body of Evidence",
+                  coords = { map = 1951, x = 73.8, y = 62.6 }, note = "Fra Lantresor." },
+        }},
+        { label = "Ekstra: Lantresor of the Blade (valgfri)", elements = {
+                { kind = "do", quest = 9932, title = "Body of Evidence",
+                  coords = { map = 1951, x = 46.6, y = 24.4 }, note = "Skaf beviserne." },
+        }},
+        { label = "Ekstra: Lantresor of the Blade (valgfri)", elements = {
+                { kind = "turnin", quest = 9932, title = "Body of Evidence",
+                  coords = { map = 1951, x = 73.8, y = 62.6 }, note = "Aflever hos Lantresor of the Blade." },
+                { kind = "accept", quest = 9934, title = "Message to Garadar",
+                  coords = { map = 1951, x = 73.8, y = 62.6 }, note = "Fra Lantresor." },
+        }},
+        { label = "Ekstra: Lantresor of the Blade (valgfri)", elements = {
+                { kind = "turnin", quest = 9934, title = "Message to Garadar",
+                  coords = { map = 1951, x = 55.4, y = 37.6 }, note = "Bring beskeden til Garrosh i Garadar." },
+        }},
+        { label = "Valgfri lore & gruppe-indhold", elements = {
+                { kind = "note", coords = { map = 1951, x = 55.4, y = 37.6 }, text = "Garrosh & Greatmother Geyah",
+                  note = "Valgfrit: lore-kæden fra Garrosh fører til 'A Visit With the Greatmother' og Thralls ankomst. Følg den for XP + historie." },
+        }},
+        { label = "Valgfri lore & gruppe-indhold", elements = {
                 { kind = "note", coords = { map = 1951, x = 42.8, y = 20.7 }, text = "Ring of Blood (gruppe)",
-                  note = "The Ring of Blood ved Gurgthock: seks gladiator-kampe for en 5-mands gruppe - en af TBC's bedste XP-klumper plus et stærkt våben. Find en gruppe! Tryk 'Spring over', hvis du dropper den." },
+                  note = "Valgfrit: seks gladiator-kampe for en 5-mands gruppe ved Gurgthock - en af TBC's bedste XP-klumper plus et stærkt våben. Find en gruppe!" },
         }},
-        { label = "Mag'har-kæden og afslutning", elements = {
-                { kind = "ding", level = 67 },
+        { label = "Videre", elements = {
+                { kind = "ding", level = 67, note = "Du skal være level 67. Mangler du XP: gør Mastery-opfølgerne eller Lantresor-kæden færdige, eller grind clefthoofs/talbuks på sletterne indtil du dinger." },
         }},
-        { label = "Mag'har-kæden og afslutning", elements = {
-                { kind = "note", coords = { map = 1951, x = 55.4, y = 37.6 }, text = "Ryd op i Nagrand",
-                  note = "Valgfrit: gør Mastery-kæderne og resterende Garadar-quests færdige indtil ca. level 66-67." },
-        }},
-        { label = "Mag'har-kæden og afslutning", elements = {
+        { label = "Videre", elements = {
                 { kind = "travel", coords = { map = 1949, x = 51.9, y = 58.4 }, radius = 100,
                   text = "Mod Blade's Edge Mountains", note = "Flyv nordpå gennem bjergene til Thunderlord Stronghold i Blade's Edge Mountains. Qeasy skifter automatisk rute." },
         }},

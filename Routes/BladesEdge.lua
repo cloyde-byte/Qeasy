@@ -144,18 +144,92 @@ ns.Q:RegisterRoute({
                 { kind = "turnin", quest = 10820, title = "Deceive thy Enemy",
                   coords = { map = 1949, x = 73.3, y = 40.0 }, note = "Aflever hos Wildlord Antelarion." },
         }},
-        { label = "Afslutning", elements = {
-                { kind = "note", coords = { map = 1949, x = 53.3, y = 41.2 }, text = "Gruuls sønner (Baron Sablemane)",
-                  note = "Baron Sablemanes kæde mod Gruuls sønner (Grulloc, Gorgrom m.fl.) giver stor XP og fører op mod Gruul's Lair - enkelte dele kræver en gruppe. Tryk 'Spring over', hvis du dropper den." },
+        { label = "Ekstra: Bladespire kegger & Thunderspike (valgfri)", elements = {
+                { kind = "note", coords = { map = 1949, x = 45.0, y = 72.3 }, text = "Disse quests er valgfri",
+                  note = "God XP hvis du mangler op til level 68. Spring over efter behov." },
         }},
-        { label = "Afslutning", elements = {
-                { kind = "ding", level = 68 },
+        { label = "Ekstra: Bladespire kegger & Thunderspike (valgfri)", elements = {
+                { kind = "accept", quest = 10542, title = "They Stole Me Hookah and Me Brews!",
+                  coords = { map = 1949, x = 45.0, y = 72.3 }, note = "Fra T'chali the Witch Doctor (sydvest, ved Bladespire)." },
         }},
-        { label = "Afslutning", elements = {
-                { kind = "note", coords = { map = 1949, x = 51.9, y = 58.4 }, text = "Ryd op i Blade's Edge",
-                  note = "Valgfrit: ryd resterende quests (Ruuan Weald, Bloodmaul Camp, Skyguard Outpost) indtil ca. level 67-68." },
+        { label = "Ekstra: Bladespire kegger & Thunderspike (valgfri)", elements = {
+                { kind = "do", quest = 10542, title = "They Stole Me Hookah and Me Brews!",
+                  coords = { map = 1949, x = 47.3, y = 69.3 }, note = "Skaf hookah og brews tilbage." },
         }},
-        { label = "Afslutning", elements = {
+        { label = "Ekstra: Bladespire kegger & Thunderspike (valgfri)", elements = {
+                { kind = "turnin", quest = 10542, title = "They Stole Me Hookah and Me Brews!",
+                  coords = { map = 1949, x = 45.0, y = 72.3 }, note = "Aflever hos T'chali the Witch Doctor." },
+                { kind = "accept", quest = 10545, title = "Bladespire Kegger",
+                  coords = { map = 1949, x = 45.0, y = 72.3 }, note = "Fra T'chali." },
+                { kind = "do", quest = 10545, title = "Bladespire Kegger",
+                  coords = { map = 1949, x = 45.0, y = 72.3 }, note = "Forgift Bladespire-ogrernes øl (Bladespire Kegger)." },
+                { kind = "turnin", quest = 10545, title = "Bladespire Kegger",
+                  coords = { map = 1949, x = 45.0, y = 72.3 }, note = "Aflever hos T'chali the Witch Doctor." },
+                { kind = "accept", quest = 10543, title = "Grimnok and Korgaah, I Am For You!",
+                  coords = { map = 1949, x = 45.0, y = 72.3 }, note = "Fra T'chali." },
+        }},
+        { label = "Ekstra: Bladespire kegger & Thunderspike (valgfri)", elements = {
+                { kind = "do", quest = 10543, title = "Grimnok and Korgaah, I Am For You!",
+                  coords = { map = 1949, x = 44.4, y = 63.7 }, note = "Dræb Grimnok og Korgaah." },
+        }},
+        { label = "Ekstra: Bladespire kegger & Thunderspike (valgfri)", elements = {
+                { kind = "turnin", quest = 10543, title = "Grimnok and Korgaah, I Am For You!",
+                  coords = { map = 1949, x = 45.0, y = 72.3 }, note = "Aflever hos T'chali the Witch Doctor." },
+        }},
+        { label = "Ekstra: Bladespire kegger & Thunderspike (valgfri)", elements = {
+                { kind = "accept", quest = 10525, title = "Vision Guide",
+                  coords = { map = 1949, x = 52.8, y = 59.0 }, note = "Fra Rokgah Bloodgrip ved Thunderlord Stronghold." },
+                { kind = "do", quest = 10525, title = "Vision Guide",
+                  coords = { map = 1949, x = 52.8, y = 59.0 }, note = "Følg visionens vejledning." },
+                { kind = "turnin", quest = 10525, title = "Vision Guide",
+                  coords = { map = 1949, x = 52.8, y = 59.0 }, note = "Aflever hos Rokgah Bloodgrip." },
+                { kind = "accept", quest = 10526, title = "The Thunderspike",
+                  coords = { map = 1949, x = 52.8, y = 59.0 }, note = "Fra Rokgah Bloodgrip." },
+        }},
+        { label = "Ekstra: Bladespire kegger & Thunderspike (valgfri)", elements = {
+                { kind = "do", quest = 10526, title = "The Thunderspike",
+                  coords = { map = 1949, x = 39.8, y = 85.5 }, note = "Placér Thunderspike i Circle of Blood." },
+        }},
+        { label = "Ekstra: Bladespire kegger & Thunderspike (valgfri)", elements = {
+                { kind = "turnin", quest = 10526, title = "The Thunderspike",
+                  coords = { map = 1949, x = 52.8, y = 59.0 }, note = "Aflever hos Rokgah Bloodgrip." },
+        }},
+        { label = "Ekstra: Mok'Nathal ånde-kæde (valgfri)", elements = {
+                { kind = "accept", quest = 10851, title = "The Totems of My Enemy",
+                  coords = { map = 1949, x = 74.9, y = 60.5 }, note = "Fra Spiritcaller Dohgar i Mok'Nathal Village." },
+        }},
+        { label = "Ekstra: Mok'Nathal ånde-kæde (valgfri)", elements = {
+                { kind = "do", quest = 10851, title = "The Totems of My Enemy",
+                  coords = { map = 1949, x = 58.0, y = 57.7 }, note = "Ødelæg fjendens totems." },
+        }},
+        { label = "Ekstra: Mok'Nathal ånde-kæde (valgfri)", elements = {
+                { kind = "turnin", quest = 10851, title = "The Totems of My Enemy",
+                  coords = { map = 1949, x = 74.9, y = 60.5 }, note = "Aflever hos Spiritcaller Dohgar." },
+                { kind = "accept", quest = 10853, title = "Spirit Calling",
+                  coords = { map = 1949, x = 74.9, y = 60.5 }, note = "Fra Spiritcaller Dohgar." },
+        }},
+        { label = "Ekstra: Mok'Nathal ånde-kæde (valgfri)", elements = {
+                { kind = "do", quest = 10853, title = "Spirit Calling",
+                  coords = { map = 1949, x = 62.6, y = 76.2 }, note = "Kald ånderne." },
+        }},
+        { label = "Ekstra: Mok'Nathal ånde-kæde (valgfri)", elements = {
+                { kind = "turnin", quest = 10853, title = "Spirit Calling",
+                  coords = { map = 1949, x = 74.9, y = 60.5 }, note = "Aflever hos Spiritcaller Dohgar." },
+                { kind = "accept", quest = 10859, title = "Gather the Orbs",
+                  coords = { map = 1949, x = 74.9, y = 60.5 }, note = "Fra Spiritcaller Dohgar." },
+                { kind = "do", quest = 10859, title = "Gather the Orbs",
+                  coords = { map = 1949, x = 74.9, y = 60.5 }, note = "Saml ånde-orbs." },
+                { kind = "turnin", quest = 10859, title = "Gather the Orbs",
+                  coords = { map = 1949, x = 74.9, y = 60.5 }, note = "Aflever hos Spiritcaller Dohgar." },
+        }},
+        { label = "Valgfri: Gruuls sønner", elements = {
+                { kind = "note", coords = { map = 1949, x = 53.3, y = 41.2 }, text = "Baron Sablemane-kæden",
+                  note = "Valgfrit: Baron Sablemanes kæde mod Gruuls sønner (Grulloc, Gorgrom m.fl.) giver stor XP og fører op mod Gruul's Lair - enkelte dele kræver en gruppe." },
+        }},
+        { label = "Videre", elements = {
+                { kind = "ding", level = 68, note = "Du skal være level 68. Mangler du XP: gør de valgfri kæder ovenfor færdige, eller grind Bloodmaul-ogrer (45,62) indtil du dinger." },
+        }},
+        { label = "Videre", elements = {
                 { kind = "travel", coords = { map = 1953, x = 32.7, y = 65.0 }, radius = 100,
                   text = "Mod Netherstorm", note = "Følg vejen nordøst over broen til Netherstorm; første stop er goblin-byen Area 52. Qeasy skifter automatisk rute." },
         }},

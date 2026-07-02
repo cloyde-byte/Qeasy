@@ -63,10 +63,22 @@ tekstkommandoer.
 - **Pilen** peger på det **nærmeste ufærdige mål** i det aktuelle step (som
   RestedXP's "Follow the Arrow") og skifter farve grøn→rød efter, om du
   løber rigtigt. Afstand vises i yards. Flyt pilen med **Shift + træk**.
+- Under handlingerne står en **hjælpe-tekst** for det, du er i gang med
+  (hvor NPC'en står, hvad du skal dræbe/samle osv.).
 - Handlinger krydses af **automatisk**: accept, objectives, aflevering,
   rejse (ved ankomst) og level-checkpoints (`ding`). Quests du allerede har
   klaret, springes over.
 - `Spring over` fuldfører hele det aktuelle step; `Tilbage` fortryder.
+
+### Ding-garanti og ekstra quests
+
+Hver zone ender med et **`ding`-checkpoint** (fx "Ding 65!"). Det kan
+**ikke** passeres, før du faktisk har nået det level — så guiden lover dig
+aldrig et level, du ikke har. Før hvert ding ligger en eller flere
+**"Ekstra quests (valgfri)"**-sektioner med rigtige quests (med hjælp), så
+der er nok XP til at nå målet. Mangler du stadig, fortæller ding-steppet
+hvor du bedst grinder de sidste procent. Vil du springe de valgfri quests
+over, trykker du bare `Spring over`.
 
 ### Trin-typer
 

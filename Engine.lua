@@ -215,8 +215,11 @@ function Q:IsStepDone(route, step)
     if self.char.skipped[route.key] and self.char.skipped[route.key][step.index] then
         return true
     end
+    -- Alle elementer skal være udført (valgfri er kun kosmetisk: brug
+    -- "Spring over" for at forlade et step, du ikke vil lave). Det sikrer
+    -- at valgfri/ekstra quests faktisk vises i stedet for at forsvinde.
     for _, el in ipairs(step.elements) do
-        if not el.optional and not self:IsElementDone(route, step, el) then
+        if not self:IsElementDone(route, step, el) then
             return false
         end
     end

@@ -117,12 +117,21 @@ for i = 1, MAX_ROWS do
     rows[i] = row
 end
 
+-- Hjælpe-tekst (noten for den aktuelle handling)
+local helpText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+helpText:SetPoint("TOPLEFT", rows[MAX_ROWS], "BOTTOMLEFT", 2, -6)
+helpText:SetPoint("RIGHT", frame, "RIGHT", -10, 0)
+helpText:SetJustifyH("LEFT")
+helpText:SetWordWrap(true)
+helpText:SetSpacing(2)
+helpText:SetTextColor(0.85, 0.78, 0.55)
+
 -- Kommende steps
 local upcoming = {}
 for i = 1, UPCOMING do
     local fs = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     if i == 1 then
-        fs:SetPoint("TOPLEFT", rows[MAX_ROWS], "BOTTOMLEFT", 0, -6)
+        fs:SetPoint("TOPLEFT", helpText, "BOTTOMLEFT", -2, -6)
     else
         fs:SetPoint("TOPLEFT", upcoming[i - 1], "BOTTOMLEFT", 0, -3)
     end
@@ -219,8 +228,15 @@ function Guide:Update()
         row:Show()
     end
 
-    -- Note fra første ufærdige element (kort hjælp)
-    -- (vises som ekstra række hvis plads; ellers udeladt)
+    -- Hjælpe-tekst: noten for den første ufærdige handling i steppet
+    local help = ""
+    for _, el in ipairs(step.elements) do
+        if not Q:IsElementDone(route, step, el) then
+            help = el.note or el.text or ""
+            break
+        end
+    end
+    helpText:SetText(help)
 
     -- Kommende steps (vis første handling i hvert)
     local up = 0
@@ -235,8 +251,9 @@ function Guide:Update()
         i = i + 1
     end
 
-    -- Dynamisk højde
-    local h = 8 + 14 + 6 + 14 + 4 + shown * 18 + 6 + up * 15 + 10 + 20 + 8
+    -- Dynamisk højde (inkl. hjælpe-tekstens ombrudte højde)
+    local helpH = (help ~= "" and (helpText:GetStringHeight() + 8)) or 0
+    local h = 8 + 14 + 6 + 14 + 4 + shown * 18 + 6 + helpH + up * 15 + 10 + 20 + 8
     frame:SetHeight(h)
 end
 

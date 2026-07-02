@@ -178,18 +178,76 @@ ns.Q:RegisterRoute({
                 { kind = "note", coords = { map = 1946, x = 19.8, y = 50.8 }, text = "Fhwoor Smash! (eskorte)",
                   note = "Valgfrit: eskorte-questen 'Fhwoor Smash!' giver god XP. Tryk 'Spring over' bagefter." },
         }},
-        { label = "Afslutning", elements = {
+        { label = "Aflever plantedelene", elements = {
                 { kind = "turnin", quest = 9802, title = "Plants of Zangarmarsh",
                   coords = { map = 1946, x = 80.3, y = 64.2 }, note = "Flyv tilbage til Cenarion Refuge og aflever plantedelene hos Lauranna, når du har alle 10." },
         }},
-        { label = "Afslutning", elements = {
-                { kind = "ding", level = 64 },
+        { label = "Ekstra: Sporeling-observation & Feralfen (valgfri)", elements = {
+                { kind = "note", coords = { map = 1946, x = 78.5, y = 63.1 }, text = "Disse quests er valgfri",
+                  note = "God XP hvis du mangler op til level 64. Watcher Leesa'oh-kæden er især effektiv. Spring over efter behov." },
         }},
-        { label = "Afslutning", elements = {
-                { kind = "note", coords = { map = 1946, x = 78.4, y = 62.0 }, text = "Ryd op i Zangarmarsh",
-                  note = "Valgfrit: ryd resterende quests (Feralfen, Dead Mire, Twin Spire Ruins) indtil ca. level 63-64." },
+        { label = "Ekstra: Sporeling-observation & Feralfen (valgfri)", elements = {
+                { kind = "accept", quest = 9697, title = "Watcher Leesa'oh",
+                  coords = { map = 1946, x = 78.5, y = 63.1 }, note = "Fra Lethyn Moonfire i Cenarion Refuge." },
         }},
-        { label = "Afslutning", elements = {
+        { label = "Ekstra: Sporeling-observation & Feralfen (valgfri)", elements = {
+                { kind = "turnin", quest = 9697, title = "Watcher Leesa'oh",
+                  coords = { map = 1946, x = 23.3, y = 66.2 }, note = "Tal med Watcher Leesa'oh vest for Sporeggar." },
+                { kind = "accept", quest = 9701, title = "Observing the Sporelings",
+                  coords = { map = 1946, x = 23.3, y = 66.2 }, note = "Fra Watcher Leesa'oh." },
+                { kind = "do", quest = 9701, title = "Observing the Sporelings",
+                  coords = { map = 1946, x = 23.3, y = 66.2 }, note = "Observér sporelingerne som beskrevet." },
+                { kind = "turnin", quest = 9701, title = "Observing the Sporelings",
+                  coords = { map = 1946, x = 23.3, y = 66.2 }, note = "Aflever hos Watcher Leesa'oh." },
+                { kind = "accept", quest = 9702, title = "A Question of Gluttony",
+                  coords = { map = 1946, x = 23.3, y = 66.2 }, note = "Fra Watcher Leesa'oh." },
+                { kind = "do", quest = 9702, title = "A Question of Gluttony",
+                  coords = { map = 1946, x = 23.3, y = 66.2 }, note = "Fodr en Bog Lord til den er mæt." },
+                { kind = "turnin", quest = 9702, title = "A Question of Gluttony",
+                  coords = { map = 1946, x = 23.3, y = 66.2 }, note = "Aflever hos Watcher Leesa'oh." },
+                { kind = "accept", quest = 9708, title = "Familiar Fungi",
+                  coords = { map = 1946, x = 23.3, y = 66.2 }, note = "Fra Watcher Leesa'oh." },
+        }},
+        { label = "Ekstra: Sporeling-observation & Feralfen (valgfri)", elements = {
+                { kind = "do", quest = 9708, title = "Familiar Fungi",
+                  coords = { map = 1946, x = 31.5, y = 30.7 }, note = "Find de velkendte svampe." },
+        }},
+        { label = "Ekstra: Sporeling-observation & Feralfen (valgfri)", elements = {
+                { kind = "turnin", quest = 9708, title = "Familiar Fungi",
+                  coords = { map = 1946, x = 23.3, y = 66.2 }, note = "Aflever hos Watcher Leesa'oh." },
+                { kind = "accept", quest = 9709, title = "Stealing Back the Mushrooms",
+                  coords = { map = 1946, x = 23.3, y = 66.2 }, note = "Fra Watcher Leesa'oh." },
+        }},
+        { label = "Ekstra: Sporeling-observation & Feralfen (valgfri)", elements = {
+                { kind = "do", quest = 9709, title = "Stealing Back the Mushrooms",
+                  coords = { map = 1946, x = 18.9, y = 7.5 }, note = "Stjæl svampene tilbage fra Bloodscale-nagaerne." },
+        }},
+        { label = "Ekstra: Sporeling-observation & Feralfen (valgfri)", elements = {
+                { kind = "turnin", quest = 9709, title = "Stealing Back the Mushrooms",
+                  coords = { map = 1946, x = 23.3, y = 66.2 }, note = "Aflever hos Watcher Leesa'oh." },
+        }},
+        { label = "Ekstra: Sporeling-observation & Feralfen (valgfri)", elements = {
+                { kind = "accept", quest = 9786, title = "The Boha'mu Ruins",
+                  coords = { map = 1946, x = 68.2, y = 49.4 }, note = "Fra Anchorite Ahuurn ved Orebor Harborage." },
+                { kind = "do", quest = 9786, title = "The Boha'mu Ruins",
+                  coords = { map = 1946, x = 68.2, y = 49.4 }, note = "Undersøg Boha'mu-ruinerne." },
+                { kind = "turnin", quest = 9786, title = "The Boha'mu Ruins",
+                  coords = { map = 1946, x = 68.2, y = 49.4 }, note = "Aflever hos Anchorite Ahuurn." },
+                { kind = "accept", quest = 9782, title = "The Dead Mire",
+                  coords = { map = 1946, x = 68.3, y = 50.1 }, note = "Fra Vindicator Idaar ved Orebor Harborage." },
+        }},
+        { label = "Ekstra: Sporeling-observation & Feralfen (valgfri)", elements = {
+                { kind = "do", quest = 9782, title = "The Dead Mire",
+                  coords = { map = 1946, x = 81.4, y = 38.1 }, note = "Undersøg Dead Mire nordøst i zonen." },
+        }},
+        { label = "Ekstra: Sporeling-observation & Feralfen (valgfri)", elements = {
+                { kind = "turnin", quest = 9782, title = "The Dead Mire",
+                  coords = { map = 1946, x = 68.3, y = 50.1 }, note = "Aflever hos Vindicator Idaar." },
+        }},
+        { label = "Videre", elements = {
+                { kind = "ding", level = 64, note = "Du skal være level 64. Mangler du XP: gør de valgfri quests ovenfor færdige, eller grind naga ved Bloodscale/Darkcrest indtil du dinger." },
+        }},
+        { label = "Videre", elements = {
                 { kind = "travel", coords = { map = 1952, x = 44.3, y = 26.3 }, radius = 100,
                   text = "Mod Terokkar Forest", note = "Følg vejen sydøst ud af Zangarmarsh mod Terokkar Forest. Qeasy skifter automatisk rute." },
         }},
