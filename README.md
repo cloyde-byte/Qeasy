@@ -13,9 +13,14 @@ Burning Crusade Classic (Rokmans zone-guides) og dækker **Horde**:
 |---|---|---|
 | `hellfire-horde` | Hellfire Peninsula | 58–63 |
 | `zangarmarsh-horde` | Zangarmarsh | 61–64 |
+| `terokkar-horde` | Terokkar Forest | 62–65 |
+| `nagrand-horde` | Nagrand | 64–67 |
+| `blades-edge-horde` | Blade's Edge Mountains | 65–68 |
+| `netherstorm-horde` | Netherstorm | 67–69 |
+| `shadowmoon-horde` | Shadowmoon Valley | 67–70 |
 
-Flere zoner (Terokkar Forest, Nagrand, …) er planlagt — dataformatet er
-klar til dem.
+Ruterne hænger sammen i en kæde: Når du fuldfører én rute, skifter Qeasy
+automatisk til den næste — hele vejen fra Dark Portal til level 70.
 
 ## Ikke en bot
 
@@ -96,6 +101,16 @@ Ruterne ligger i `Routes/*.lua` og består af simple trin:
 
 Rettelser til quest-id'er, koordinater og rækkefølge modtages meget gerne
 som pull requests — det er én linje pr. rettelse.
+
+## Test
+
+`tests/test_qeasy.py` indlæser hele addonet i en rigtig Lua-runtime med
+stubbet WoW-API og simulerer en spiller, der følger ruten (fremdrift,
+læring, pil, rutekæde). Kør den med:
+
+```
+pip install lupa && python3 tests/test_qeasy.py
+```
 
 ## Inspiration
 

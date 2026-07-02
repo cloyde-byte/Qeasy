@@ -19,6 +19,7 @@ ns.Q:RegisterRoute({
     faction = "Horde",
     levels = "61-64",
     zones = { ZM },
+    next = "terokkar-horde",
     steps = {
         -- ========================= Cenarion Refuge ==========================
         { type = "TRAVEL", label = "Cenarion Refuge",
@@ -119,8 +120,8 @@ ns.Q:RegisterRoute({
           coords = { map = ZM, x = 34.8, y = 51.3 },
           note = "Valgfrit: Ryd op i resterende quests i loggen (Daggerfen, Feralfen, Dead Mire m.fl.) indtil ca. level 63-64. Tryk 'Spring over', når du er klar." },
 
-        { type = "NOTE", label = "Videre til Terokkar Forest",
-          coords = { map = ZM, x = 78.5, y = 66.0 },
-          note = "Herfra fortsætter rejsen til Terokkar Forest via vejen sydøst i zonen. Terokkar-ruten kommer i en senere version af Qeasy - tryk 'Spring over' for at afslutte ruten." },
+        { type = "TRAVEL", label = "Mod Terokkar Forest",
+          coords = { map = ZM, x = 80.0, y = 66.0 }, radius = 80,
+          note = "Følg vejen sydøst ud af Zangarmarsh mod Terokkar Forest. Qeasy skifter automatisk til Terokkar-ruten." },
     },
 })
