@@ -1,0 +1,41 @@
+local _, ns = ...
+
+-- Danske UI-tekster. Quest-navne holdes altid på engelsk, da de skal matche
+-- spilklienten (der findes ingen dansk WoW-klient).
+ns.L = {
+    ADDON_LOADED       = "|cff69ccf0Qeasy|r v%s indlæst. Skriv |cffffff00/qeasy|r for hjælp.",
+    NOT_HORDE          = "|cff69ccf0Qeasy|r: Ruterne i denne version er kun til |cffff0000Horde|r. Addonet er sat på pause for denne karakter.",
+    ROUTE_ACTIVE       = "|cff69ccf0Qeasy|r: Aktiv rute: %s",
+    ROUTE_COMPLETE     = "|cff69ccf0Qeasy|r: Rute fuldført - godt gået! %s",
+    ROUTE_NEXT         = "Skifter til næste rute: %s",
+    ROUTE_UNKNOWN      = "|cff69ccf0Qeasy|r: Ukendt rute '%s'. Skriv /qeasy list for at se ruter.",
+    ROUTE_LIST         = "|cff69ccf0Qeasy|r: Tilgængelige ruter:",
+    ROUTE_RESET        = "|cff69ccf0Qeasy|r: Ruten er nulstillet (quests du allerede har klaret, springes stadig over automatisk).",
+    STEP_SKIPPED       = "|cff69ccf0Qeasy|r: Trin sprunget over.",
+    STEP_BACK          = "|cff69ccf0Qeasy|r: Gik et trin tilbage.",
+    STEP_NOTHING_BACK  = "|cff69ccf0Qeasy|r: Der er ikke noget manuelt trin at fortryde.",
+    LEARNED_ID         = "|cff69ccf0Qeasy|r: Lærte quest-id %d for '%s' (data siger %s). Gemt - bruges automatisk fremover.",
+    STEP_COUNTER       = "%d/%d",
+    ARRIVED            = "Du er fremme",
+    OTHER_CONTINENT    = "Andet kontinent - se trin-teksten",
+    NO_TARGET          = "Intet mål for dette trin",
+    BTN_SKIP           = "Spring over",
+    BTN_BACK           = "Tilbage",
+    TRACKER_EMPTY      = "Ingen aktiv rute. /qeasy list",
+    TYPE_ACCEPT        = "Tag quest",
+    TYPE_TURNIN        = "Aflever",
+    TYPE_DO            = "Udfør",
+    TYPE_TRAVEL        = "Rejs til",
+    TYPE_NOTE          = "Info",
+    HELP = {
+        "|cff69ccf0Qeasy|r - kommandoer:",
+        "  /qeasy show|hide - vis/skjul tracker og pil",
+        "  /qeasy arrow - vis/skjul kun pilen",
+        "  /qeasy skip - spring det aktuelle trin over",
+        "  /qeasy back - fortryd seneste spring/manuelle trin",
+        "  /qeasy list - vis alle ruter",
+        "  /qeasy route <navn> - skift rute",
+        "  /qeasy reset - nulstil manuelle trin på den aktive rute",
+        "  /qeasy debug - vis info om det aktuelle trin",
+    },
+}
