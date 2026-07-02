@@ -3,71 +3,153 @@ local _, ns = ...
 -- =========================================================================
 -- Blade's Edge Mountains (Horde) - level 65-68
 --
--- Rækkefølgen følger Wowheads "Blade's Edge Mountains Horde Leveling
--- Quest Guide" for Burning Crusade Classic. Quest-id'er og koordinater er
--- best-effort: mangler et id (nil), matcher addonet på quest-titlen og
--- lærer selv id'et, når questen accepteres i spillet.
+-- Rækkefølgen følger Wowheads leveling-guide for Burning Crusade Classic.
+-- Quest-id'er og koordinater er verificeret mod pfQuest-databasen
+-- (https://github.com/shagu/pfQuest, MIT-licens, © Eric Mauser/Shagu):
+-- ACCEPT peger på quest-giveren, TURNIN på modtageren og DO på midten af
+-- objective-området.
 --
--- Koordinater er zone-procenter (x, y) på uiMapID 1949 = Blade's Edge.
+-- Koordinater er zone-procenter (x, y) på uiMapID:
+--   1949 = Blade's Edge Mountains, 1953 = Netherstorm
 -- =========================================================================
-
-local BEM = 1949
-local NS = 1953
 
 ns.Q:RegisterRoute({
     key = "blades-edge-horde",
     title = "Blade's Edge Mountains (Horde)",
     faction = "Horde",
     levels = "65-68",
-    zones = { BEM },
+    zones = { 1949 },
     next = "netherstorm-horde",
     steps = {
-        -- ====================== Thunderlord Stronghold ======================
+        -- ======================= Thunderlord Stronghold =======================
         { type = "TRAVEL", label = "Thunderlord Stronghold",
-          coords = { map = BEM, x = 52.5, y = 54.5 }, radius = 60,
+          coords = { map = 1949, x = 51.9, y = 58.4 }, radius = 60,
           note = "Horde-basen Thunderlord Stronghold midt i zonen (flight point)." },
+        { type = "ACCEPT", quest = 10503, title = "The Bladespire Threat",
+          coords = { map = 1949, x = 51.9, y = 58.4 },
+          note = "Fra Tor'chunk Twoclaws." },
+        { type = "ACCEPT", quest = 10505, title = "The Bloodmaul Ogres",
+          coords = { map = 1949, x = 51.9, y = 58.4 },
+          note = "Fra Tor'chunk Twoclaws." },
+        { type = "ACCEPT", quest = 10486, title = "The Encroaching Wilderness",
+          coords = { map = 1949, x = 52.4, y = 57.9 },
+          note = "Fra Gor'drek." },
+        { type = "ACCEPT", quest = 10489, title = "Felling an Ancient Tree",
+          coords = { map = 1949, x = 51.9, y = 57.8 },
+          note = "Wanted-plakat." },
+        { type = "DO", quest = 10503, title = "The Bladespire Threat",
+          coords = { map = 1949, x = 45.0, y = 50.0 },
+          note = "Spionér på Bladespire-ogrerne i deres fæstning (nordvest)." },
+        { type = "DO", quest = 10505, title = "The Bloodmaul Ogres",
+          coords = { map = 1949, x = 45.0, y = 62.0 },
+          note = "Dræb Bloodmaul-ogrer sydvest for holden." },
+        { type = "DO", quest = 10486, title = "The Encroaching Wilderness",
+          coords = { map = 1949, x = 50.0, y = 60.0 },
+          note = "Dræb dyr, der truer holden." },
+        { type = "DO", quest = 10489, title = "Felling an Ancient Tree",
+          coords = { map = 1949, x = 48.0, y = 63.0 },
+          note = "Fæld det gamle træ (brug øksen ved træet)." },
+        { type = "TURNIN", quest = 10503, title = "The Bladespire Threat",
+          coords = { map = 1949, x = 51.9, y = 58.4 },
+          note = "Aflever hos Tor'chunk Twoclaws." },
+        { type = "TURNIN", quest = 10505, title = "The Bloodmaul Ogres",
+          coords = { map = 1949, x = 51.9, y = 58.4 },
+          note = "Aflever hos Tor'chunk Twoclaws." },
+        { type = "TURNIN", quest = 10486, title = "The Encroaching Wilderness",
+          coords = { map = 1949, x = 52.4, y = 57.9 },
+          note = "Aflever hos Gor'drek." },
+        { type = "TURNIN", quest = 10489, title = "Felling an Ancient Tree",
+          coords = { map = 1949, x = 51.9, y = 58.4 },
+          note = "Aflever hos Tor'chunk Twoclaws." },
+        { type = "ACCEPT", quest = 10487, title = "Dust from the Drakes",
+          coords = { map = 1949, x = 52.4, y = 57.9 },
+          note = "Fra Gor'drek." },
+        { type = "DO", quest = 10487, title = "Dust from the Drakes",
+          coords = { map = 1949, x = 44.0, y = 66.0 },
+          note = "Saml støv fra drakerne ved Dragons' End." },
+        { type = "TURNIN", quest = 10487, title = "Dust from the Drakes",
+          coords = { map = 1949, x = 52.4, y = 57.9 },
+          note = "Aflever hos Gor'drek." },
 
-        { type = "NOTE", label = "Thunderlord-quests",
-          coords = { map = BEM, x = 52.5, y = 54.5 },
-          note = "Saml alle quests op - de peger mod Bloodmaul-ogrerne, dalenes dyr og fel-orcerne. Tryk 'Spring over', når loggen er fyldt." },
-
-        { type = "NOTE", label = "Bloodmaul-lejrene",
-          coords = { map = BEM, x = 45.0, y = 60.0 },
-          note = "Ryd Bloodmaul-ogrernes lejre og huler sydvest for Thunderlord Stronghold, og løs questsene i området. Tryk 'Spring over', når du er færdig." },
-
-        -- ========================= Mok'Nathal Village ========================
+        -- ==================== Mok'Nathal Village og Rexxar ====================
+        { type = "ACCEPT", quest = 10614, title = "Whispers on the Wind",
+          coords = { map = 1949, x = 51.8, y = 58.3 },
+          note = "Fra Rexxar (ved Thunderlord)." },
         { type = "TRAVEL", label = "Mok'Nathal Village",
-          coords = { map = BEM, x = 75.0, y = 60.0 }, radius = 60,
-          note = "Halvogrenes landsby i sydøst (flight point). Her møder du Rexxar og hans far Leoroxx." },
+          coords = { map = 1949, x = 75.3, y = 60.9 }, radius = 60,
+          note = "Halvogrenes landsby i sydøst (flight point) - Rexxars far Leoroxx." },
+        { type = "TURNIN", quest = 10614, title = "Whispers on the Wind",
+          coords = { map = 1949, x = 75.3, y = 60.9 },
+          note = "Aflever hos Leoroxx." },
+        { type = "ACCEPT", quest = 10709, title = "Reunion",
+          coords = { map = 1949, x = 75.3, y = 60.9 },
+          note = "Fra Leoroxx." },
+        { type = "DO", quest = 10709, title = "Reunion",
+          coords = { map = 1949, x = 72.0, y = 58.0 },
+          note = "Klar opgaven for Leoroxx i dalene." },
+        { type = "TURNIN", quest = 10709, title = "Reunion",
+          coords = { map = 1949, x = 51.8, y = 58.3 },
+          note = "Tilbage til Rexxar." },
+        { type = "ACCEPT", quest = 10860, title = "Mok'Nathal Treats",
+          coords = { map = 1949, x = 76.1, y = 60.3 },
+          note = "Fra Matron Varah - Mok'Nathal-lækkerier." },
+        { type = "DO", quest = 10860, title = "Mok'Nathal Treats",
+          coords = { map = 1949, x = 72.0, y = 62.0 },
+          note = "Jag dyr til Mok'Nathal Treats." },
+        { type = "TURNIN", quest = 10860, title = "Mok'Nathal Treats",
+          coords = { map = 1949, x = 76.1, y = 60.3 },
+          note = "Aflever hos Matron Varah." },
 
-        { type = "NOTE", label = "Mok'Nathal-quests",
-          coords = { map = BEM, x = 75.0, y = 60.0 },
-          note = "Løs Rexxars og landsbyens quests i dalene omkring byen. Tryk 'Spring over', når du er færdig." },
-
-        -- ============================ Evergrove ==============================
+        -- ============================= Evergrove =============================
         { type = "TRAVEL", label = "Evergrove",
-          coords = { map = BEM, x = 62.0, y = 39.5 }, radius = 60,
+          coords = { map = 1949, x = 62.3, y = 40.1 }, radius = 60,
           note = "Flyv/løb nordpå til druidernes lejr Evergrove (flight point)." },
+        { type = "ACCEPT", quest = 10682, title = "A Time for Negotiation...",
+          coords = { map = 1949, x = 62.0, y = 39.5 },
+          note = "Fra Tree Warden Chawn." },
+        { type = "ACCEPT", quest = 10753, title = "Culling the Wild",
+          coords = { map = 1949, x = 62.6, y = 38.3 },
+          note = "Fra Faradrella." },
+        { type = "DO", quest = 10682, title = "A Time for Negotiation...",
+          coords = { map = 1949, x = 58.0, y = 42.0 },
+          note = "Forhandl/dræb ved Bloodmaul-lejrene omkring Evergrove." },
+        { type = "DO", quest = 10753, title = "Culling the Wild",
+          coords = { map = 1949, x = 60.0, y = 35.0 },
+          note = "Kontrollér bestanden af nether drakes." },
+        { type = "TURNIN", quest = 10682, title = "A Time for Negotiation...",
+          coords = { map = 1949, x = 62.0, y = 39.5 },
+          note = "Aflever hos Tree Warden Chawn." },
+        { type = "TURNIN", quest = 10753, title = "Culling the Wild",
+          coords = { map = 1949, x = 62.6, y = 38.3 },
+          note = "Aflever hos Faradrella." },
+        { type = "ACCEPT", quest = 10819, title = "Felsworn Gas Mask",
+          coords = { map = 1949, x = 62.3, y = 40.1 },
+          note = "Fra Wildlord Antelarion - Death's Door-kæden." },
+        { type = "DO", quest = 10819, title = "Felsworn Gas Mask",
+          coords = { map = 1949, x = 73.0, y = 40.0 },
+          note = "Saml en Felsworn Gas Mask ved Death's Door (syd)." },
+        { type = "TURNIN", quest = 10819, title = "Felsworn Gas Mask",
+          coords = { map = 1949, x = 73.3, y = 40.0 },
+          note = "Aflever ved Legion Communicator." },
+        { type = "ACCEPT", quest = 10820, title = "Deceive thy Enemy",
+          coords = { map = 1949, x = 73.3, y = 40.0 },
+          note = "Fra Legion Communicator." },
+        { type = "DO", quest = 10820, title = "Deceive thy Enemy",
+          coords = { map = 1949, x = 73.3, y = 40.0 },
+          note = "Brug kommunikatoren til at narre Legionen." },
+        { type = "TURNIN", quest = 10820, title = "Deceive thy Enemy",
+          coords = { map = 1949, x = 73.3, y = 40.0 },
+          note = "Aflever hos Wildlord Antelarion." },
 
-        { type = "NOTE", label = "Evergrove-quests",
-          coords = { map = BEM, x = 62.0, y = 39.5 },
-          note = "Saml Evergrove-questsene op: de dækker Ruuan Weald, wyrmerne og dæmonerne i nord. Tryk 'Spring over', når loggen er fyldt." },
-
-        { type = "NOTE", label = "Death's Door",
-          coords = { map = BEM, x = 35.0, y = 72.0 },
-          note = "Ved Death's Door i syd åbner Legionen portaler - løs questsene mod fel cannons og portalvogterne. Tryk 'Spring over', når du er færdig." },
-
+        -- ============================= Afslutning =============================
         { type = "NOTE", label = "Gruuls sønner (Baron Sablemane)", optional = true,
-          coords = { map = BEM, x = 62.0, y = 39.5 },
-          note = "Baron Sablemanes kæde mod Gruuls sønner (Grulloc, Maggoc m.fl.) giver stor XP og fører op mod Gruul's Lair - enkelte dele kræver en gruppe. Tryk 'Spring over', hvis du springer den over." },
-
-        -- ============================ Afslutning =============================
+          coords = { map = 1949, x = 53.3, y = 41.2 },
+          note = "Baron Sablemanes kæde mod Gruuls sønner (Grulloc, Gorgrom m.fl.) giver stor XP og fører op mod Gruul's Lair - enkelte dele kræver en gruppe. Tryk 'Spring over', hvis du dropper den." },
         { type = "NOTE", label = "Ryd op i Blade's Edge", optional = true,
-          coords = { map = BEM, x = 52.5, y = 54.5 },
-          note = "Valgfrit: Ryd op i resterende quests (Bladespire-ogrerne, arakkoa-lejrene) indtil ca. level 67-68. Tryk 'Spring over', når du er klar." },
-
+          coords = { map = 1949, x = 51.9, y = 58.4 },
+          note = "Valgfrit: ryd resterende quests (Ruuan Weald, Bloodmaul Camp, Skyguard Outpost) indtil ca. level 67-68." },
         { type = "TRAVEL", label = "Mod Netherstorm",
-          coords = { map = NS, x = 32.5, y = 64.0 }, radius = 100,
-          note = "Følg vejen nordøst ud af Blade's Edge og over broen til Netherstorm. Første stop er goblin-byen Area 52. Qeasy skifter automatisk rute." },
+          coords = { map = 1953, x = 32.7, y = 65.0 }, radius = 100,
+          note = "Følg vejen nordøst over broen til Netherstorm; første stop er goblin-byen Area 52. Qeasy skifter automatisk rute." },
     },
 })

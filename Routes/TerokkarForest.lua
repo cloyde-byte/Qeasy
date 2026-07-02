@@ -3,104 +3,152 @@ local _, ns = ...
 -- =========================================================================
 -- Terokkar Forest (Horde) - level 62-65
 --
--- Rækkefølgen følger Wowheads "Terokkar Forest Horde Leveling Quest Guide"
--- for Burning Crusade Classic. Quest-id'er og koordinater er best-effort:
--- mangler et id (nil), matcher addonet på quest-titlen og lærer selv
--- id'et, når questen accepteres i spillet.
+-- Rækkefølgen følger Wowheads leveling-guide for Burning Crusade Classic.
+-- Quest-id'er og koordinater er verificeret mod pfQuest-databasen
+-- (https://github.com/shagu/pfQuest, MIT-licens, © Eric Mauser/Shagu):
+-- ACCEPT peger på quest-giveren, TURNIN på modtageren og DO på midten af
+-- objective-området.
 --
--- Koordinater er zone-procenter (x, y) på uiMapID 1952 = Terokkar Forest.
+-- Koordinater er zone-procenter (x, y) på uiMapID:
+--   1952 = Terokkar Forest, 1951 = Nagrand
 -- =========================================================================
-
-local TF = 1952
 
 ns.Q:RegisterRoute({
     key = "terokkar-horde",
     title = "Terokkar Forest (Horde)",
     faction = "Horde",
     levels = "62-65",
-    zones = { TF },
+    zones = { 1952 },
     next = "nagrand-horde",
     steps = {
-        -- ========================= Cenarion Thicket ==========================
+        -- ========================== Cenarion Thicket ==========================
         { type = "TRAVEL", label = "Cenarion Thicket",
-          coords = { map = TF, x = 44.0, y = 26.0 }, radius = 60,
-          note = "Følg vejen fra Zangarmarsh ind i Terokkar Forest. Cenarion Thicket ligger ved indgangen mod nordvest." },
-
-        { type = "NOTE", label = "Cenarion Thicket-quests",
-          coords = { map = TF, x = 44.0, y = 26.0 },
-          note = "Saml de lokale Cenarion-quests op og løs dem i området (undersøg det ødelagte tårn og dræb de korrupte dyr). Tryk 'Spring over', når du er færdig her." },
+          coords = { map = 1952, x = 44.3, y = 26.3 }, radius = 60,
+          note = "Fra Zangarmarsh ind i Terokkar; Cenarion Thicket ligger ved indgangen." },
+        { type = "ACCEPT", quest = 9971, title = "Clues in the Thicket",
+          coords = { map = 1952, x = 44.3, y = 26.3 },
+          note = "Fra Earthbinder Tavgren." },
+        { type = "DO", quest = 9971, title = "Clues in the Thicket",
+          coords = { map = 1952, x = 46.0, y = 24.0 },
+          note = "Undersøg spor i thicket omkring det ødelagte tårn." },
+        { type = "TURNIN", quest = 9971, title = "Clues in the Thicket",
+          coords = { map = 1952, x = 44.3, y = 26.3 },
+          note = "Aflever hos Earthbinder Tavgren." },
+        { type = "ACCEPT", quest = 9968, title = "Strange Energy",
+          coords = { map = 1952, x = 44.3, y = 26.3 },
+          note = "Fra Earthbinder Tavgren." },
+        { type = "DO", quest = 9968, title = "Strange Energy",
+          coords = { map = 1952, x = 45.0, y = 28.0 },
+          note = "Dræb korrupte dyr og undersøg den mærkelige energi." },
+        { type = "TURNIN", quest = 9968, title = "Strange Energy",
+          coords = { map = 1952, x = 44.3, y = 26.3 },
+          note = "Aflever hos Earthbinder Tavgren." },
 
         -- ========================= Stonebreaker Hold =========================
         { type = "TRAVEL", label = "Stonebreaker Hold",
-          coords = { map = TF, x = 49.3, y = 44.0 }, radius = 60,
-          note = "Løb sydøst til Horde-basen Stonebreaker Hold og hent flight point'et." },
+          coords = { map = 1952, x = 49.2, y = 45.7 }, radius = 60,
+          note = "Løb syd til Horde-basen Stonebreaker Hold (flight point)." },
+        { type = "ACCEPT", quest = 10027, title = "Magical Disturbances",
+          coords = { map = 1952, x = 48.8, y = 45.7 },
+          note = "Fra Kurgatok." },
+        { type = "ACCEPT", quest = 9987, title = "Stymying the Arakkoa",
+          coords = { map = 1952, x = 49.0, y = 44.6 },
+          note = "Fra Rokag." },
+        { type = "ACCEPT", quest = 10000, title = "An Unwelcome Presence",
+          coords = { map = 1952, x = 48.8, y = 45.7 },
+          note = "Fra Kurgatok - arakkoa-spionage." },
+        { type = "ACCEPT", quest = 10034, title = "Wanted: Bonelashers Dead!",
+          coords = { map = 1952, x = 49.8, y = 45.3 },
+          note = "Wanted-plakat: Bonelashers." },
+        { type = "DO", quest = 10027, title = "Magical Disturbances",
+          coords = { map = 1952, x = 54.0, y = 35.0 },
+          note = "Klar de magiske forstyrrelser omkring Tuurem nordøst for holden." },
+        { type = "DO", quest = 9987, title = "Stymying the Arakkoa",
+          coords = { map = 1952, x = 54.0, y = 36.0 },
+          note = "Dræb arakkoa ved Tuurem." },
+        { type = "DO", quest = 10034, title = "Wanted: Bonelashers Dead!",
+          coords = { map = 1952, x = 52.0, y = 40.0 },
+          note = "Dræb Bonelasher-behemoths i skoven." },
+        { type = "TURNIN", quest = 10027, title = "Magical Disturbances",
+          coords = { map = 1952, x = 48.8, y = 45.7 },
+          note = "Aflever hos Kurgatok." },
+        { type = "TURNIN", quest = 9987, title = "Stymying the Arakkoa",
+          coords = { map = 1952, x = 49.0, y = 44.6 },
+          note = "Aflever hos Rokag." },
+        { type = "TURNIN", quest = 10034, title = "Wanted: Bonelashers Dead!",
+          coords = { map = 1952, x = 49.2, y = 45.9 },
+          note = "Aflever hos Mawg Grimshot." },
+        { type = "ACCEPT", quest = 10036, title = "Torgos!",
+          coords = { map = 1952, x = 49.2, y = 45.9 },
+          note = "Fra Mawg Grimshot - kæmpegribben Torgos." },
+        { type = "DO", quest = 10036, title = "Torgos!",
+          coords = { map = 1952, x = 55.0, y = 42.0 },
+          note = "Torgos kredser over Bonelasher-territoriet." },
+        { type = "TURNIN", quest = 10036, title = "Torgos!",
+          coords = { map = 1952, x = 49.2, y = 45.9 },
+          note = "Aflever hos Mawg Grimshot." },
+        { type = "DO", quest = 10000, title = "An Unwelcome Presence",
+          coords = { map = 1952, x = 63.4, y = 42.7 },
+          note = "Find den arakkoiske forbindelse ved Firewing Point." },
+        { type = "TURNIN", quest = 10000, title = "An Unwelcome Presence",
+          coords = { map = 1952, x = 63.4, y = 42.7 },
+          note = "Aflever hos Shadowstalker Kaide nær Firewing Point." },
+        { type = "ACCEPT", quest = 10003, title = "The Firewing Liaison",
+          coords = { map = 1952, x = 63.4, y = 42.7 },
+          note = "Fra Shadowstalker Kaide." },
+        { type = "ACCEPT", quest = 10008, title = "What Happens in Terokkar Stays in Terokkar",
+          coords = { map = 1952, x = 63.4, y = 42.7 },
+          note = "Fra Shadowstalker Kaide." },
+        { type = "DO", quest = 10003, title = "The Firewing Liaison",
+          coords = { map = 1952, x = 65.0, y = 40.0 },
+          note = "Efterlad den falske ordre for Firewing-liaisonen." },
+        { type = "DO", quest = 10008, title = "What Happens in Terokkar Stays in Terokkar",
+          coords = { map = 1952, x = 66.0, y = 39.0 },
+          note = "Dræb blood elves ved Firewing Point." },
+        { type = "TURNIN", quest = 10003, title = "The Firewing Liaison",
+          coords = { map = 1952, x = 63.4, y = 42.7 },
+          note = "Aflever hos Shadowstalker Kaide." },
+        { type = "TURNIN", quest = 10008, title = "What Happens in Terokkar Stays in Terokkar",
+          coords = { map = 1952, x = 63.4, y = 42.7 },
+          note = "Aflever hos Shadowstalker Kaide." },
 
-        { type = "NOTE", label = "Stonebreaker Hold-quests",
-          coords = { map = TF, x = 49.3, y = 44.0 },
-          note = "Saml alle quests op ved Stonebreaker Hold - de peger mod Tuurem, skovens dyr og Firewing Point. Tryk 'Spring over', når loggen er fyldt." },
-
-        { type = "ACCEPT", title = "Magical Disturbances",
-          coords = { map = TF, x = 49.3, y = 44.0 },
-          note = "Fra Stonebreaker Hold." },
-
-        { type = "DO", title = "Magical Disturbances",
-          coords = { map = TF, x = 54.0, y = 35.0 }, label = "Tuurem",
-          note = "Løs questen ved Broken-landsbyen Tuurem nordøst for Stonebreaker Hold." },
-
-        { type = "TURNIN", title = "Magical Disturbances",
-          coords = { map = TF, x = 49.3, y = 44.0 } },
-
-        { type = "NOTE", label = "Firewing Point", optional = true,
-          coords = { map = TF, x = 70.0, y = 37.0 },
-          note = "Firewing Point mod øst: blood elf-fæstning med en god quest-klynge. Toppen af tårnet er elite-område - tag evt. en makker med. Tryk 'Spring over', når du er færdig." },
-
-        -- ============================ Shattrath ==============================
+        -- =========================== Shattrath City ===========================
         { type = "TRAVEL", label = "Shattrath City",
-          coords = { map = TF, x = 34.0, y = 22.5 }, radius = 80,
-          note = "Besøg Shattrath City: hent flight point'et, og overvej at binde din hearthstone her - det er Outlands centrale by." },
+          coords = { map = 1952, x = 34.0, y = 22.5 }, radius = 80,
+          note = "Besøg Shattrath City i nordvest: hent flight point'et og overvej at binde din hearthstone - Outlands centrale by." },
+        { type = "NOTE", label = "Shattrath og Aldor/Scryers",
+          coords = { map = 1952, x = 34.0, y = 22.5 },
+          note = "Se A'dal i Terrace of Light og tag byens quests. Valget mellem Aldor og Scryers kan vente - bind dig ikke endnu. Tryk 'Spring over' bagefter." },
 
-        { type = "NOTE", label = "Shattrath rundtur",
-          coords = { map = TF, x = 34.0, y = 22.5 },
-          note = "Tag byrundvisnings-questen i Shattrath (starter ved indgangen) og se A'dal i Terrace of Light. Valget mellem Aldor og Scryers kan vente - lad være med at binde dig endnu. Tryk 'Spring over' bagefter." },
-
-        -- =========================== Bone Wastes =============================
+        -- ==================== Bone Wastes: Refugee Caravan ====================
         { type = "TRAVEL", label = "Refugee Caravan",
-          coords = { map = TF, x = 37.0, y = 50.0 }, radius = 60,
-          note = "Syd for Shattrath ligger Bone Wastes. Flygtninge-karavanen midt i asken har flere quests." },
+          coords = { map = 1952, x = 37.7, y = 51.3 }, radius = 60,
+          note = "Syd for Shattrath ligger Bone Wastes; flygtninge-karavanen har quests." },
+        { type = "ACCEPT", quest = 10852, title = "Missing Friends",
+          coords = { map = 1952, x = 37.7, y = 51.3 },
+          note = "Fra Ethan - børnene er bortført." },
+        { type = "DO", quest = 10852, title = "Missing Friends",
+          coords = { map = 1952, x = 36.0, y = 65.0 },
+          note = "Befri de fangne børn i arakkoa-landsbyen Veil Skith sydvest i skoven." },
+        { type = "TURNIN", quest = 10852, title = "Missing Friends",
+          coords = { map = 1952, x = 37.7, y = 51.3 },
+          note = "Aflever hos Ethan." },
+        { type = "ACCEPT", quest = 10878, title = "Before Darkness Falls",
+          coords = { map = 1952, x = 37.8, y = 51.8 },
+          note = "Fra Mekeda." },
+        { type = "DO", quest = 10878, title = "Before Darkness Falls",
+          coords = { map = 1952, x = 40.0, y = 55.0 },
+          note = "Klar opgaven ved Auchindouns ringmur, før mørket falder." },
+        { type = "TURNIN", quest = 10878, title = "Before Darkness Falls",
+          coords = { map = 1952, x = 37.8, y = 51.8 },
+          note = "Aflever hos Mekeda." },
 
-        { type = "NOTE", label = "Bone Wastes-quests",
-          coords = { map = TF, x = 37.0, y = 50.0 },
-          note = "Saml quests op ved karavanen og ved Auchindouns ringmur. Tryk 'Spring over', når loggen er fyldt." },
-
-        { type = "ACCEPT", title = "Torgos!",
-          coords = { map = TF, x = 37.0, y = 50.0 },
-          note = "Dusør på kæmpegribben Torgos." },
-
-        { type = "DO", title = "Torgos!",
-          coords = { map = TF, x = 42.0, y = 66.0 }, label = "Torgos",
-          note = "Torgos kredser over den østlige del af Bone Wastes." },
-
-        { type = "TURNIN", title = "Torgos!",
-          coords = { map = TF, x = 37.0, y = 50.0 } },
-
-        { type = "ACCEPT", title = "Missing Friends",
-          coords = { map = TF, x = 34.0, y = 23.0 }, label = "Lower City",
-          note = "Fra Lower City i Shattrath: børnene fra karavanen er blevet bortført af arakkoa." },
-
-        { type = "DO", title = "Missing Friends",
-          coords = { map = TF, x = 36.0, y = 65.0 }, label = "Veil Skith",
-          note = "Befri de tilfangetagne børn i arakkoa-landsbyen Veil Skith sydvest i skoven." },
-
-        { type = "TURNIN", title = "Missing Friends",
-          coords = { map = TF, x = 34.0, y = 23.0 }, label = "Lower City" },
-
-        -- ============================ Afslutning =============================
+        -- ============================= Afslutning =============================
         { type = "NOTE", label = "Ryd op i Terokkar", optional = true,
-          coords = { map = TF, x = 49.3, y = 44.0 },
-          note = "Valgfrit: Ryd op i resterende quests (arakkoa-lejrene, Auchindoun-ringen, Skettis-forløberne) indtil ca. level 64-65. Tryk 'Spring over', når du er klar." },
-
+          coords = { map = 1952, x = 49.2, y = 45.7 },
+          note = "Valgfrit: ryd resterende quests (Auchindoun-ringen, Skettis-forløbere, Sha'tari Base Camp i syd) indtil ca. level 64-65." },
         { type = "TRAVEL", label = "Mod Nagrand",
-          coords = { map = TF, x = 29.0, y = 47.0 }, radius = 80,
-          note = "Følg vejen vest ud af Bone Wastes mod Nagrand. Qeasy skifter automatisk til Nagrand-ruten." },
+          coords = { map = 1951, x = 55.5, y = 37.5 }, radius = 100,
+          note = "Følg vejen vest ud af Terokkar mod Nagrand. Qeasy skifter automatisk rute." },
     },
 })

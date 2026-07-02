@@ -1,89 +1,151 @@
 local _, ns = ...
 
 -- =========================================================================
--- Netherstorm (Horde/neutral) - level 67-69
+-- Netherstorm (Horde) - level 67-69
 --
--- Rækkefølgen følger Wowheads "Netherstorm Leveling Quest Guide" for
--- Burning Crusade Classic. Quest-id'er og koordinater er best-effort:
--- mangler et id (nil), matcher addonet på quest-titlen og lærer selv
--- id'et, når questen accepteres i spillet.
+-- Rækkefølgen følger Wowheads leveling-guide for Burning Crusade Classic.
+-- Quest-id'er og koordinater er verificeret mod pfQuest-databasen
+-- (https://github.com/shagu/pfQuest, MIT-licens, © Eric Mauser/Shagu):
+-- ACCEPT peger på quest-giveren, TURNIN på modtageren og DO på midten af
+-- objective-området.
 --
--- Koordinater er zone-procenter (x, y) på uiMapID 1953 = Netherstorm.
+-- Koordinater er zone-procenter (x, y) på uiMapID:
+--   1953 = Netherstorm, 1948 = Shadowmoon Valley
 -- =========================================================================
-
-local NS = 1953
-local SMV = 1948
 
 ns.Q:RegisterRoute({
     key = "netherstorm-horde",
     title = "Netherstorm (Horde)",
     faction = "Horde",
     levels = "67-69",
-    zones = { NS },
+    zones = { 1953 },
     next = "shadowmoon-horde",
     steps = {
-        -- ============================= Area 52 ===============================
+        -- ============================== Area 52 ==============================
         { type = "TRAVEL", label = "Area 52",
-          coords = { map = NS, x = 32.5, y = 64.0 }, radius = 60,
-          note = "Goblin-byen Area 52 er din base i Netherstorm (flight point). Overvej at binde din hearthstone her." },
+          coords = { map = 1953, x = 32.7, y = 65.0 }, radius = 60,
+          note = "Goblin-byen Area 52 er din base i Netherstorm (flight point). Bind evt. din hearthstone her." },
+        { type = "ACCEPT", quest = 10261, title = "Wanted: Annihilator Servo!",
+          coords = { map = 1953, x = 32.1, y = 64.6 },
+          note = "Wanted-plakat." },
+        { type = "ACCEPT", quest = 10206, title = "Pick Your Part",
+          coords = { map = 1953, x = 33.0, y = 64.7 },
+          note = "Fra Papa Wheeler." },
+        { type = "ACCEPT", quest = 10189, title = "Manaforge B'naar",
+          coords = { map = 1953, x = 32.0, y = 64.1 },
+          note = "Fra Spymaster Thalodien - Manaforge B'naar." },
+        { type = "DO", quest = 10261, title = "Wanted: Annihilator Servo!",
+          coords = { map = 1953, x = 24.0, y = 68.0 },
+          note = "Dræb Annihilator Servo ved manaforge B'naar (sydvest)." },
+        { type = "DO", quest = 10206, title = "Pick Your Part",
+          coords = { map = 1953, x = 30.0, y = 62.0 },
+          note = "Saml robot-dele fra vraget omkring Area 52." },
+        { type = "DO", quest = 10189, title = "Manaforge B'naar",
+          coords = { map = 1953, x = 23.2, y = 68.2 },
+          note = "Spionér på Manaforge B'naar." },
+        { type = "TURNIN", quest = 10261, title = "Wanted: Annihilator Servo!",
+          coords = { map = 1953, x = 33.0, y = 64.7 },
+          note = "Aflever hos Papa Wheeler." },
+        { type = "TURNIN", quest = 10206, title = "Pick Your Part",
+          coords = { map = 1953, x = 33.0, y = 64.7 },
+          note = "Aflever hos Papa Wheeler." },
+        { type = "TURNIN", quest = 10189, title = "Manaforge B'naar",
+          coords = { map = 1953, x = 32.0, y = 64.1 },
+          note = "Tilbage til Spymaster Thalodien." },
 
-        { type = "ACCEPT", title = "You're Hired!",
-          coords = { map = NS, x = 32.5, y = 64.0 },
-          note = "Goblinerne ved indgangen hyrer dig på stedet." },
-
-        { type = "DO", title = "You're Hired!",
-          coords = { map = NS, x = 23.0, y = 69.0 }, label = "Manaforge B'naar",
-          note = "Løs opgaven ved Manaforge B'naar sydvest for Area 52." },
-
-        { type = "TURNIN", title = "You're Hired!",
-          coords = { map = NS, x = 32.5, y = 64.0 } },
-
-        { type = "NOTE", label = "Area 52-quests",
-          coords = { map = NS, x = 32.5, y = 64.0 },
-          note = "Saml resten af Area 52-questsene op - de peger mod manaforge'ene, Sunfury-elverne og ødemarkerne. Tryk 'Spring over', når loggen er fyldt." },
-
-        -- ==================== Manaforge-nedlukningskæden =====================
-        { type = "NOTE", label = "Shutting Down Manaforge B'naar",
-          coords = { map = NS, x = 23.0, y = 69.0 },
-          note = "Consortium-kæden 'Shutting Down Manaforge...': brug adgangs-nøglen på konsollen i Manaforge B'naar (vagterne omkring konsollen skal ryddes). Tryk 'Spring over', når B'naar er lukket ned." },
-
-        { type = "NOTE", label = "Shutting Down Manaforge Coruu",
-          coords = { map = NS, x = 49.0, y = 84.0 },
-          note = "Samme procedure ved Manaforge Coruu mod sydøst. Tryk 'Spring over', når den er lukket ned." },
-
-        { type = "NOTE", label = "Shutting Down Manaforge Duro",
-          coords = { map = NS, x = 57.0, y = 64.0 },
-          note = "Videre til Manaforge Duro mod øst. Tryk 'Spring over', når den er lukket ned." },
-
-        { type = "NOTE", label = "Shutting Down Manaforge Ara", optional = true,
-          coords = { map = NS, x = 22.0, y = 55.0 },
-          note = "Kædens finale ved Manaforge Ara i nordvest - hårdere område. Tryk 'Spring over', når den er klaret (eller hvis du springer den over)." },
+        -- ============= Manaforge-nedlukningen (Consortium/Aldor) =============
+        { type = "ACCEPT", quest = 10193, title = "High Value Targets",
+          coords = { map = 1953, x = 32.0, y = 64.1 },
+          note = "Fra Spymaster Thalodien." },
+        { type = "DO", quest = 10193, title = "High Value Targets",
+          coords = { map = 1953, x = 23.0, y = 69.0 },
+          note = "Dræb high value targets ved Manaforge B'naar." },
+        { type = "TURNIN", quest = 10193, title = "High Value Targets",
+          coords = { map = 1953, x = 32.0, y = 64.1 },
+          note = "Aflever hos Spymaster Thalodien." },
+        { type = "ACCEPT", quest = 10329, title = "Shutting Down Manaforge B'naar",
+          coords = { map = 1953, x = 32.0, y = 64.1 },
+          note = "Fra Spymaster Thalodien." },
+        { type = "DO", quest = 10329, title = "Shutting Down Manaforge B'naar",
+          coords = { map = 1953, x = 23.2, y = 68.2 },
+          note = "Luk Manaforge B'naar ned via konsollen (ryd vagterne)." },
+        { type = "TURNIN", quest = 10329, title = "Shutting Down Manaforge B'naar",
+          coords = { map = 1953, x = 32.0, y = 64.1 },
+          note = "Aflever hos Spymaster Thalodien." },
+        { type = "ACCEPT", quest = 10194, title = "Stealth Flight",
+          coords = { map = 1953, x = 32.0, y = 64.1 },
+          note = "Stealth-flyvning." },
+        { type = "DO", quest = 10194, title = "Stealth Flight",
+          coords = { map = 1953, x = 45.0, y = 84.0 },
+          note = "Flyv rekognoscering over manaforge Coruu." },
+        { type = "TURNIN", quest = 10194, title = "Stealth Flight",
+          coords = { map = 1953, x = 33.8, y = 64.2 },
+          note = "Aflever hos Veronia." },
 
         -- ========================= Kirin'Var Village =========================
-        { type = "NOTE", label = "Kirin'Var Village (Archmage Vargoth)",
-          coords = { map = NS, x = 57.0, y = 85.0 },
-          note = "Spøgelseslandsbyen Kirin'Var i sydøst: Archmage Vargoth i troldmandstårnet har en fin quest-kæde om landsbyens skæbne. Tryk 'Spring over', når du er færdig." },
+        { type = "TRAVEL", label = "Kirin'Var Village",
+          coords = { map = 1953, x = 57.5, y = 86.3 }, radius = 60,
+          note = "Spøgelseslandsbyen i sydøst - Archmage Vargoths tårn." },
+        { type = "ACCEPT", quest = 10184, title = "Malevolent Remnants",
+          coords = { map = 1953, x = 57.5, y = 86.3 },
+          note = "Fra Custodian Dieworth." },
+        { type = "ACCEPT", quest = 10343, title = "The Unending Invasion",
+          coords = { map = 1953, x = 57.6, y = 86.3 },
+          note = "Fra Lieutenant-Sorcerer Morran." },
+        { type = "DO", quest = 10184, title = "Malevolent Remnants",
+          coords = { map = 1953, x = 58.0, y = 82.0 },
+          note = "Saml malevolent remnants blandt spøgelserne." },
+        { type = "DO", quest = 10343, title = "The Unending Invasion",
+          coords = { map = 1953, x = 60.0, y = 85.0 },
+          note = "Dræb Sunfury-belejrerne ved landsbyen." },
+        { type = "TURNIN", quest = 10184, title = "Malevolent Remnants",
+          coords = { map = 1953, x = 57.5, y = 86.3 },
+          note = "Aflever hos Custodian Dieworth." },
+        { type = "TURNIN", quest = 10343, title = "The Unending Invasion",
+          coords = { map = 1953, x = 57.6, y = 86.3 },
+          note = "Aflever hos Lieutenant-Sorcerer Morran." },
+        { type = "ACCEPT", quest = 10173, title = "The Archmage's Staff",
+          coords = { map = 1953, x = 31.4, y = 66.2 },
+          note = "Fra Ravandwyr - Archmage Vargoth-kæden." },
+        { type = "DO", quest = 10173, title = "The Archmage's Staff",
+          coords = { map = 1953, x = 59.0, y = 87.0 },
+          note = "Find Vargoths stav i det ødelagte tårn." },
+        { type = "TURNIN", quest = 10173, title = "The Archmage's Staff",
+          coords = { map = 1953, x = 31.4, y = 66.2 },
+          note = "Aflever hos Ravandwyr." },
 
         -- ==================== The Stormspire og eco-domes ====================
         { type = "TRAVEL", label = "The Stormspire",
-          coords = { map = NS, x = 45.0, y = 36.0 }, radius = 60,
+          coords = { map = 1953, x = 44.1, y = 36.0 }, radius = 60,
           note = "Ethereal-byen The Stormspire i nord (flight point)." },
+        { type = "ACCEPT", quest = 10426, title = "Flora of the Eco-Domes",
+          coords = { map = 1953, x = 42.3, y = 32.6 },
+          note = "Fra Aurine Moonblaze - eco-domes." },
+        { type = "ACCEPT", quest = 10290, title = "In Search of Farahlite",
+          coords = { map = 1953, x = 44.1, y = 36.0 },
+          note = "Fra Zuben Elgenubi." },
+        { type = "DO", quest = 10426, title = "Flora of the Eco-Domes",
+          coords = { map = 1953, x = 42.0, y = 32.0 },
+          note = "Undersøg floraen i Eco-Dome Midrealm." },
+        { type = "DO", quest = 10290, title = "In Search of Farahlite",
+          coords = { map = 1953, x = 44.0, y = 34.0 },
+          note = "Find Farahlite-krystaller ved ruinerne." },
+        { type = "TURNIN", quest = 10426, title = "Flora of the Eco-Domes",
+          coords = { map = 1953, x = 42.3, y = 32.6 },
+          note = "Aflever hos Aurine Moonblaze." },
+        { type = "TURNIN", quest = 10290, title = "In Search of Farahlite",
+          coords = { map = 1953, x = 44.1, y = 36.0 },
+          note = "Aflever hos Zuben Elgenubi." },
 
-        { type = "NOTE", label = "Stormspire- og eco-dome-quests",
-          coords = { map = NS, x = 47.0, y = 52.0 },
-          note = "Løs Consortium- og Protectorate-questsene i og omkring eco-dome-kuplerne (Eco-Dome Midrealm m.fl.). Tryk 'Spring over', når du er færdig." },
-
-        { type = "NOTE", label = "Cosmowrench", optional = true,
-          coords = { map = NS, x = 65.0, y = 32.0 },
-          note = "Valgfrit: Cosmowrench mod øst ved Tempest Keep har et par quests og flight point - praktisk hvis du senere skal i heroics/raids her. Tryk 'Spring over'." },
-
-        -- ============================ Afslutning =============================
+        -- ============================= Afslutning =============================
+        { type = "NOTE", label = "Manaforge-kæden fortsætter", optional = true,
+          coords = { map = 1953, x = 32.0, y = 64.1 },
+          note = "Consortium-kæden fortsætter: Coruu (10330) -> Duro (10338) -> Ara (10365). God XP og fører mod Voren'thal/Scryers-ry. Tryk 'Spring over', når du er klar." },
         { type = "NOTE", label = "Ryd op i Netherstorm", optional = true,
-          coords = { map = NS, x = 32.5, y = 64.0 },
-          note = "Valgfrit: Ryd op i resterende quests indtil ca. level 69. Tryk 'Spring over', når du er klar." },
-
+          coords = { map = 1953, x = 32.7, y = 65.0 },
+          note = "Valgfrit: ryd resterende quests (Protectorate ved Celestial Ridge, Ruins of Enkaat) indtil ca. level 69." },
         { type = "TRAVEL", label = "Mod Shadowmoon Valley",
-          coords = { map = SMV, x = 30.0, y = 28.0 }, radius = 100,
+          coords = { map = 1948, x = 30.0, y = 27.7 }, radius = 100,
           note = "Flyv til Shadowmoon Village i Shadowmoon Valley - sidste stop før level 70. Qeasy skifter automatisk rute." },
     },
 })

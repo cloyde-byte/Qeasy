@@ -6,18 +6,20 @@ quests du skal tage, i hvilken rækkefølge — med en **GPS-pil** der peger
 derhen, hvor du skal løbe (som TomTom), og en **tracker** der viser det
 aktuelle trin og de næste par trin.
 
-Ruterne er bygget over anbefalingerne i Wowheads leveling-guides til
-Burning Crusade Classic (Rokmans zone-guides) og dækker **Horde**:
+Ruternes rækkefølge følger Wowheads leveling-guides til Burning Crusade
+Classic, og **hvert quest-id og hver koordinat er verificeret mod
+[pfQuest](https://github.com/shagu/pfQuest)-databasen** (se
+[Datakilde](#datakilde)). Qeasy dækker **Horde** hele vejen 58 → 70:
 
-| Rute | Zone | Level |
-|---|---|---|
-| `hellfire-horde` | Hellfire Peninsula | 58–63 |
-| `zangarmarsh-horde` | Zangarmarsh | 61–64 |
-| `terokkar-horde` | Terokkar Forest | 62–65 |
-| `nagrand-horde` | Nagrand | 64–67 |
-| `blades-edge-horde` | Blade's Edge Mountains | 65–68 |
-| `netherstorm-horde` | Netherstorm | 67–69 |
-| `shadowmoon-horde` | Shadowmoon Valley | 67–70 |
+| Rute | Zone | Level | Trin |
+|---|---|---|---|
+| `hellfire-horde` | Hellfire Peninsula | 58–63 | 78 |
+| `zangarmarsh-horde` | Zangarmarsh | 61–64 | 50 |
+| `terokkar-horde` | Terokkar Forest | 62–65 | 40 |
+| `nagrand-horde` | Nagrand | 64–67 | 46 |
+| `blades-edge-horde` | Blade's Edge Mountains | 65–68 | 41 |
+| `netherstorm-horde` | Netherstorm | 67–69 | 39 |
+| `shadowmoon-horde` | Shadowmoon Valley | 67–70 | 38 |
 
 Ruterne hænger sammen i en kæde: Når du fuldfører én rute, skifter Qeasy
 automatisk til den næste — hele vejen fra Dark Portal til level 70.
@@ -72,10 +74,27 @@ fra din zone (eller Hellfire-ruten fra level 58) og viser tracker + pil.
 /qeasy debug         vis teknisk info om det aktuelle trin
 ```
 
+## Datakilde
+
+Quest-id'er, engelske titler og koordinater (quest-giver, afleverings-NPC
+og objective-områder) er slået op i **[pfQuest](https://github.com/shagu/pfQuest)**'
+åbne TBC-database (MIT-licens, © Eric Mauser / Shagu). Selve rækkefølgen
+og hub-strukturen følger Wowheads Horde-leveling-guides.
+
+Ruterne genereres fra korte planer med quest-id'er (`tools/plans.py`), der
+via et opslagsmodul (`tools/qdb.py` mod pfQuest) udfyldes med titler og
+koordinater. Det gør dataene lette at rette og udvide: én linje pr. quest.
+Koordinaterne er *centroider* af NPC-/mob-spawns — som regel præcise nok
+til pilen, men enkelte objective-punkter er sat manuelt.
+
+> pfQuest-databasen (~130 MB) følger **ikke** med i dette repo. Vil du
+> regenerere ruterne, så klon pfQuest og kør `tools/plans.py` (se
+> kildehenvisningerne i toppen af hver `Routes/*.lua`).
+
 ## Selvlærende quest-data
 
-Rute-dataene (quest-id'er og koordinater) er *best effort*. Qeasy retter
-selv småfejl, mens du spiller:
+Ovenpå den verificerede data retter Qeasy stadig selv eventuelle
+uoverensstemmelser, mens du spiller:
 
 - Accepterer du en quest, hvis titel matcher et trin, men med et andet
   quest-id end dataene siger, **lærer** Qeasy det rigtige id og bruger det
@@ -92,15 +111,16 @@ Ruterne ligger i `Routes/*.lua` og består af simple trin:
 
 ```lua
 { type = "ACCEPT",              -- ACCEPT | DO | TURNIN | TRAVEL | NOTE
-  quest = 10121,                -- quest-id (kan udelades)
+  quest = 9407,                 -- quest-id (kan udelades)
   title = "Through the Dark Portal",  -- engelsk titel (skal matche klienten)
-  coords = { map = 1944, x = 87.3, y = 52.0 },  -- uiMapID + zone-procenter
+  coords = { map = 1419, x = 55.2, y = 53.7 },  -- uiMapID + zone-procenter
   label = "The Stair of Destiny",     -- kort tekst til pilen
   note  = "Dansk hjælpetekst..." },
 ```
 
 Rettelser til quest-id'er, koordinater og rækkefølge modtages meget gerne
-som pull requests — det er én linje pr. rettelse.
+som pull requests — det er én linje pr. rettelse. Genereringsværktøjerne
+ligger i `tools/`.
 
 ## Test
 

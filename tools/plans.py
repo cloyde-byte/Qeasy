@@ -1,0 +1,501 @@
+#!/usr/bin/env python3
+"""Rute-planer for Qeasy - bygget på verificerede quest-id'er fra pfQuest.
+
+Kør: python3 plans.py   (skriver /home/user/Qeasy/Routes/*.lua)
+"""
+from gen_route import Plan, write
+
+import os
+ROUTES = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "Routes")
+
+BLASTED, HFP, ZM, TF, NG, BEM, NS, SMV = 1419, 1944, 1946, 1952, 1951, 1949, 1953, 1948
+
+# =========================================================================
+# HELLFIRE PENINSULA (Horde) 58-63
+# =========================================================================
+p = Plan("hellfire-horde", "Hellfire Peninsula (Horde)", "58-63",
+         [HFP, BLASTED], HFP, nxt="zangarmarsh-horde")
+
+p.S("Gennem Dark Portal")
+p.T("Dark Portal, Blasted Lands", (BLASTED, 55.2, 53.7),
+    "Rejs til Dark Portal i Blasted Lands (portal fra Orgrimmar, eller zeppelin til Grom'gol og løb nordøst).", radius=90)
+p.A(9407, "Warlord Dar'toon står ved foden af portalen. Gå derefter gennem Dark Portal.")
+p.X(9407, "Aflever hos Lieutenant General Orion på Outland-siden.")
+p.A(10120)
+p.X(10120, "Aflever hos flight masteren Vlagga Freyfeather. Tag derefter den gratis wyvern til Thrallmar.")
+p.A(10289)
+p.T("Thrallmar", (HFP, 55.3, 36.5), "Flyv til Thrallmar - din base i Hellfire Peninsula.")
+p.X(10289, "Aflever hos General Krakork midt i Thrallmar.")
+p.A(10291)
+p.X(10291, "Nazgrel står inde i hovedbygningen bag Krakork.")
+
+p.S("Thrallmar: saml op og ryd ramparts")
+p.A(10110, "Fra Battlecryer Blackeye - dræb fel orcs på Hellfire Ramparts.")
+p.A(10086, "Fra goblinen Megzeg Nukklebust.")
+p.A(10087)
+p.A(10450, "Fra Vurtok Axebreaker ved essen.")
+p.A(10121, "Fra Nazgrel.")
+p.D(10110, "Dræb Hellfire-fel orcs på ramparts nord for Thrallmar.", at=(HFP, 51.0, 32.0))
+p.D(10086, "Saml fuel og tryk på pumperne ved Legion Front nordøst for Thrallmar.", at=(HFP, 59.0, 30.0))
+p.X(10086)
+p.X(10087, "Tilbage til Megzeg.")
+p.D(10450, "Dræb Bonechewer fel orcs syd/vest for Thrallmar og saml blod.", at=(HFP, 44.0, 40.0))
+p.X(10450)
+p.A(10449, "Opfølger fra Vurtok.")
+p.X(10110, "Tilbage til Battlecryer Blackeye.")
+p.D(10121, "Dræb Flamewaker Imps og Infernals i Pools of Aggonar (dæmon-portalen sydvest for Thrallmar).", at=(HFP, 47.0, 36.0))
+p.X(10121, "Aflever hos Sergeant Shatterskull ved Temple of Telhamat-vejen.")
+
+p.S("Legion-fronten: Reaver's Fall")
+p.A(10123)
+p.D(10123, "Ryd Felspark Ravine nordøst for Thrallmar for Legion-dæmoner.", at=(HFP, 60.0, 28.0))
+p.X(10123)
+p.A(10124)
+p.T("Reaver's Fall", (HFP, 65.9, 43.6), "Løb sydøst ad vejen mod Dark Portal til forposten Reaver's Fall.")
+p.X(10124, "Aflever hos Forward Commander To'arch.")
+p.A(10208)
+p.D(10208, "Dræb Legion-styrker langs Path of Glory (vejen af knogler).", at=(HFP, 60.0, 45.0))
+p.X(10208)
+p.A(10129, "Bombetur - tal med wyvern-føreren.")
+p.D(10129, "Bomb gateways Murketh og Shaadraz over Path of Glory. Du flyves automatisk.", at=(HFP, 63.0, 55.0))
+p.X(10129)
+p.A(10162)
+p.D(10162, "Bomb Gan'arg-arbejdere og fel cannons på Abyssal Shelf.", at=(HFP, 66.0, 60.0))
+p.X(10162)
+p.A(10388)
+p.X(10388, "Tilbage til Nazgrel i Thrallmar.")
+
+p.S("Nazgrels Legion-kæde")
+p.A(10390, "Fra Nazgrel.")
+p.D(10390, "Dræb Forge Camp: Mageddon-dæmonerne (og infernalen Gorehowl) vest for Thrallmar.", at=(HFP, 44.0, 32.0))
+p.X(10390)
+p.A(10391)
+p.D(10391, "Ødelæg fel cannons ved Forge Camp: Rage nord for Thrallmar.", at=(HFP, 49.0, 24.0))
+p.X(10391)
+p.A(10392)
+p.D(10392, "Luk portalen ved Forge Camp: Rage.", at=(HFP, 49.0, 24.0))
+p.X(10392)
+
+p.S("Spinebreaker Post og Zeth'Gor")
+p.A(10449, optional=True)  # ensure accepted (already above); harmless
+p.T("Spinebreaker Post", (HFP, 61.1, 81.8), "Løb syd til Spinebreaker Post og hent flight point'et.")
+p.X(10449, "Aflever hos Apothecary Zelana... (bemærk: Zelana er ved ramparts - se note).")
+p.A(10242, "Fra Apothecary Zelana.")
+p.X(10242, "Aflever hos Apothecary Albreck ved Spinebreaker Post.")
+p.A(10538, "Fra Apothecary Albreck.")
+p.A(10809, "Wanted-plakat ved Spinebreaker Post.")
+p.D(10538, "Dræb Bleeding Hollow fel orcs ved Zeth'Gor øst for posten og saml blod.", at=(HFP, 66.5, 68.0))
+p.X(10538)
+p.A(10813, "Fra Zezzak.")
+p.D(10813, "Brug Zezzak's Shard på et Eye of Grillok i Zeth'Gor.", at=(HFP, 65.5, 66.5))
+p.X(10813)
+p.A(10834)
+p.D(10834, "Dræb Grillok \"Darkeye\" i den nordøstlige del af Zeth'Gor.", at=(HFP, 68.5, 63.5))
+p.X(10834)
+
+p.S("Vestpå: Falcon Watch og Sha'naar")
+p.A(9498, "Fra Martik Tor'seldori i Thrallmar (rejs vestpå).")
+p.T("Falcon Watch", (HFP, 28.5, 60.2), "Følg vejen vestpå til blood elf-forposten Falcon Watch.")
+p.X(9498, "Aflever hos Ranger Captain Venn'ren.")
+p.A(9361, "Fra Legassi ved vraget syd for Falcon Watch.")
+p.D(9361, "Dræb Deranged Helboars og saml Tainted Helboar Meat.", at=(HFP, 45.0, 74.0))
+p.X(9361)
+p.A(10403, "Fra Akoru the Firecaller i Ruins of Sha'naar (sydvest).")
+p.T("Ruins of Sha'naar", (HFP, 16.3, 65.1), "Sydvest for Falcon Watch: dreghood-slaverne i Sha'naar.")
+p.X(10403, "Aflever hos Naladu.")
+p.N("Dreghood-kæden", (HFP, 16.3, 65.1),
+    "Følg Naladus kæde: A Traitor Among Us -> The Dreghood Elders -> Arzeth's Demise. Tryk 'Spring over', når kæden er afleveret.")
+
+p.S("Afslutning")
+p.N("Ryd op i Hellfire", (HFP, 55.3, 36.5),
+    "Valgfrit: ryd resterende quests i loggen (Void Ridge, The Mag'har-kæden, Expedition Armory) indtil ca. level 62.", optional=True)
+p.T("Mod Zangarmarsh", (ZM, 78.5, 62.7),
+    "Følg vejen vest/nordvest ud af Hellfire mod Zangarmarsh. Qeasy skifter automatisk rute.", radius=100)
+
+write(p, f"{ROUTES}/HellfirePeninsula.lua",
+      "1419 = Blasted Lands, 1944 = Hellfire Peninsula, 1946 = Zangarmarsh")
+
+
+# =========================================================================
+# ZANGARMARSH (Horde) 61-64
+# =========================================================================
+p = Plan("zangarmarsh-horde", "Zangarmarsh (Horde)", "61-64",
+         [ZM], ZM, nxt="terokkar-horde")
+
+p.S("Cenarion Refuge")
+p.T("Cenarion Refuge", (ZM, 78.4, 62.0), "Følg vejen fra Hellfire ind i Zangarmarsh til Cenarion Refuge.")
+p.A(9802, "Fra Lauranna Thar'well. Saml Unidentified Plant Parts fra planter/mobs i hele zonen undervejs.")
+p.A(9730, "Wanted-plakat ved refuge.")
+p.A(9817)
+p.A(9716, "Fra Ysiel Windsinger.")
+p.D(9730, "Dræb Darkcrest-nagaer syd for refuge; lederen patruljerer.", at=(ZM, 84.0, 77.0))
+p.D(9817, "Dræb Bloodscale-nagaer sydøst for refuge; lederen patruljerer.", at=(ZM, 83.0, 70.0))
+p.X(9730, "Aflever hos Warden Hamoot.")
+p.X(9817)
+p.D(9716, "Undersøg Umbrafen Lake syd for refuge.", at=(ZM, 82.0, 78.0))
+p.X(9716)
+
+p.S("Swamprat Post")
+p.T("Swamprat Post", (ZM, 85.0, 54.0), "Løb nord til Horde-forposten Swamprat Post (flight point).")
+p.A(9770, "Fra Reavij.")
+p.A(9774, "Fra Zurai.")
+p.D(9770, "Dræb Marshfang Rippers omkring posten.", at=(ZM, 82.0, 50.0))
+p.D(9774, "Saml Thick Hydra Scales fra hydraer ved Serpent Lake.", at=(ZM, 80.0, 45.0))
+p.X(9770)
+p.X(9774)
+p.A(9771, "Opfølger fra Zurai.")
+p.D(9771, "Find Scout Jyoba ved Serpent Lake.", at=(ZM, 80.8, 36.3))
+p.X(9771, "Scout Jyoba ligger såret ved den nordlige damppumpe.")
+p.A(9772)
+p.X(9772, "Tilbage til Zurai.")
+
+p.S("Zabra'jin og troldene")
+p.T("Zabra'jin", (ZM, 30.7, 50.9), "Følg vejen vest gennem sumpen til troldebyen Zabra'jin (flight point).")
+p.A(9820, "Wanted-plakat: Boss Grog'ak.")
+p.A(10117, "Wanted-plakat: Chieftain Mummaki.")
+p.A(9822, "Fra Shadow Hunter Denjai.")
+p.D(9820, "Dræb Boss Grog'ak blandt Ango'rosh-ogrerne nordvest for byen.", at=(ZM, 27.5, 32.5))
+p.D(10117, "Dræb Chieftain Mummaki hos Umbrafen-stammen i sydøst.", at=(ZM, 84.5, 77.5))
+p.D(9822, "Dræb Bloodscale-nagaer ved deres enklave.", at=(ZM, 36.0, 60.0))
+p.X(9820, "Aflever hos Shadow Hunter Denjai.")
+p.X(10117)
+p.X(9822)
+p.A(9823)
+p.D(9823, "Dræb flere Bloodscale-nagaer.", at=(ZM, 36.0, 60.0))
+p.X(9823)
+
+p.S("Sporeggar")
+p.T("Sporeggar", (ZM, 19.7, 52.1), "Besøg sporeling-byen Sporeggar vest i zonen.")
+p.A(9808, "Fra Msshi'fn - Glowcaps bruges som valuta i Sporeggar!")
+p.A(9739, "Fra Fahssn.")
+p.A(9743)
+p.D(9739, "Saml Spore Sacs fra Marsh Spores i Sporewind Lake.", at=(ZM, 15.0, 60.0))
+p.D(9743, "Dræb Bog Lords og Marsh Walkers vest for byen.", at=(ZM, 12.0, 55.0))
+p.D(9808, "Saml Glowcap Mushrooms i sumpen omkring Sporeggar.", at=(ZM, 16.0, 50.0))
+p.X(9739)
+p.X(9743)
+p.X(9808)
+p.N("Fhwoor Smash! (eskorte)", (ZM, 19.8, 50.8),
+    "Valgfrit: eskorte-questen 'Fhwoor Smash!' giver god XP. Tryk 'Spring over' bagefter.", optional=True)
+
+p.S("Afslutning")
+p.X(9802, "Flyv tilbage til Cenarion Refuge og aflever plantedelene hos Lauranna, når du har alle 10.")
+p.N("Ryd op i Zangarmarsh", (ZM, 78.4, 62.0),
+    "Valgfrit: ryd resterende quests (Feralfen, Dead Mire, Twin Spire Ruins) indtil ca. level 63-64.", optional=True)
+p.T("Mod Terokkar Forest", (TF, 44.3, 26.3),
+    "Følg vejen sydøst ud af Zangarmarsh mod Terokkar Forest. Qeasy skifter automatisk rute.", radius=100)
+
+write(p, f"{ROUTES}/Zangarmarsh.lua", "1946 = Zangarmarsh, 1952 = Terokkar Forest")
+
+
+# =========================================================================
+# TEROKKAR FOREST (Horde) 62-65
+# =========================================================================
+p = Plan("terokkar-horde", "Terokkar Forest (Horde)", "62-65",
+         [TF], TF, nxt="nagrand-horde")
+
+p.S("Cenarion Thicket")
+p.T("Cenarion Thicket", (TF, 44.3, 26.3), "Fra Zangarmarsh ind i Terokkar; Cenarion Thicket ligger ved indgangen.")
+p.A(9971, "Fra Earthbinder Tavgren.")
+p.D(9971, "Undersøg spor i thicket omkring det ødelagte tårn.", at=(TF, 46.0, 24.0))
+p.X(9971)
+p.A(9968)
+p.D(9968, "Dræb korrupte dyr og undersøg den mærkelige energi.", at=(TF, 45.0, 28.0))
+p.X(9968)
+
+p.S("Stonebreaker Hold")
+p.T("Stonebreaker Hold", (TF, 49.2, 45.7), "Løb syd til Horde-basen Stonebreaker Hold (flight point).")
+p.A(10027, "Fra Kurgatok.")
+p.A(9987, "Fra Rokag.")
+p.A(10000, "Fra Kurgatok - arakkoa-spionage.")
+p.A(10034, "Wanted-plakat: Bonelashers.")
+p.D(10027, "Klar de magiske forstyrrelser omkring Tuurem nordøst for holden.", at=(TF, 54.0, 35.0))
+p.D(9987, "Dræb arakkoa ved Tuurem.", at=(TF, 54.0, 36.0))
+p.D(10034, "Dræb Bonelasher-behemoths i skoven.", at=(TF, 52.0, 40.0))
+p.X(10027)
+p.X(9987)
+p.X(10034, "Aflever hos Mawg Grimshot.")
+p.A(10036, "Fra Mawg Grimshot - kæmpegribben Torgos.")
+p.D(10036, "Torgos kredser over Bonelasher-territoriet.", at=(TF, 55.0, 42.0))
+p.X(10036)
+p.D(10000, "Find den arakkoiske forbindelse ved Firewing Point.", at=(TF, 63.4, 42.7))
+p.X(10000, "Aflever hos Shadowstalker Kaide nær Firewing Point.")
+p.A(10003)
+p.A(10008)
+p.D(10003, "Efterlad den falske ordre for Firewing-liaisonen.", at=(TF, 65.0, 40.0))
+p.D(10008, "Dræb blood elves ved Firewing Point.", at=(TF, 66.0, 39.0))
+p.X(10003)
+p.X(10008)
+
+p.S("Shattrath City")
+p.T("Shattrath City", (TF, 34.0, 22.5),
+    "Besøg Shattrath City i nordvest: hent flight point'et og overvej at binde din hearthstone - Outlands centrale by.", radius=80)
+p.N("Shattrath og Aldor/Scryers", (TF, 34.0, 22.5),
+    "Se A'dal i Terrace of Light og tag byens quests. Valget mellem Aldor og Scryers kan vente - bind dig ikke endnu. Tryk 'Spring over' bagefter.")
+
+p.S("Bone Wastes: Refugee Caravan")
+p.T("Refugee Caravan", (TF, 37.7, 51.3), "Syd for Shattrath ligger Bone Wastes; flygtninge-karavanen har quests.")
+p.A(10852, "Fra Ethan - børnene er bortført.")
+p.D(10852, "Befri de fangne børn i arakkoa-landsbyen Veil Skith sydvest i skoven.", at=(TF, 36.0, 65.0))
+p.X(10852)
+p.A(10878, "Fra Mekeda.")
+p.D(10878, "Klar opgaven ved Auchindouns ringmur, før mørket falder.", at=(TF, 40.0, 55.0))
+p.X(10878)
+
+p.S("Afslutning")
+p.N("Ryd op i Terokkar", (TF, 49.2, 45.7),
+    "Valgfrit: ryd resterende quests (Auchindoun-ringen, Skettis-forløbere, Sha'tari Base Camp i syd) indtil ca. level 64-65.", optional=True)
+p.T("Mod Nagrand", (NG, 55.5, 37.5),
+    "Følg vejen vest ud af Terokkar mod Nagrand. Qeasy skifter automatisk rute.", radius=100)
+
+write(p, f"{ROUTES}/TerokkarForest.lua", "1952 = Terokkar Forest, 1951 = Nagrand")
+
+
+# =========================================================================
+# NAGRAND (Horde) 64-67
+# =========================================================================
+p = Plan("nagrand-horde", "Nagrand (Horde)", "64-67",
+         [NG], NG, nxt="blades-edge-horde")
+
+p.S("Garadar")
+p.T("Garadar", (NG, 55.4, 37.6), "Følg vejen fra Terokkar ind i Nagrand til Mag'har-byen Garadar (flight point).")
+p.A(9863, "Fra Farseer Kurkush.")
+p.A(9910, "Fra Elkay'gan the Mystic.")
+p.A(9935, "Dusør fra Garadar Bulletin Board.")
+p.A(9939)
+p.D(9863, "Dræb Murkblood-Broken ved Sunspring Post (vest) og Laughing Skull.", at=(NG, 33.0, 41.0))
+p.D(9910, "Dræb Kil'sorrow-orcs ved deres fæstning (sydøst).", at=(NG, 56.0, 73.0))
+p.D(9935, "Dræb Giselda the Crone på Warmaul Hill (nordvest).", at=(NG, 22.0, 28.0))
+p.D(9939, "Dræb Zorbo the Advisor på Warmaul Hill.", at=(NG, 21.0, 30.0))
+p.X(9863)
+p.X(9910)
+p.X(9935, "Aflever hos Warden Bullrok.")
+p.X(9939)
+
+p.S("Throne of the Elements")
+p.A(9870, "Fra Elementalist Yal'hah i Garadar.")
+p.T("Throne of the Elements", (NG, 60.7, 22.1), "Nordøst for Garadar: elementernes helligdom.")
+p.X(9870, "Aflever hos Elementalist Sharvak.")
+p.A(9800, "Fra Elementalist Lo'ap.")
+p.A(9818, "Fra Elementalist Untrag.")
+p.D(9800, "Saml Bak'nari Coffee Beans på markerne.", at=(NG, 58.0, 30.0))
+p.D(9818, "Undersøg The Underneath under thronet.", at=(NG, 61.0, 24.0))
+p.X(9800)
+p.X(9818, "Aflever hos Gordawg.")
+
+p.S("Nesingwary Safari")
+p.A(10114, "Fra Ohlorn Farstrider i Garadar.")
+p.T("Nesingwary Safari", (NG, 71.5, 40.8), "Hemet Nesingwarys jagtlejr i øst.")
+p.X(10114, "Aflever hos Shado 'Fitz' Farstrider.")
+p.A(9789, "Clefthoof Mastery - fra Hemet Nesingwary.")
+p.A(9854, "Windroc Mastery - fra Shado Farstrider.")
+p.A(9857, "Talbuk Mastery - fra Harold Lane.")
+p.D(9789, "Jag clefthoofs på sletterne (findes i hele Nagrand).", at=(NG, 63.0, 50.0))
+p.D(9854, "Jag windrocs på sletterne.", at=(NG, 66.0, 45.0))
+p.D(9857, "Jag talbuks på sletterne.", at=(NG, 60.0, 48.0))
+p.X(9789)
+p.X(9854)
+p.X(9857)
+p.N("Mastery-kæderne fortsætter", (NG, 71.5, 40.8),
+    "Hver Mastery har tre trin (Clefthoof 9789->9850->9851, Windroc 9854->9855->9856, Talbuk 9857->9858->9859) og munder ud i 'The Ultimate Bloodsport'. Enorm XP - fortsæt sideløbende. Tryk 'Spring over', når du er klar.", optional=True)
+
+p.S("Consortium: Aeris Landing")
+p.T("Aeris Landing", (NG, 31.4, 57.8), "Consortium-lejren ved foden af Oshu'gun i sydvest.")
+p.A(9882, "Fra Gezhe.")
+p.A(9914, "Fra Shadrek.")
+p.D(9882, "Saml Obsidian Warbeads/krystaller fra ogrer på Spirit Fields.", at=(NG, 35.0, 55.0))
+p.D(9914, "Saml elfenben fra clefthoofs.", at=(NG, 40.0, 55.0))
+p.X(9882)
+p.X(9914)
+
+p.S("Mag'har-kæden og afslutning")
+p.N("Garrosh og Greatmother Geyah", (NG, 55.4, 37.6),
+    "Lore-kæden fra Garrosh (via Kil'sorrow, Warmaul og elementerne) fører til 'A Visit With the Greatmother' og senere Thralls ankomst. Tryk 'Spring over', når du har fulgt den.", optional=True)
+p.N("Ring of Blood (gruppe)", (NG, 42.8, 20.7),
+    "The Ring of Blood ved Gurgthock: seks gladiator-kampe for en 5-mands gruppe - en af TBC's bedste XP-klumper plus et stærkt våben. Find en gruppe! Tryk 'Spring over', hvis du dropper den.", optional=True)
+p.N("Ryd op i Nagrand", (NG, 55.4, 37.6),
+    "Valgfrit: gør Mastery-kæderne og resterende Garadar-quests færdige indtil ca. level 66-67.", optional=True)
+p.T("Mod Blade's Edge Mountains", (BEM, 51.9, 58.4),
+    "Flyv nordpå gennem bjergene til Thunderlord Stronghold i Blade's Edge Mountains. Qeasy skifter automatisk rute.", radius=100)
+
+write(p, f"{ROUTES}/Nagrand.lua", "1951 = Nagrand, 1949 = Blade's Edge Mountains")
+
+
+# =========================================================================
+# BLADE'S EDGE MOUNTAINS (Horde) 65-68
+# =========================================================================
+p = Plan("blades-edge-horde", "Blade's Edge Mountains (Horde)", "65-68",
+         [BEM], BEM, nxt="netherstorm-horde")
+
+p.S("Thunderlord Stronghold")
+p.T("Thunderlord Stronghold", (BEM, 51.9, 58.4), "Horde-basen Thunderlord Stronghold midt i zonen (flight point).")
+p.A(10503, "Fra Tor'chunk Twoclaws.")
+p.A(10505)
+p.A(10486, "Fra Gor'drek.")
+p.A(10489, "Wanted-plakat.")
+p.D(10503, "Spionér på Bladespire-ogrerne i deres fæstning (nordvest).", at=(BEM, 45.0, 50.0))
+p.D(10505, "Dræb Bloodmaul-ogrer sydvest for holden.", at=(BEM, 45.0, 62.0))
+p.D(10486, "Dræb dyr, der truer holden.", at=(BEM, 50.0, 60.0))
+p.D(10489, "Fæld det gamle træ (brug øksen ved træet).", at=(BEM, 48.0, 63.0))
+p.X(10503)
+p.X(10505)
+p.X(10486)
+p.X(10489, "Aflever hos Tor'chunk Twoclaws.")
+p.A(10487)
+p.D(10487, "Saml støv fra drakerne ved Dragons' End.", at=(BEM, 44.0, 66.0))
+p.X(10487)
+
+p.S("Mok'Nathal Village og Rexxar")
+p.A(10614, "Fra Rexxar (ved Thunderlord).")
+p.T("Mok'Nathal Village", (BEM, 75.3, 60.9), "Halvogrenes landsby i sydøst (flight point) - Rexxars far Leoroxx.")
+p.X(10614, "Aflever hos Leoroxx.")
+p.A(10709)
+p.D(10709, "Klar opgaven for Leoroxx i dalene.", at=(BEM, 72.0, 58.0))
+p.X(10709, "Tilbage til Rexxar.")
+p.A(10860, "Fra Matron Varah - Mok'Nathal-lækkerier.")
+p.D(10860, "Jag dyr til Mok'Nathal Treats.", at=(BEM, 72.0, 62.0))
+p.X(10860)
+
+p.S("Evergrove")
+p.T("Evergrove", (BEM, 62.3, 40.1), "Flyv/løb nordpå til druidernes lejr Evergrove (flight point).")
+p.A(10682, "Fra Tree Warden Chawn.")
+p.A(10753, "Fra Faradrella.")
+p.D(10682, "Forhandl/dræb ved Bloodmaul-lejrene omkring Evergrove.", at=(BEM, 58.0, 42.0))
+p.D(10753, "Kontrollér bestanden af nether drakes.", at=(BEM, 60.0, 35.0))
+p.X(10682)
+p.X(10753)
+p.A(10819, "Fra Wildlord Antelarion - Death's Door-kæden.")
+p.D(10819, "Saml en Felsworn Gas Mask ved Death's Door (syd).", at=(BEM, 73.0, 40.0))
+p.X(10819, "Aflever ved Legion Communicator.")
+p.A(10820)
+p.D(10820, "Brug kommunikatoren til at narre Legionen.", at=(BEM, 73.3, 40.0))
+p.X(10820, "Aflever hos Wildlord Antelarion.")
+
+p.S("Afslutning")
+p.N("Gruuls sønner (Baron Sablemane)", (BEM, 53.3, 41.2),
+    "Baron Sablemanes kæde mod Gruuls sønner (Grulloc, Gorgrom m.fl.) giver stor XP og fører op mod Gruul's Lair - enkelte dele kræver en gruppe. Tryk 'Spring over', hvis du dropper den.", optional=True)
+p.N("Ryd op i Blade's Edge", (BEM, 51.9, 58.4),
+    "Valgfrit: ryd resterende quests (Ruuan Weald, Bloodmaul Camp, Skyguard Outpost) indtil ca. level 67-68.", optional=True)
+p.T("Mod Netherstorm", (NS, 32.7, 65.0),
+    "Følg vejen nordøst over broen til Netherstorm; første stop er goblin-byen Area 52. Qeasy skifter automatisk rute.", radius=100)
+
+write(p, f"{ROUTES}/BladesEdge.lua", "1949 = Blade's Edge Mountains, 1953 = Netherstorm")
+
+
+# =========================================================================
+# NETHERSTORM (Horde/neutral) 67-69
+# =========================================================================
+p = Plan("netherstorm-horde", "Netherstorm (Horde)", "67-69",
+         [NS], NS, nxt="shadowmoon-horde")
+
+p.S("Area 52")
+p.T("Area 52", (NS, 32.7, 65.0), "Goblin-byen Area 52 er din base i Netherstorm (flight point). Bind evt. din hearthstone her.")
+p.A(10261, "Wanted-plakat.")
+p.A(10206, "Fra Papa Wheeler.")
+p.A(10189, "Fra Spymaster Thalodien - Manaforge B'naar.")
+p.D(10261, "Dræb Annihilator Servo ved manaforge B'naar (sydvest).", at=(NS, 24.0, 68.0))
+p.D(10206, "Saml robot-dele fra vraget omkring Area 52.", at=(NS, 30.0, 62.0))
+p.D(10189, "Spionér på Manaforge B'naar.", at=(NS, 23.2, 68.2))
+p.X(10261, "Aflever hos Papa Wheeler.")
+p.X(10206)
+p.X(10189, "Tilbage til Spymaster Thalodien.")
+
+p.S("Manaforge-nedlukningen (Consortium/Aldor)")
+p.A(10193, "Fra Spymaster Thalodien.")
+p.D(10193, "Dræb high value targets ved Manaforge B'naar.", at=(NS, 23.0, 69.0))
+p.X(10193)
+p.A(10329)
+p.D(10329, "Luk Manaforge B'naar ned via konsollen (ryd vagterne).", at=(NS, 23.2, 68.2))
+p.X(10329)
+p.A(10194, "Stealth-flyvning.")
+p.D(10194, "Flyv rekognoscering over manaforge Coruu.", at=(NS, 45.0, 84.0))
+p.X(10194, "Aflever hos Veronia.")
+
+p.S("Kirin'Var Village")
+p.T("Kirin'Var Village", (NS, 57.5, 86.3), "Spøgelseslandsbyen i sydøst - Archmage Vargoths tårn.")
+p.A(10184, "Fra Custodian Dieworth.")
+p.A(10343)
+p.D(10184, "Saml malevolent remnants blandt spøgelserne.", at=(NS, 58.0, 82.0))
+p.D(10343, "Dræb Sunfury-belejrerne ved landsbyen.", at=(NS, 60.0, 85.0))
+p.X(10184)
+p.X(10343)
+p.A(10173, "Fra Ravandwyr - Archmage Vargoth-kæden.")
+p.D(10173, "Find Vargoths stav i det ødelagte tårn.", at=(NS, 59.0, 87.0))
+p.X(10173)
+
+p.S("The Stormspire og eco-domes")
+p.T("The Stormspire", (NS, 44.1, 36.0), "Ethereal-byen The Stormspire i nord (flight point).")
+p.A(10426, "Fra Aurine Moonblaze - eco-domes.")
+p.A(10290, "Fra Zuben Elgenubi.")
+p.D(10426, "Undersøg floraen i Eco-Dome Midrealm.", at=(NS, 42.0, 32.0))
+p.D(10290, "Find Farahlite-krystaller ved ruinerne.", at=(NS, 44.0, 34.0))
+p.X(10426)
+p.X(10290)
+
+p.S("Afslutning")
+p.N("Manaforge-kæden fortsætter", (NS, 32.0, 64.1),
+    "Consortium-kæden fortsætter: Coruu (10330) -> Duro (10338) -> Ara (10365). God XP og fører mod Voren'thal/Scryers-ry. Tryk 'Spring over', når du er klar.", optional=True)
+p.N("Ryd op i Netherstorm", (NS, 32.7, 65.0),
+    "Valgfrit: ryd resterende quests (Protectorate ved Celestial Ridge, Ruins of Enkaat) indtil ca. level 69.", optional=True)
+p.T("Mod Shadowmoon Valley", (SMV, 30.0, 27.7),
+    "Flyv til Shadowmoon Village i Shadowmoon Valley - sidste stop før level 70. Qeasy skifter automatisk rute.", radius=100)
+
+write(p, f"{ROUTES}/Netherstorm.lua", "1953 = Netherstorm, 1948 = Shadowmoon Valley")
+
+
+# =========================================================================
+# SHADOWMOON VALLEY (Horde) 67-70
+# =========================================================================
+p = Plan("shadowmoon-horde", "Shadowmoon Valley (Horde)", "67-70",
+         [SMV], SMV)
+
+p.S("Shadowmoon Village")
+p.T("Shadowmoon Village", (SMV, 30.0, 27.7), "Horde-byen i nordvest (flight point) er din base i zonen.")
+p.A(10660, "Fra Researcher Tiorus.")
+p.A(10627, "Fra Grokom Deatheye. Kræver Illidari-Bane Shard, som dropper fra Illidari-orcs i dalen - saml den op undervejs.")
+p.A(10624, "Fra Chief Apothecary Hildagard.")
+p.D(10660, "Saml prøver fra dalens mærkelige skabninger.", at=(SMV, 33.0, 25.0))
+p.D(10627, "Erobr våben fra Shadowmoon-orcerne.", at=(SMV, 33.0, 33.0))
+p.D(10624, "Undersøg den hjemsøgte historie omkring byen.", at=(SMV, 31.0, 28.0))
+p.X(10660)
+p.X(10627)
+p.X(10624)
+p.A(10625, "Fra Hildagard - spøgelses-briller.")
+p.D(10625, "Tag Spectrecles på og hjælp de faldne orc-ånder omkring byen.", at=(SMV, 32.0, 30.0))
+p.X(10625)
+
+p.S("Legion Hold")
+p.A(10595, "Fra Blood Guard Gulmok.")
+p.D(10595, "Bryd belejringen ved Shadowmoon Village.", at=(SMV, 30.5, 34.0))
+p.X(10595)
+p.A(10596)
+p.D(10596, "Rekognoscér ved Legion Hold (sydvest).", at=(SMV, 25.0, 39.0))
+p.X(10596)
+p.A(10597)
+p.A(10598)
+p.D(10597, "Placér bomben ved Legion Hold.", at=(SMV, 25.0, 40.0))
+p.D(10598, "Spræng Infernals ved Legion Hold.", at=(SMV, 24.0, 40.0))
+p.X(10597)
+p.X(10598)
+
+p.S("Hand of Gul'dan")
+p.A(10681, "Fra Earthmender Splinthoof.")
+p.T("Altar of Damnation", (SMV, 42.2, 45.1), "Ved vulkanen Hand of Gul'dan midt i dalen - Earthmender Torlok.")
+p.X(10681, "Aflever hos Earthmender Torlok.")
+p.A(10458)
+p.D(10458, "Berolig Enraged Spirits of Fire og Earth ved vulkanen.", at=(SMV, 45.0, 43.0))
+p.X(10458)
+p.A(10480)
+p.D(10480, "Berolig Enraged Spirits of Water.", at=(SMV, 40.0, 48.0))
+p.X(10480)
+
+p.S("The Cipher of Damnation og afslutning")
+p.A(10513, "Fra Earthmender Torlok - starter Oronok-kæden.")
+p.N("Oronok Torn-heart (Cipher of Damnation)", (SMV, 54.0, 23.5),
+    "Aflever hos Oronok Torn-heart og følg zonens store kæde: du hjælper hans tre sønner (Grom'tor, Ar'tor, Borak) og samler cipher-fragmenterne. Fremragende XP og afslutning på dalens historie. Tryk 'Spring over', når kæden er færdig.")
+p.N("Sanctum of the Stars / Altar of Sha'tar", (SMV, 56.0, 59.6),
+    "Valgfrit: Scryers' Sanctum of the Stars (eller Aldors Altar of Sha'tar) har quests fra 69-70 og dailies - godt sted at starte dit endgame-ry.", optional=True)
+p.N("Tillykke med level 70!", (SMV, 30.0, 27.7),
+    "Du er i mål! Herfra venter Netherwing-ry (Dragonmaw-kæderne i sydøst), dungeons, heroics og Karazhan-attunement. Tak fordi du levelede med Qeasy - tryk 'Spring over' for at afslutte ruten.")
+
+write(p, f"{ROUTES}/ShadowmoonValley.lua", "1948 = Shadowmoon Valley")
