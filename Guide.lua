@@ -228,7 +228,9 @@ function Guide:Update()
         row:Show()
     end
 
-    -- Hjælpe-tekst: noten for den første ufærdige handling i steppet
+    -- Hjælpe-tekst: noten for den første ufærdige handling i steppet.
+    -- Re-forankres til den SIDSTE viste række, så den ikke havner uden for
+    -- vinduet, når steppet kun har få handlinger.
     local help = ""
     for _, el in ipairs(step.elements) do
         if not Q:IsElementDone(route, step, el) then
@@ -236,6 +238,13 @@ function Guide:Update()
             break
         end
     end
+    helpText:ClearAllPoints()
+    if shown > 0 then
+        helpText:SetPoint("TOPLEFT", rows[shown], "BOTTOMLEFT", 2, -6)
+    else
+        helpText:SetPoint("TOPLEFT", stepLabel, "BOTTOMLEFT", 0, -6)
+    end
+    helpText:SetPoint("RIGHT", frame, "RIGHT", -10, 0)
     helpText:SetText(help)
 
     -- Kommende steps (vis første handling i hvert)
