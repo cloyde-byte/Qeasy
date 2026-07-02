@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Generator: bygger Qeasy Routes/*.lua ud fra planer med quest-id'er.
+"""Generator: bygger Qeasy Routes/*.lua (grupperet v2-format) fra planer.
 
-Koordinater og titler slås op i pfQuest TBC-databasen (MIT, © Shagu):
+En rute = liste af STEPS (grupper). Hvert step har en label og en liste af
+ELEMENTS. Koordinater/titler slås op i pfQuest (MIT, © Shagu):
 ACCEPT -> quest-giver, TURNIN -> modtager, DO -> objective-centroid.
 """
 import qdb
@@ -10,35 +11,73 @@ HORDE_MASK = 2 + 16 + 32 + 128 + 512
 
 
 def esc(s):
-    return s.replace("\\", "\\\\").replace('"', '\\"')
+    return str(s).replace("\\", "\\\\").replace('"', '\\"')
 
 
 class Plan:
     def __init__(self, key, title, levels, zones, main_map, nxt=None):
         self.meta = dict(key=key, title=title, levels=levels, zones=zones, nxt=nxt)
         self.main_map = main_map
-        self.rows = []
+        self.steps = []          # liste af {label, elements}
         self.warnings = []
 
-    def S(self, text):
-        self.rows.append(("SECTION", text))
+    # -- gruppering --------------------------------------------------
+    def step(self, label=""):
+        self.steps.append({"label": label, "elements": []})
+        return self
 
+    S = step  # sektion = ny gruppe
+
+    def _cur(self):
+        if not self.steps:
+            self.step("")
+        return self.steps[-1]
+
+    def _add(self, el):
+        self._cur()["elements"].append(el)
+
+    # -- rejse / logistik -------------------------------------------
     def T(self, label, coords, note, radius=60):
-        self.rows.append(("TRAVEL", label, coords, note, radius))
+        self._add({"kind": "travel", "coords": coords, "radius": radius,
+                   "text": label, "note": note})
+
+    def fly(self, label, coords, note, radius=60):
+        self._add({"kind": "fly", "coords": coords, "radius": radius,
+                   "text": label, "note": note})
+
+    def hearth(self, label, coords, note=None):
+        self._add({"kind": "hearth", "coords": coords, "text": label, "note": note})
+
+    def train(self, coords, text="Træn dine spells hos klassetræneren", note=None):
+        self._add({"kind": "train", "coords": coords, "text": text, "note": note})
+
+    def vendor(self, coords, text="Sælg/reparér hos vendoren", note=None):
+        self._add({"kind": "vendor", "coords": coords, "text": text, "note": note})
+
+    def buy(self, coords, text, note=None):
+        self._add({"kind": "buy", "coords": coords, "text": text, "note": note})
 
     def N(self, label, coords, note, optional=False):
-        self.rows.append(("NOTE", label, coords, note, optional))
+        self._add({"kind": "note", "coords": coords, "text": label,
+                   "note": note, "optional": optional})
 
-    def A(self, qid, note=None, optional=False, label=None):
-        self.rows.append(("ACCEPT", qid, note, optional, label))
+    def ding(self, level):
+        self._add({"kind": "ding", "level": level})
 
-    def D(self, qid, note, at=None, optional=False, label=None):
-        self.rows.append(("DO", qid, note, optional, label, at))
+    def grind(self, level, text=None):
+        self._add({"kind": "grind", "level": level, "text": text})
 
-    def X(self, qid, note=None, optional=False, label=None):
-        self.rows.append(("TURNIN", qid, note, optional, label))
+    # -- quest-elementer --------------------------------------------
+    def A(self, qid, note=None, optional=False):
+        self._quest("accept", qid, note, optional)
 
-    def q(self, qid):
+    def D(self, qid, note, at=None, optional=False):
+        self._quest("do", qid, note, optional, at=at)
+
+    def X(self, qid, note=None, optional=False):
+        self._quest("turnin", qid, note, optional)
+
+    def _info(self, qid):
         i = qdb.info(qid, prefer_map=self.main_map)
         if not i or not i["title"]:
             raise SystemExit(f"{self.meta['key']}: quest {qid} findes ikke")
@@ -46,78 +85,71 @@ class Plan:
             raise SystemExit(f"{self.meta['key']}: quest {qid} '{i['title']}' er Alliance-only!")
         return i
 
-    def emit_step(self, kind, qid, note, optional, label, at=None):
-        i = self.q(qid)
-        lines = [f'        {{ type = "{kind}", quest = {qid}, title = "{esc(i["title"])}",']
+    def _quest(self, kind, qid, note, optional, at=None):
+        i = self._info(qid)
         coords = None
-        if kind == "ACCEPT":
+        if kind == "accept":
             coords = i["start"][1] if i["start"] else None
             if note is None and i["start"]:
                 note = f"Fra {i['start'][0]}."
-        elif kind == "TURNIN":
+        elif kind == "turnin":
             coords = i["end"][1] if i["end"] else None
             if note is None and i["end"]:
                 note = f"Aflever hos {i['end'][0]}."
-        elif kind == "DO":
+        else:  # do
             coords = at or i["obj"] or (i["end"][1] if i["end"] else None)
             if at is None and i["obj"] is None:
-                self.warnings.append(f"DO {qid} '{i['title']}': ingen objective-koordinater - bruger aflevering")
+                self.warnings.append(f"DO {qid} '{i['title']}': ingen objective-koordinater")
         if coords is None:
             self.warnings.append(f"{kind} {qid} '{i['title']}': INGEN koordinater")
-        attrs = []
-        if coords:
-            attrs.append(f"coords = {{ map = {coords[0]}, x = {coords[1]}, y = {coords[2]} }}")
-        if label:
-            attrs.append(f'label = "{esc(label)}"')
-        if optional:
-            attrs.append("optional = true")
-        if attrs:
-            lines.append("          " + ", ".join(attrs) + ("," if note else " },"))
-        if note:
-            lines.append(f'          note = "{esc(note)}" }},')
-        elif not attrs:
-            lines[-1] = lines[-1].rstrip(",") + " },"
-        return "\n".join(lines)
+        self._add({"kind": kind, "quest": qid, "title": i["title"],
+                   "coords": coords, "note": note, "optional": optional})
+
+    # -- serialisering ----------------------------------------------
+    def _emit_element(self, el):
+        parts = [f'kind = "{el["kind"]}"']
+        if el.get("quest"):
+            parts.append(f'quest = {el["quest"]}')
+        if el.get("title"):
+            parts.append(f'title = "{esc(el["title"])}"')
+        if el.get("coords"):
+            m, x, y = el["coords"]
+            parts.append(f"coords = {{ map = {m}, x = {x}, y = {y} }}")
+        if el.get("radius"):
+            parts.append(f'radius = {el["radius"]}')
+        if el.get("level"):
+            parts.append(f'level = {el["level"]}')
+        if el.get("text"):
+            parts.append(f'text = "{esc(el["text"])}"')
+        if el.get("note"):
+            parts.append(f'note = "{esc(el["note"])}"')
+        if el.get("optional"):
+            parts.append("optional = true")
+        head = ", ".join(parts[:3])
+        tail = ", ".join(parts[3:])
+        if tail:
+            return f"                {{ {head},\n                  {tail} }},"
+        return f"                {{ {head} }},"
 
     def build(self, header_comment):
-        out = ['local _, ns = ...', '', header_comment, '']
         m = self.meta
-        out.append("ns.Q:RegisterRoute({")
-        out.append(f'    key = "{m["key"]}",')
-        out.append(f'    title = "{esc(m["title"])}",')
-        out.append('    faction = "Horde",')
-        out.append(f'    levels = "{m["levels"]}",')
-        out.append(f'    zones = {{ {", ".join(str(z) for z in m["zones"])} }},')
+        out = ["local _, ns = ...", "", header_comment, "",
+               "ns.Q:RegisterRoute({",
+               f'    key = "{m["key"]}",',
+               f'    title = "{esc(m["title"])}",',
+               '    faction = "Horde",',
+               f'    levels = "{m["levels"]}",',
+               f'    zones = {{ {", ".join(str(z) for z in m["zones"])} }},']
         if m["nxt"]:
             out.append(f'    next = "{m["nxt"]}",')
         out.append("    steps = {")
-        first = True
-        for row in self.rows:
-            kind = row[0]
-            if kind == "SECTION":
-                pad = max(2, (68 - len(row[1])) // 2)
-                if not first:
-                    out.append("")
-                out.append(f'        -- {"=" * pad} {row[1]} {"=" * pad}')
-            elif kind == "TRAVEL":
-                _, label, coords, note, radius = row
-                out.append(f'        {{ type = "TRAVEL", label = "{esc(label)}",')
-                out.append(f'          coords = {{ map = {coords[0]}, x = {coords[1]}, y = {coords[2]} }}, radius = {radius},')
-                out.append(f'          note = "{esc(note)}" }},')
-            elif kind == "NOTE":
-                _, label, coords, note, optional = row
-                opt = ", optional = true" if optional else ""
-                out.append(f'        {{ type = "NOTE", label = "{esc(label)}"{opt},')
-                if coords:
-                    out.append(f'          coords = {{ map = {coords[0]}, x = {coords[1]}, y = {coords[2]} }},')
-                out.append(f'          note = "{esc(note)}" }},')
-            elif kind == "DO":
-                _, qid, note, optional, label, at = row
-                out.append(self.emit_step("DO", qid, note, optional, label, at))
-            else:
-                _, qid, note, optional, label = row
-                out.append(self.emit_step(kind, qid, note, optional, label))
-            first = False
+        for step in self.steps:
+            if not step["elements"]:
+                continue
+            out.append(f'        {{ label = "{esc(step["label"])}", elements = {{')
+            for el in step["elements"]:
+                out.append(self._emit_element(el))
+            out.append("        }},")
         out.append("    },")
         out.append("})")
         out.append("")
@@ -129,19 +161,23 @@ HEADER = """-- =================================================================
 --
 -- Rækkefølgen følger Wowheads leveling-guide for Burning Crusade Classic.
 -- Quest-id'er og koordinater er verificeret mod pfQuest-databasen
--- (https://github.com/shagu/pfQuest, MIT-licens, © Eric Mauser/Shagu):
--- ACCEPT peger på quest-giveren, TURNIN på modtageren og DO på midten af
--- objective-området.
+-- (https://github.com/shagu/pfQuest, MIT-licens, © Eric Mauser/Shagu).
+-- Ruten er GENERERET af tools/plans.py - rediger ikke i hånden.
 --
--- Koordinater er zone-procenter (x, y) på uiMapID:
+-- Format: grupperede steps med elementer (kind = accept|do|turnin|travel|
+-- fly|hearth|train|vendor|buy|note|ding|grind). Koordinater er zone-
+-- procenter (x, y) på uiMapID:
 --   {maps}
 -- ========================================================================="""
 
 
 def write(plan, path, maps_desc):
-    src = plan.build(HEADER.format(title=plan.meta["title"], levels=plan.meta["levels"], maps=maps_desc))
+    src = plan.build(HEADER.format(title=plan.meta["title"],
+                                   levels=plan.meta["levels"], maps=maps_desc))
     with open(path, "w", encoding="utf-8") as fh:
         fh.write(src)
-    print(f"{path}: {sum(1 for r in plan.rows if r[0] != 'SECTION')} trin")
+    n_steps = sum(1 for s in plan.steps if s["elements"])
+    n_el = sum(len(s["elements"]) for s in plan.steps)
+    print(f"{path.split('/')[-1]}: {n_steps} steps, {n_el} elementer")
     for w in plan.warnings:
         print(f"  ⚠ {w}")

@@ -28,6 +28,8 @@ p.T("Thrallmar", (HFP, 55.3, 36.5), "Flyv til Thrallmar - din base i Hellfire Pe
 p.X(10289, "Aflever hos General Krakork midt i Thrallmar.")
 p.A(10291)
 p.X(10291, "Nazgrel står inde i hovedbygningen bag Krakork.")
+p.train((HFP, 55.3, 36.5), "Træn dine nye spells hos klassetræneren i Thrallmar.")
+p.hearth("Sæt din hearthstone i Thrallmar", (HFP, 55.3, 36.5))
 
 p.S("Thrallmar: saml op og ryd ramparts")
 p.A(10110, "Fra Battlecryer Blackeye - dræb fel orcs på Hellfire Ramparts.")
@@ -107,6 +109,7 @@ p.N("Dreghood-kæden", (HFP, 16.3, 65.1),
     "Følg Naladus kæde: A Traitor Among Us -> The Dreghood Elders -> Arzeth's Demise. Tryk 'Spring over', når kæden er afleveret.")
 
 p.S("Afslutning")
+p.ding(62)
 p.N("Ryd op i Hellfire", (HFP, 55.3, 36.5),
     "Valgfrit: ryd resterende quests i loggen (Void Ridge, The Mag'har-kæden, Expedition Armory) indtil ca. level 62.", optional=True)
 p.T("Mod Zangarmarsh", (ZM, 78.5, 62.7),
@@ -180,6 +183,7 @@ p.N("Fhwoor Smash! (eskorte)", (ZM, 19.8, 50.8),
 
 p.S("Afslutning")
 p.X(9802, "Flyv tilbage til Cenarion Refuge og aflever plantedelene hos Lauranna, når du har alle 10.")
+p.ding(64)
 p.N("Ryd op i Zangarmarsh", (ZM, 78.4, 62.0),
     "Valgfrit: ryd resterende quests (Feralfen, Dead Mire, Twin Spire Ruins) indtil ca. level 63-64.", optional=True)
 p.T("Mod Terokkar Forest", (TF, 44.3, 26.3),
@@ -243,6 +247,7 @@ p.D(10878, "Klar opgaven ved Auchindouns ringmur, før mørket falder.", at=(TF,
 p.X(10878)
 
 p.S("Afslutning")
+p.ding(65)
 p.N("Ryd op i Terokkar", (TF, 49.2, 45.7),
     "Valgfrit: ryd resterende quests (Auchindoun-ringen, Skettis-forløbere, Sha'tari Base Camp i syd) indtil ca. level 64-65.", optional=True)
 p.T("Mod Nagrand", (NG, 55.5, 37.5),
@@ -313,6 +318,7 @@ p.N("Garrosh og Greatmother Geyah", (NG, 55.4, 37.6),
     "Lore-kæden fra Garrosh (via Kil'sorrow, Warmaul og elementerne) fører til 'A Visit With the Greatmother' og senere Thralls ankomst. Tryk 'Spring over', når du har fulgt den.", optional=True)
 p.N("Ring of Blood (gruppe)", (NG, 42.8, 20.7),
     "The Ring of Blood ved Gurgthock: seks gladiator-kampe for en 5-mands gruppe - en af TBC's bedste XP-klumper plus et stærkt våben. Find en gruppe! Tryk 'Spring over', hvis du dropper den.", optional=True)
+p.ding(67)
 p.N("Ryd op i Nagrand", (NG, 55.4, 37.6),
     "Valgfrit: gør Mastery-kæderne og resterende Garadar-quests færdige indtil ca. level 66-67.", optional=True)
 p.T("Mod Blade's Edge Mountains", (BEM, 51.9, 58.4),
@@ -374,6 +380,7 @@ p.X(10820, "Aflever hos Wildlord Antelarion.")
 p.S("Afslutning")
 p.N("Gruuls sønner (Baron Sablemane)", (BEM, 53.3, 41.2),
     "Baron Sablemanes kæde mod Gruuls sønner (Grulloc, Gorgrom m.fl.) giver stor XP og fører op mod Gruul's Lair - enkelte dele kræver en gruppe. Tryk 'Spring over', hvis du dropper den.", optional=True)
+p.ding(68)
 p.N("Ryd op i Blade's Edge", (BEM, 51.9, 58.4),
     "Valgfrit: ryd resterende quests (Ruuan Weald, Bloodmaul Camp, Skyguard Outpost) indtil ca. level 67-68.", optional=True)
 p.T("Mod Netherstorm", (NS, 32.7, 65.0),
@@ -435,6 +442,7 @@ p.X(10290)
 p.S("Afslutning")
 p.N("Manaforge-kæden fortsætter", (NS, 32.0, 64.1),
     "Consortium-kæden fortsætter: Coruu (10330) -> Duro (10338) -> Ara (10365). God XP og fører mod Voren'thal/Scryers-ry. Tryk 'Spring over', når du er klar.", optional=True)
+p.ding(69)
 p.N("Ryd op i Netherstorm", (NS, 32.7, 65.0),
     "Valgfrit: ryd resterende quests (Protectorate ved Celestial Ridge, Ruins of Enkaat) indtil ca. level 69.", optional=True)
 p.T("Mod Shadowmoon Valley", (SMV, 30.0, 27.7),
@@ -495,6 +503,7 @@ p.N("Oronok Torn-heart (Cipher of Damnation)", (SMV, 54.0, 23.5),
     "Aflever hos Oronok Torn-heart og følg zonens store kæde: du hjælper hans tre sønner (Grom'tor, Ar'tor, Borak) og samler cipher-fragmenterne. Fremragende XP og afslutning på dalens historie. Tryk 'Spring over', når kæden er færdig.")
 p.N("Sanctum of the Stars / Altar of Sha'tar", (SMV, 56.0, 59.6),
     "Valgfrit: Scryers' Sanctum of the Stars (eller Aldors Altar of Sha'tar) har quests fra 69-70 og dailies - godt sted at starte dit endgame-ry.", optional=True)
+p.ding(70)
 p.N("Tillykke med level 70!", (SMV, 30.0, 27.7),
     "Du er i mål! Herfra venter Netherwing-ry (Dragonmaw-kæderne i sydøst), dungeons, heroics og Karazhan-attunement. Tak fordi du levelede med Qeasy - tryk 'Spring over' for at afslutte ruten.")
 

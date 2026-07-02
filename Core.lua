@@ -79,19 +79,22 @@ end
 local function Debug()
     local route = Q:GetActiveRoute()
     if not route then print("Qeasy: ingen aktiv rute.") return end
-    print(string.format("Qeasy: rute '%s', trin %s af %d", route.key, tostring(Q.current), #route.steps))
+    print(string.format("Qeasy: rute '%s', step %s af %d", route.key, tostring(Q.current), #route.steps))
     local step = Q:GetCurrentStep()
     if not step then return end
-    print(string.format("  type=%s label=%s", step.type, tostring(step.label)))
-    for _, q in ipairs(step.quests) do
-        local on, complete = Q:IsQuestOn(q)
-        print(string.format("  quest '%s' id=%s | i log=%s færdig=%s afleveret=%s",
-            tostring(q.title), tostring(q.id), tostring(on), tostring(complete),
-            tostring(Q:IsQuestTurnedIn(q))))
-    end
-    local coords = Q:GetStepTarget(step)
-    if coords then
-        print(string.format("  mål: map=%d %.1f, %.1f", coords.map, coords.x, coords.y))
+    print(string.format("  step '%s' med %d elementer:", tostring(step.label), #step.elements))
+    for _, el in ipairs(step.elements) do
+        local done = Q:IsElementDone(route, step, el)
+        local extra = ""
+        if el.q then
+            local on, complete = Q:IsQuestOn(el.q)
+            extra = string.format(" id=%s log=%s færdig=%s afl=%s", tostring(el.q.id),
+                tostring(on), tostring(complete), tostring(Q:IsQuestTurnedIn(el.q)))
+        end
+        local coords = Q:ElementTarget(el)
+        local pos = coords and string.format(" @%d %.1f,%.1f", coords.map, coords.x, coords.y) or ""
+        print(string.format("  [%s] %s '%s'%s%s", done and "x" or " ", el.kind,
+            tostring((el.q and el.q.title) or el.text or el.label or ""), extra, pos))
     end
 end
 
@@ -113,7 +116,7 @@ SlashCmdList["QEASY"] = function(msg)
     elseif cmd == "arrow" then
         ns.Arrow:SetShown(not Q.char.ui.arrowShown)
     elseif cmd == "skip" then
-        Q:SkipCurrent()
+        Q:SkipStep()
     elseif cmd == "back" then
         Q:Back()
     elseif cmd == "reset" then

@@ -45,20 +45,34 @@ du selv. Det holder addonet trygt inden for Blizzards regler.
 
 ## Sådan bruges det
 
-Addonet starter automatisk på Horde-karakterer: Det vælger selv ruten ud
-fra din zone (eller Hellfire-ruten fra level 58) og viser tracker + pil.
+Qeasy er inspireret af **RestedXP**: Ruten er delt i **grupperede steps**
+— fx "tag disse 4 quests → lav dem i én sløjfe → aflever dem alle" — så du
+ikke render frem og tilbage. Addonet starter automatisk på Horde-karakterer
+og vælger ruten ud fra din zone (eller Hellfire fra level 58).
 
-- **Pilen** peger mod målet for det aktuelle trin og skifter farve:
-  grøn = du løber den rigtige vej, rød = du vender forkert. Afstanden
-  vises i yards. Flyt pilen med **Shift + træk**.
-- **Trackeren** viser det aktuelle trin med dansk hjælpetekst og de næste
-  par trin. Flyt den ved at trække i den.
-- Trin fuldføres **automatisk**: Når du accepterer en quest, gør dens
-  objectives færdige eller afleverer den, hopper Qeasy videre til næste
-  trin. Rejse-trin fuldføres, når du når frem. Quests du allerede har
-  klaret, springes over automatisk.
-- `Spring over` / `Tilbage`-knapperne styrer trin manuelt (bruges også
-  til info-trin, fx "ryd op i loggen").
+- **Guide-vinduet** viser det aktuelle step som en liste af handlinger,
+  hver med et ikon og et **grønt flueben**, der sættes automatisk, når du
+  har gjort den. De næste steps vises nedtonet nedenunder. Træk vinduet
+  for at flytte det.
+- **Pilen** peger på det **nærmeste ufærdige mål** i det aktuelle step (som
+  RestedXP's "Follow the Arrow") og skifter farve grøn→rød efter, om du
+  løber rigtigt. Afstand vises i yards. Flyt pilen med **Shift + træk**.
+- Handlinger krydses af **automatisk**: accept, objectives, aflevering,
+  rejse (ved ankomst) og level-checkpoints (`ding`). Quests du allerede har
+  klaret, springes over.
+- `Spring over` fuldfører hele det aktuelle step; `Tilbage` fortryder.
+
+### Trin-typer
+
+Hvert step består af handlinger af disse typer:
+
+| Type | Betydning |
+|---|---|
+| `accept` / `turnin` / `do` | tag / aflever / udfør en quest |
+| `travel` / `fly` | løb/flyv til et sted (auto-flueben ved ankomst) |
+| `hearth` / `train` / `vendor` / `buy` | sæt hearthstone, træn spells, handl |
+| `ding` / `grind` | level-checkpoint / grind til level N |
+| `note` | info/påmindelse (fx en quest-kæde du selv følger) |
 
 ### Kommandoer
 
