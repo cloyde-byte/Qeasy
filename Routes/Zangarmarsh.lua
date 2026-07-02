@@ -25,6 +25,8 @@ ns.Q:RegisterRoute({
         { label = "Cenarion Refuge", elements = {
                 { kind = "travel", coords = { map = 1946, x = 78.4, y = 62.0 }, radius = 60,
                   text = "Cenarion Refuge", note = "Følg vejen fra Hellfire ind i Zangarmarsh til Cenarion Refuge." },
+        }},
+        { label = "Cenarion Refuge", elements = {
                 { kind = "accept", quest = 9802, title = "Plants of Zangarmarsh",
                   coords = { map = 1946, x = 80.3, y = 64.2 }, note = "Fra Lauranna Thar'well. Saml Unidentified Plant Parts fra planter/mobs i hele zonen undervejs." },
                 { kind = "accept", quest = 9730, title = "Leader of the Darkcrest",
@@ -33,60 +35,92 @@ ns.Q:RegisterRoute({
                   coords = { map = 1946, x = 79.1, y = 64.9 }, note = "Fra Wanted Poster." },
                 { kind = "accept", quest = 9716, title = "Disturbance at Umbrafen Lake",
                   coords = { map = 1946, x = 78.4, y = 62.0 }, note = "Fra Ysiel Windsinger." },
+        }},
+        { label = "Cenarion Refuge", elements = {
                 { kind = "do", quest = 9730, title = "Leader of the Darkcrest",
                   coords = { map = 1946, x = 84.0, y = 77.0 }, note = "Dræb Darkcrest-nagaer syd for refuge; lederen patruljerer." },
+        }},
+        { label = "Cenarion Refuge", elements = {
                 { kind = "do", quest = 9817, title = "Leader of the Bloodscale",
                   coords = { map = 1946, x = 83.0, y = 70.0 }, note = "Dræb Bloodscale-nagaer sydøst for refuge; lederen patruljerer." },
+        }},
+        { label = "Cenarion Refuge", elements = {
                 { kind = "turnin", quest = 9730, title = "Leader of the Darkcrest",
                   coords = { map = 1946, x = 79.1, y = 65.3 }, note = "Aflever hos Warden Hamoot." },
                 { kind = "turnin", quest = 9817, title = "Leader of the Bloodscale",
                   coords = { map = 1946, x = 79.1, y = 65.3 }, note = "Aflever hos Warden Hamoot." },
+        }},
+        { label = "Cenarion Refuge", elements = {
                 { kind = "do", quest = 9716, title = "Disturbance at Umbrafen Lake",
                   coords = { map = 1946, x = 82.0, y = 78.0 }, note = "Undersøg Umbrafen Lake syd for refuge." },
+        }},
+        { label = "Cenarion Refuge", elements = {
                 { kind = "turnin", quest = 9716, title = "Disturbance at Umbrafen Lake",
                   coords = { map = 1946, x = 78.4, y = 62.0 }, note = "Aflever hos Ysiel Windsinger." },
         }},
         { label = "Swamprat Post", elements = {
                 { kind = "travel", coords = { map = 1946, x = 85.0, y = 54.0 }, radius = 60,
                   text = "Swamprat Post", note = "Løb nord til Horde-forposten Swamprat Post (flight point)." },
+        }},
+        { label = "Swamprat Post", elements = {
                 { kind = "accept", quest = 9770, title = "Menacing Marshfangs",
                   coords = { map = 1946, x = 85.0, y = 54.0 }, note = "Fra Reavij." },
                 { kind = "accept", quest = 9774, title = "Thick Hydra Scales",
                   coords = { map = 1946, x = 85.3, y = 54.8 }, note = "Fra Zurai." },
+        }},
+        { label = "Swamprat Post", elements = {
                 { kind = "do", quest = 9770, title = "Menacing Marshfangs",
                   coords = { map = 1946, x = 82.0, y = 50.0 }, note = "Dræb Marshfang Rippers omkring posten." },
+        }},
+        { label = "Swamprat Post", elements = {
                 { kind = "do", quest = 9774, title = "Thick Hydra Scales",
                   coords = { map = 1946, x = 80.0, y = 45.0 }, note = "Saml Thick Hydra Scales fra hydraer ved Serpent Lake." },
+        }},
+        { label = "Swamprat Post", elements = {
                 { kind = "turnin", quest = 9770, title = "Menacing Marshfangs",
                   coords = { map = 1946, x = 85.0, y = 54.0 }, note = "Aflever hos Reavij." },
                 { kind = "turnin", quest = 9774, title = "Thick Hydra Scales",
                   coords = { map = 1946, x = 85.3, y = 54.8 }, note = "Aflever hos Zurai." },
                 { kind = "accept", quest = 9771, title = "Searching for Scout Jyoba",
                   coords = { map = 1946, x = 85.3, y = 54.8 }, note = "Opfølger fra Zurai." },
+        }},
+        { label = "Swamprat Post", elements = {
                 { kind = "do", quest = 9771, title = "Searching for Scout Jyoba",
                   coords = { map = 1946, x = 80.8, y = 36.3 }, note = "Find Scout Jyoba ved Serpent Lake." },
                 { kind = "turnin", quest = 9771, title = "Searching for Scout Jyoba",
                   coords = { map = 1946, x = 80.8, y = 36.3 }, note = "Scout Jyoba ligger såret ved den nordlige damppumpe." },
                 { kind = "accept", quest = 9772, title = "Jyoba's Report",
                   coords = { map = 1946, x = 80.8, y = 36.3 }, note = "Fra Scout Jyoba." },
+        }},
+        { label = "Swamprat Post", elements = {
                 { kind = "turnin", quest = 9772, title = "Jyoba's Report",
                   coords = { map = 1946, x = 85.3, y = 54.8 }, note = "Tilbage til Zurai." },
         }},
         { label = "Zabra'jin og troldene", elements = {
                 { kind = "travel", coords = { map = 1946, x = 30.7, y = 50.9 }, radius = 60,
                   text = "Zabra'jin", note = "Følg vejen vest gennem sumpen til troldebyen Zabra'jin (flight point)." },
+        }},
+        { label = "Zabra'jin og troldene", elements = {
                 { kind = "accept", quest = 9820, title = "WANTED: Boss Grog'ak",
                   coords = { map = 1946, x = 32.0, y = 49.3 }, note = "Wanted-plakat: Boss Grog'ak." },
                 { kind = "accept", quest = 10117, title = "Wanted: Chieftain Mummaki",
                   coords = { map = 1946, x = 32.0, y = 49.3 }, note = "Wanted-plakat: Chieftain Mummaki." },
                 { kind = "accept", quest = 9822, title = "Impending Attack",
                   coords = { map = 1946, x = 30.7, y = 50.9 }, note = "Fra Shadow Hunter Denjai." },
+        }},
+        { label = "Zabra'jin og troldene", elements = {
                 { kind = "do", quest = 9820, title = "WANTED: Boss Grog'ak",
                   coords = { map = 1946, x = 27.5, y = 32.5 }, note = "Dræb Boss Grog'ak blandt Ango'rosh-ogrerne nordvest for byen." },
+        }},
+        { label = "Zabra'jin og troldene", elements = {
                 { kind = "do", quest = 10117, title = "Wanted: Chieftain Mummaki",
                   coords = { map = 1946, x = 84.5, y = 77.5 }, note = "Dræb Chieftain Mummaki hos Umbrafen-stammen i sydøst." },
+        }},
+        { label = "Zabra'jin og troldene", elements = {
                 { kind = "do", quest = 9822, title = "Impending Attack",
                   coords = { map = 1946, x = 36.0, y = 60.0 }, note = "Dræb Bloodscale-nagaer ved deres enklave." },
+        }},
+        { label = "Zabra'jin og troldene", elements = {
                 { kind = "turnin", quest = 9820, title = "WANTED: Boss Grog'ak",
                   coords = { map = 1946, x = 30.7, y = 50.9 }, note = "Aflever hos Shadow Hunter Denjai." },
                 { kind = "turnin", quest = 10117, title = "Wanted: Chieftain Mummaki",
@@ -95,41 +129,67 @@ ns.Q:RegisterRoute({
                   coords = { map = 1946, x = 30.7, y = 50.9 }, note = "Aflever hos Shadow Hunter Denjai." },
                 { kind = "accept", quest = 9823, title = "Us or Them",
                   coords = { map = 1946, x = 30.7, y = 50.9 }, note = "Fra Shadow Hunter Denjai." },
+        }},
+        { label = "Zabra'jin og troldene", elements = {
                 { kind = "do", quest = 9823, title = "Us or Them",
                   coords = { map = 1946, x = 36.0, y = 60.0 }, note = "Dræb flere Bloodscale-nagaer." },
+        }},
+        { label = "Zabra'jin og troldene", elements = {
                 { kind = "turnin", quest = 9823, title = "Us or Them",
                   coords = { map = 1946, x = 30.7, y = 50.9 }, note = "Aflever hos Shadow Hunter Denjai." },
         }},
         { label = "Sporeggar", elements = {
                 { kind = "travel", coords = { map = 1946, x = 19.7, y = 52.1 }, radius = 60,
                   text = "Sporeggar", note = "Besøg sporeling-byen Sporeggar vest i zonen." },
+        }},
+        { label = "Sporeggar", elements = {
                 { kind = "accept", quest = 9808, title = "Glowcap Mushrooms",
                   coords = { map = 1946, x = 19.7, y = 52.1 }, note = "Fra Msshi'fn - Glowcaps bruges som valuta i Sporeggar!" },
+        }},
+        { label = "Sporeggar", elements = {
                 { kind = "accept", quest = 9739, title = "The Sporelings' Plight",
                   coords = { map = 1946, x = 19.0, y = 62.4 }, note = "Fra Fahssn." },
                 { kind = "accept", quest = 9743, title = "Natural Enemies",
                   coords = { map = 1946, x = 19.0, y = 62.4 }, note = "Fra Fahssn." },
+        }},
+        { label = "Sporeggar", elements = {
                 { kind = "do", quest = 9739, title = "The Sporelings' Plight",
                   coords = { map = 1946, x = 15.0, y = 60.0 }, note = "Saml Spore Sacs fra Marsh Spores i Sporewind Lake." },
+        }},
+        { label = "Sporeggar", elements = {
                 { kind = "do", quest = 9743, title = "Natural Enemies",
                   coords = { map = 1946, x = 12.0, y = 55.0 }, note = "Dræb Bog Lords og Marsh Walkers vest for byen." },
+        }},
+        { label = "Sporeggar", elements = {
                 { kind = "do", quest = 9808, title = "Glowcap Mushrooms",
                   coords = { map = 1946, x = 16.0, y = 50.0 }, note = "Saml Glowcap Mushrooms i sumpen omkring Sporeggar." },
+        }},
+        { label = "Sporeggar", elements = {
                 { kind = "turnin", quest = 9739, title = "The Sporelings' Plight",
                   coords = { map = 1946, x = 19.0, y = 62.4 }, note = "Aflever hos Fahssn." },
                 { kind = "turnin", quest = 9743, title = "Natural Enemies",
                   coords = { map = 1946, x = 19.0, y = 62.4 }, note = "Aflever hos Fahssn." },
+        }},
+        { label = "Sporeggar", elements = {
                 { kind = "turnin", quest = 9808, title = "Glowcap Mushrooms",
                   coords = { map = 1946, x = 19.7, y = 52.1 }, note = "Aflever hos Msshi'fn." },
+        }},
+        { label = "Sporeggar", elements = {
                 { kind = "note", coords = { map = 1946, x = 19.8, y = 50.8 }, text = "Fhwoor Smash! (eskorte)",
-                  note = "Valgfrit: eskorte-questen 'Fhwoor Smash!' giver god XP. Tryk 'Spring over' bagefter.", optional = true },
+                  note = "Valgfrit: eskorte-questen 'Fhwoor Smash!' giver god XP. Tryk 'Spring over' bagefter." },
         }},
         { label = "Afslutning", elements = {
                 { kind = "turnin", quest = 9802, title = "Plants of Zangarmarsh",
                   coords = { map = 1946, x = 80.3, y = 64.2 }, note = "Flyv tilbage til Cenarion Refuge og aflever plantedelene hos Lauranna, når du har alle 10." },
+        }},
+        { label = "Afslutning", elements = {
                 { kind = "ding", level = 64 },
+        }},
+        { label = "Afslutning", elements = {
                 { kind = "note", coords = { map = 1946, x = 78.4, y = 62.0 }, text = "Ryd op i Zangarmarsh",
-                  note = "Valgfrit: ryd resterende quests (Feralfen, Dead Mire, Twin Spire Ruins) indtil ca. level 63-64.", optional = true },
+                  note = "Valgfrit: ryd resterende quests (Feralfen, Dead Mire, Twin Spire Ruins) indtil ca. level 63-64." },
+        }},
+        { label = "Afslutning", elements = {
                 { kind = "travel", coords = { map = 1952, x = 44.3, y = 26.3 }, radius = 100,
                   text = "Mod Terokkar Forest", note = "Følg vejen sydøst ud af Zangarmarsh mod Terokkar Forest. Qeasy skifter automatisk rute." },
         }},

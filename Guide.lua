@@ -10,8 +10,8 @@ local Guide = {}
 ns.Guide = Guide
 ns.Tracker = Guide -- bagudkompatibelt alias
 
-local MAX_ROWS = 16       -- elementer i det aktuelle step
-local UPCOMING = 2        -- kommende steps (som overskrifter)
+local MAX_ROWS = 8        -- elementer i det aktuelle step (nu små steps)
+local UPCOMING = 4        -- kommende steps (som linjer)
 
 -- Indbyggede spil-teksturer (ingen medier at sende med).
 local ICON = {
@@ -222,13 +222,15 @@ function Guide:Update()
     -- Note fra første ufærdige element (kort hjælp)
     -- (vises som ekstra række hvis plads; ellers udeladt)
 
-    -- Kommende steps
+    -- Kommende steps (vis første handling i hvert)
     local up = 0
     local i = current + 1
     while up < UPCOMING and i <= total do
-        if not Q:IsStepDone(route, route.steps[i]) then
+        local s = route.steps[i]
+        if not Q:IsStepDone(route, s) then
             up = up + 1
-            upcoming[up]:SetText("» " .. (route.steps[i].label or ("Step " .. i)))
+            local first = s.elements[1]
+            upcoming[up]:SetText("» " .. (first and ElementText(first) or (s.label or ("Step " .. i))))
         end
         i = i + 1
     end
@@ -249,4 +251,9 @@ function Guide:RestorePosition()
         frame:ClearAllPoints()
         frame:SetPoint(pos.point, UIParent, pos.point, pos.x, pos.y)
     end
+    self:ApplyScale()
+end
+
+function Guide:ApplyScale()
+    frame:SetScale(ns.Q.char.ui.guideScale or 1)
 end

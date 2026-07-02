@@ -1,0 +1,201 @@
+local _, ns = ...
+local L = ns.L
+
+-- =========================================================================
+-- Qeasy Config: et rigtigt indstillingsvindue (i stedet for slash-tekst).
+-- Åbnes med /qeasy. Registreres også i Blizzards AddOn-indstillinger, hvis
+-- API'et findes.
+-- =========================================================================
+
+local Config = {}
+ns.Config = Config
+
+local backdrop = BackdropTemplateMixin and "BackdropTemplate" or nil
+local frame = CreateFrame("Frame", "QeasyConfigFrame", UIParent, backdrop)
+frame:SetSize(340, 470)
+frame:SetPoint("CENTER")
+frame:SetFrameStrata("HIGH")
+frame:SetMovable(true)
+frame:EnableMouse(true)
+frame:RegisterForDrag("LeftButton")
+frame:SetClampedToScreen(true)
+frame:SetScript("OnDragStart", frame.StartMoving)
+frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
+frame:Hide()
+
+if frame.SetBackdrop then
+    frame:SetBackdrop({
+        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+        tile = true, tileSize = 32, edgeSize = 24,
+        insets = { left = 6, right = 6, top = 6, bottom = 6 },
+    })
+end
+
+local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+title:SetPoint("TOP", frame, "TOP", 0, -14)
+title:SetText(L.CFG_TITLE)
+title:SetTextColor(0.41, 0.80, 0.94)
+
+local close = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
+close:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -6, -6)
+close:SetScript("OnClick", function() frame:Hide() end)
+
+-- ---------------------------------------------------------------------
+-- Hjælpere til widgets
+-- ---------------------------------------------------------------------
+local y = -46
+local function section(text)
+    local fs = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    fs:SetPoint("TOPLEFT", frame, "TOPLEFT", 18, y)
+    fs:SetText(text)
+    fs:SetTextColor(1, 0.82, 0)
+    y = y - 22
+    return fs
+end
+
+local function checkbox(labeltext, getter, setter)
+    local cb = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
+    cb:SetPoint("TOPLEFT", frame, "TOPLEFT", 22, y)
+    cb:SetSize(24, 24)
+    local t = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    t:SetPoint("LEFT", cb, "RIGHT", 4, 0)
+    t:SetText(labeltext)
+    cb.qGet = getter
+    cb:SetScript("OnClick", function(self)
+        setter(self:GetChecked() and true or false)
+    end)
+    y = y - 26
+    return cb
+end
+
+local function slider(labeltext, minv, maxv, getter, setter)
+    local s = CreateFrame("Slider", nil, frame, "OptionsSliderTemplate")
+    s:SetPoint("TOPLEFT", frame, "TOPLEFT", 26, y - 14)
+    s:SetWidth(280)
+    s:SetMinMaxValues(minv, maxv)
+    s:SetValueStep(0.05)
+    if s.SetObeyStepOnDrag then s:SetObeyStepOnDrag(true) end
+    local t = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    t:SetPoint("BOTTOMLEFT", s, "TOPLEFT", 0, 2)
+    local val = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    val:SetPoint("BOTTOMRIGHT", s, "TOPRIGHT", 0, 2)
+    s.qLabel, s.qVal, s.qText = t, val, labeltext
+    s:SetScript("OnValueChanged", function(self, v)
+        v = math.floor(v * 20 + 0.5) / 20
+        self.qVal:SetText(string.format("%d%%", math.floor(v * 100 + 0.5)))
+        setter(v)
+    end)
+    s.qGet = getter
+    y = y - 44
+    return s
+end
+
+-- ---------------------------------------------------------------------
+-- Widgets
+-- ---------------------------------------------------------------------
+section(L.CFG_DISPLAY)
+local cbGuide = checkbox(L.CFG_GUIDE,
+    function() return ns.Q.char.ui.guideShown end,
+    function(v) ns.Guide:SetShown(v) end)
+local cbArrow = checkbox(L.CFG_ARROW,
+    function() return ns.Q.char.ui.arrowShown end,
+    function(v) ns.Arrow:SetShown(v) end)
+local cbAuto = checkbox(L.CFG_AUTOROUTE,
+    function() return ns.Q.char.ui.autoRoute ~= false end,
+    function(v) ns.Q.char.ui.autoRoute = v end)
+
+local sGuide = slider(L.CFG_GUIDESCALE, 0.7, 1.6,
+    function() return ns.Q.char.ui.guideScale or 1 end,
+    function(v) ns.Q.char.ui.guideScale = v; ns.Guide:ApplyScale() end)
+local sArrow = slider(L.CFG_ARROWSCALE, 0.7, 1.8,
+    function() return ns.Q.char.ui.arrowScale or 1 end,
+    function(v) ns.Q.char.ui.arrowScale = v; ns.Arrow:ApplyScale() end)
+
+section(L.CFG_ROUTES)
+local routeButtons = {}
+local function ensureRouteButtons()
+    if #routeButtons > 0 then return end
+    local ry = y
+    for _, key in ipairs(ns.Q.routeOrder) do
+        local route = ns.Q.routes[key]
+        local b = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+        b:SetSize(300, 20)
+        b:SetPoint("TOPLEFT", frame, "TOPLEFT", 20, ry)
+        b:SetText(string.format("%s  (%s)", route.title, route.levels or ""))
+        b.qKey = key
+        b:SetScript("OnClick", function()
+            ns.Q:SetActiveRoute(key)
+            Config:Refresh()
+        end)
+        routeButtons[#routeButtons + 1] = b
+        ry = ry - 23
+    end
+    -- Nulstil-knap
+    local reset = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    reset:SetSize(300, 22)
+    reset:SetPoint("TOPLEFT", frame, "TOPLEFT", 20, ry - 4)
+    reset:SetText(L.CFG_RESET)
+    reset:SetScript("OnClick", function() ns.Q:ResetRoute(); Config:Refresh() end)
+    ry = ry - 30
+    local hint = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    hint:SetPoint("TOPLEFT", frame, "TOPLEFT", 18, ry)
+    hint:SetPoint("RIGHT", frame, "RIGHT", -16, 0)
+    hint:SetJustifyH("LEFT")
+    hint:SetWordWrap(true)
+    hint:SetText(L.CFG_OPEN_HINT)
+    frame:SetHeight(math.abs(ry) + 60)
+end
+
+-- ---------------------------------------------------------------------
+function Config:Refresh()
+    cbGuide:SetChecked(cbGuide.qGet())
+    cbArrow:SetChecked(cbArrow.qGet())
+    cbAuto:SetChecked(cbAuto.qGet())
+    for _, s in ipairs({ sGuide, sArrow }) do
+        local v = s.qGet()
+        s:SetValue(v)
+        s.qLabel:SetText(s.qText)
+        s.qVal:SetText(string.format("%d%%", math.floor(v * 100 + 0.5)))
+    end
+    local active = ns.Q.char.activeRoute
+    for _, b in ipairs(routeButtons) do
+        if b.qKey == active then
+            b:SetNormalFontObject("GameFontHighlight")
+            b:LockHighlight()
+        else
+            b:SetNormalFontObject("GameFontNormal")
+            b:UnlockHighlight()
+        end
+    end
+end
+
+function Config:Open()
+    ensureRouteButtons()
+    frame:Show()
+    self:Refresh()
+end
+
+function Config:Toggle()
+    if frame:IsShown() then frame:Hide() else self:Open() end
+end
+
+-- Registrér i Blizzards AddOn-indstillinger (best-effort, versionssikkert).
+function Config:RegisterBlizzard()
+    local panel = CreateFrame("Frame", "QeasyBlizzOptions", UIParent)
+    panel.name = "Qeasy"
+    local t = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    t:SetPoint("TOPLEFT", 16, -16)
+    t:SetText("Qeasy")
+    local b = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+    b:SetSize(220, 24)
+    b:SetPoint("TOPLEFT", 16, -48)
+    b:SetText(L.CFG_BUTTON)
+    b:SetScript("OnClick", function() Config:Open() end)
+    if Settings and Settings.RegisterCanvasLayoutCategory and Settings.RegisterAddOnCategory then
+        local cat = Settings.RegisterCanvasLayoutCategory(panel, panel.name)
+        Settings.RegisterAddOnCategory(cat)
+    elseif InterfaceOptions_AddCategory then
+        InterfaceOptions_AddCategory(panel)
+    end
+end

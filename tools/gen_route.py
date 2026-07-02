@@ -14,27 +14,51 @@ def esc(s):
     return str(s).replace("\\", "\\\\").replace('"', '\\"')
 
 
+# Elementer der altid udgør deres eget lille step (distinkte handlinger).
+HARD_KINDS = {"travel", "fly", "hearth", "train", "vendor", "buy",
+              "repair", "deliver", "note", "ding", "grind"}
+# Sammenlæg kun quest-handlinger inden for denne afstand (zone-%) på samme kort.
+MERGE_DIST = 3.5
+
+
 class Plan:
     def __init__(self, key, title, levels, zones, main_map, nxt=None):
         self.meta = dict(key=key, title=title, levels=levels, zones=zones, nxt=nxt)
         self.main_map = main_map
-        self.steps = []          # liste af {label, elements}
+        self.flat = []           # liste af (chapter, element)
+        self.chapter = ""
         self.warnings = []
 
-    # -- gruppering --------------------------------------------------
+    # -- kapitler (S/step sætter kun overskriften; steps dannes ved build) --
     def step(self, label=""):
-        self.steps.append({"label": label, "elements": []})
+        self.chapter = label
         return self
 
-    S = step  # sektion = ny gruppe
-
-    def _cur(self):
-        if not self.steps:
-            self.step("")
-        return self.steps[-1]
+    S = step
 
     def _add(self, el):
-        self._cur()["elements"].append(el)
+        self.flat.append((self.chapter, el))
+
+    # -- opdel flad liste i mange små steps (RestedXP-stil) ----------
+    def _split(self):
+        steps = []
+        cur, anchor = None, None
+        for chapter, el in self.flat:
+            if el["kind"] in HARD_KINDS:
+                steps.append({"label": chapter, "elements": [el]})
+                cur, anchor = None, None
+                continue
+            c = el.get("coords")
+            merge = (cur is not None and cur["label"] == chapter and anchor and c
+                     and anchor[0] == c[0]
+                     and ((anchor[1] - c[1]) ** 2 + (anchor[2] - c[2]) ** 2) ** 0.5 <= MERGE_DIST)
+            if merge:
+                cur["elements"].append(el)
+            else:
+                cur = {"label": chapter, "elements": [el]}
+                anchor = c
+                steps.append(cur)
+        return steps
 
     # -- rejse / logistik -------------------------------------------
     def T(self, label, coords, note, radius=60):
@@ -123,7 +147,8 @@ class Plan:
             parts.append(f'text = "{esc(el["text"])}"')
         if el.get("note"):
             parts.append(f'note = "{esc(el["note"])}"')
-        if el.get("optional"):
+        # Notes er altid synlige (kræver manuel bekræftelse); andre kan være valgfri.
+        if el.get("optional") and el["kind"] != "note":
             parts.append("optional = true")
         head = ", ".join(parts[:3])
         tail = ", ".join(parts[3:])
@@ -143,7 +168,8 @@ class Plan:
         if m["nxt"]:
             out.append(f'    next = "{m["nxt"]}",')
         out.append("    steps = {")
-        for step in self.steps:
+        self._built = self._split()
+        for step in self._built:
             if not step["elements"]:
                 continue
             out.append(f'        {{ label = "{esc(step["label"])}", elements = {{')
@@ -176,8 +202,8 @@ def write(plan, path, maps_desc):
                                    levels=plan.meta["levels"], maps=maps_desc))
     with open(path, "w", encoding="utf-8") as fh:
         fh.write(src)
-    n_steps = sum(1 for s in plan.steps if s["elements"])
-    n_el = sum(len(s["elements"]) for s in plan.steps)
+    n_steps = sum(1 for s in plan._built if s["elements"])
+    n_el = sum(len(s["elements"]) for s in plan._built)
     print(f"{path.split('/')[-1]}: {n_steps} steps, {n_el} elementer")
     for w in plan.warnings:
         print(f"  ⚠ {w}")

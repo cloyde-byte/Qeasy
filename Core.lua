@@ -42,10 +42,14 @@ Q:SetScript("OnEvent", function(self, event, arg1, arg2)
             loadedPrinted = true
             print(string.format(L.ADDON_LOADED, GetVersion()))
         end
-        ns.Tracker:RestorePosition()
+        ns.Guide:RestorePosition()
         ns.Arrow:RestorePosition()
+        if ns.Config and not self.blizzRegistered then
+            self.blizzRegistered = true
+            ns.Config:RegisterBlizzard()
+        end
         if IsHorde() then
-            self:AutoPickRoute()
+            if self.char.ui.autoRoute ~= false then self:AutoPickRoute() end
         elseif not factionWarned then
             factionWarned = true
             print(L.NOT_HORDE)
@@ -64,7 +68,7 @@ Q:SetScript("OnEvent", function(self, event, arg1, arg2)
         self:Refresh()
 
     elseif event == "ZONE_CHANGED_NEW_AREA" then
-        if IsHorde() then self:AutoPickRoute() end
+        if IsHorde() and self.char.ui.autoRoute ~= false then self:AutoPickRoute() end
         self:Refresh()
     end
 end)
@@ -105,13 +109,15 @@ SlashCmdList["QEASY"] = function(msg)
     local cmd, rest = msg:match("^(%S*)%s*(.-)$")
     cmd = cmd:lower()
 
-    if cmd == "" or cmd == "help" then
+    if cmd == "" or cmd == "config" or cmd == "options" then
+        ns.Config:Toggle()
+    elseif cmd == "help" then
         PrintHelp()
     elseif cmd == "show" then
-        ns.Tracker:SetShown(true)
+        ns.Guide:SetShown(true)
         ns.Arrow:SetShown(true)
     elseif cmd == "hide" then
-        ns.Tracker:SetShown(false)
+        ns.Guide:SetShown(false)
         ns.Arrow:SetShown(false)
     elseif cmd == "arrow" then
         ns.Arrow:SetShown(not Q.char.ui.arrowShown)

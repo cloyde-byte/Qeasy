@@ -183,4 +183,9 @@ function Arrow:RestorePosition()
         frame:ClearAllPoints()
         frame:SetPoint(pos.point, UIParent, pos.point, pos.x, pos.y)
     end
+    self:ApplyScale()
+end
+
+function Arrow:ApplyScale()
+    frame:SetScale(ns.Q.char.ui.arrowScale or 1)
 end

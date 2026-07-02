@@ -45,10 +45,16 @@ du selv. Det holder addonet trygt inden for Blizzards regler.
 
 ## Sådan bruges det
 
-Qeasy er inspireret af **RestedXP**: Ruten er delt i **grupperede steps**
-— fx "tag disse 4 quests → lav dem i én sløjfe → aflever dem alle" — så du
-ikke render frem og tilbage. Addonet starter automatisk på Horde-karakterer
-og vælger ruten ud fra din zone (eller Hellfire fra level 58).
+Qeasy er inspireret af **RestedXP**: Ruten er delt i **mange små steps** —
+ét sted, én handling ad gangen, hvor kun handlinger på præcis samme spot
+lægges sammen (fx "tag disse 2 quests fra samme NPC"). Så du render ikke
+frem og tilbage. Addonet starter automatisk på Horde-karakterer og vælger
+ruten ud fra din zone (eller Hellfire fra level 58).
+
+Åbn **indstillingsvinduet** med `/qeasy` (eller via Blizzards
+AddOn-menu): her kan du slå guide og pil til/fra, justere størrelsen,
+slå automatisk rutevalg fra og skifte aktiv rute — uden at bruge
+tekstkommandoer.
 
 - **Guide-vinduet** viser det aktuelle step som en liste af handlinger,
   hver med et ikon og et **grønt flueben**, der sættes automatisk, når du
@@ -77,15 +83,16 @@ Hvert step består af handlinger af disse typer:
 ### Kommandoer
 
 ```
-/qeasy               hjælp
-/qeasy show|hide     vis/skjul tracker og pil
+/qeasy               åbn/luk indstillingsvinduet
+/qeasy help          vis kommandoliste
+/qeasy show|hide     vis/skjul guide og pil
 /qeasy arrow         vis/skjul kun pilen
-/qeasy skip          spring det aktuelle trin over
-/qeasy back          fortryd seneste manuelle trin
+/qeasy skip          spring det aktuelle step over
+/qeasy back          fortryd seneste spring/afkrydsning
 /qeasy list          vis alle ruter
 /qeasy route <navn>  skift rute (fx /qeasy route zangarmarsh-horde)
-/qeasy reset         nulstil manuelle trin på den aktive rute
-/qeasy debug         vis teknisk info om det aktuelle trin
+/qeasy reset         nulstil den aktive rute
+/qeasy debug         vis teknisk info om det aktuelle step
 ```
 
 ## Datakilde

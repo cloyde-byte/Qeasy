@@ -25,6 +25,8 @@ ns.Q:RegisterRoute({
         { label = "Garadar", elements = {
                 { kind = "travel", coords = { map = 1951, x = 55.4, y = 37.6 }, radius = 60,
                   text = "Garadar", note = "Følg vejen fra Terokkar ind i Nagrand til Mag'har-byen Garadar (flight point)." },
+        }},
+        { label = "Garadar", elements = {
                 { kind = "accept", quest = 9863, title = "Vile Idolatry",
                   coords = { map = 1951, x = 54.8, y = 39.4 }, note = "Fra Farseer Kurkush." },
                 { kind = "accept", quest = 9910, title = "Standards and Practices",
@@ -33,14 +35,22 @@ ns.Q:RegisterRoute({
                   coords = { map = 1951, x = 55.8, y = 38.0 }, note = "Dusør fra Garadar Bulletin Board." },
                 { kind = "accept", quest = 9939, title = "Wanted: Zorbo the Advisor",
                   coords = { map = 1951, x = 55.8, y = 38.0 }, note = "Fra Garadar Bulletin Board." },
+        }},
+        { label = "Garadar", elements = {
                 { kind = "do", quest = 9863, title = "Vile Idolatry",
                   coords = { map = 1951, x = 33.0, y = 41.0 }, note = "Dræb Murkblood-Broken ved Sunspring Post (vest) og Laughing Skull." },
+        }},
+        { label = "Garadar", elements = {
                 { kind = "do", quest = 9910, title = "Standards and Practices",
                   coords = { map = 1951, x = 56.0, y = 73.0 }, note = "Dræb Kil'sorrow-orcs ved deres fæstning (sydøst)." },
+        }},
+        { label = "Garadar", elements = {
                 { kind = "do", quest = 9935, title = "Wanted: Giselda the Crone",
                   coords = { map = 1951, x = 22.0, y = 28.0 }, note = "Dræb Giselda the Crone på Warmaul Hill (nordvest)." },
                 { kind = "do", quest = 9939, title = "Wanted: Zorbo the Advisor",
                   coords = { map = 1951, x = 21.0, y = 30.0 }, note = "Dræb Zorbo the Advisor på Warmaul Hill." },
+        }},
+        { label = "Garadar", elements = {
                 { kind = "turnin", quest = 9863, title = "Vile Idolatry",
                   coords = { map = 1951, x = 54.8, y = 39.4 }, note = "Aflever hos Farseer Kurkush." },
                 { kind = "turnin", quest = 9910, title = "Standards and Practices",
@@ -53,16 +63,24 @@ ns.Q:RegisterRoute({
         { label = "Throne of the Elements", elements = {
                 { kind = "accept", quest = 9870, title = "The Throne of the Elements",
                   coords = { map = 1951, x = 55.4, y = 38.0 }, note = "Fra Elementalist Yal'hah i Garadar." },
+        }},
+        { label = "Throne of the Elements", elements = {
                 { kind = "travel", coords = { map = 1951, x = 60.7, y = 22.1 }, radius = 60,
                   text = "Throne of the Elements", note = "Nordøst for Garadar: elementernes helligdom." },
+        }},
+        { label = "Throne of the Elements", elements = {
                 { kind = "turnin", quest = 9870, title = "The Throne of the Elements",
                   coords = { map = 1951, x = 60.7, y = 22.1 }, note = "Aflever hos Elementalist Sharvak." },
                 { kind = "accept", quest = 9800, title = "A Rare Bean",
                   coords = { map = 1951, x = 60.8, y = 22.4 }, note = "Fra Elementalist Lo'ap." },
                 { kind = "accept", quest = 9818, title = "The Underneath",
                   coords = { map = 1951, x = 60.7, y = 22.7 }, note = "Fra Elementalist Untrag." },
+        }},
+        { label = "Throne of the Elements", elements = {
                 { kind = "do", quest = 9800, title = "A Rare Bean",
                   coords = { map = 1951, x = 58.0, y = 30.0 }, note = "Saml Bak'nari Coffee Beans på markerne." },
+        }},
+        { label = "Throne of the Elements", elements = {
                 { kind = "do", quest = 9818, title = "The Underneath",
                   coords = { map = 1951, x = 61.0, y = 24.0 }, note = "Undersøg The Underneath under thronet." },
                 { kind = "turnin", quest = 9800, title = "A Rare Bean",
@@ -73,8 +91,12 @@ ns.Q:RegisterRoute({
         { label = "Nesingwary Safari", elements = {
                 { kind = "accept", quest = 10114, title = "The Nesingwary Safari",
                   coords = { map = 1951, x = 55.4, y = 37.3 }, note = "Fra Ohlorn Farstrider i Garadar." },
+        }},
+        { label = "Nesingwary Safari", elements = {
                 { kind = "travel", coords = { map = 1951, x = 71.5, y = 40.8 }, radius = 60,
                   text = "Nesingwary Safari", note = "Hemet Nesingwarys jagtlejr i øst." },
+        }},
+        { label = "Nesingwary Safari", elements = {
                 { kind = "turnin", quest = 10114, title = "The Nesingwary Safari",
                   coords = { map = 1951, x = 71.6, y = 40.5 }, note = "Aflever hos Shado 'Fitz' Farstrider." },
                 { kind = "accept", quest = 9789, title = "Clefthoof Mastery",
@@ -83,32 +105,50 @@ ns.Q:RegisterRoute({
                   coords = { map = 1951, x = 71.6, y = 40.5 }, note = "Windroc Mastery - fra Shado Farstrider." },
                 { kind = "accept", quest = 9857, title = "Talbuk Mastery",
                   coords = { map = 1951, x = 71.4, y = 40.6 }, note = "Talbuk Mastery - fra Harold Lane." },
+        }},
+        { label = "Nesingwary Safari", elements = {
                 { kind = "do", quest = 9789, title = "Clefthoof Mastery",
                   coords = { map = 1951, x = 63.0, y = 50.0 }, note = "Jag clefthoofs på sletterne (findes i hele Nagrand)." },
+        }},
+        { label = "Nesingwary Safari", elements = {
                 { kind = "do", quest = 9854, title = "Windroc Mastery",
                   coords = { map = 1951, x = 66.0, y = 45.0 }, note = "Jag windrocs på sletterne." },
+        }},
+        { label = "Nesingwary Safari", elements = {
                 { kind = "do", quest = 9857, title = "Talbuk Mastery",
                   coords = { map = 1951, x = 60.0, y = 48.0 }, note = "Jag talbuks på sletterne." },
+        }},
+        { label = "Nesingwary Safari", elements = {
                 { kind = "turnin", quest = 9789, title = "Clefthoof Mastery",
                   coords = { map = 1951, x = 71.5, y = 40.8 }, note = "Aflever hos Hemet Nesingwary." },
                 { kind = "turnin", quest = 9854, title = "Windroc Mastery",
                   coords = { map = 1951, x = 71.6, y = 40.5 }, note = "Aflever hos Shado 'Fitz' Farstrider." },
                 { kind = "turnin", quest = 9857, title = "Talbuk Mastery",
                   coords = { map = 1951, x = 71.4, y = 40.6 }, note = "Aflever hos Harold Lane." },
+        }},
+        { label = "Nesingwary Safari", elements = {
                 { kind = "note", coords = { map = 1951, x = 71.5, y = 40.8 }, text = "Mastery-kæderne fortsætter",
-                  note = "Hver Mastery har tre trin (Clefthoof 9789->9850->9851, Windroc 9854->9855->9856, Talbuk 9857->9858->9859) og munder ud i 'The Ultimate Bloodsport'. Enorm XP - fortsæt sideløbende. Tryk 'Spring over', når du er klar.", optional = true },
+                  note = "Hver Mastery har tre trin (Clefthoof 9789->9850->9851, Windroc 9854->9855->9856, Talbuk 9857->9858->9859) og munder ud i 'The Ultimate Bloodsport'. Enorm XP - fortsæt sideløbende. Tryk 'Spring over', når du er klar." },
         }},
         { label = "Consortium: Aeris Landing", elements = {
                 { kind = "travel", coords = { map = 1951, x = 31.4, y = 57.8 }, radius = 60,
                   text = "Aeris Landing", note = "Consortium-lejren ved foden af Oshu'gun i sydvest." },
+        }},
+        { label = "Consortium: Aeris Landing", elements = {
                 { kind = "accept", quest = 9882, title = "Stealing from Thieves",
                   coords = { map = 1951, x = 31.4, y = 57.8 }, note = "Fra Gezhe." },
                 { kind = "accept", quest = 9914, title = "A Head Full of Ivory",
                   coords = { map = 1951, x = 31.8, y = 56.8 }, note = "Fra Shadrek." },
+        }},
+        { label = "Consortium: Aeris Landing", elements = {
                 { kind = "do", quest = 9882, title = "Stealing from Thieves",
                   coords = { map = 1951, x = 35.0, y = 55.0 }, note = "Saml Obsidian Warbeads/krystaller fra ogrer på Spirit Fields." },
+        }},
+        { label = "Consortium: Aeris Landing", elements = {
                 { kind = "do", quest = 9914, title = "A Head Full of Ivory",
                   coords = { map = 1951, x = 40.0, y = 55.0 }, note = "Saml elfenben fra clefthoofs." },
+        }},
+        { label = "Consortium: Aeris Landing", elements = {
                 { kind = "turnin", quest = 9882, title = "Stealing from Thieves",
                   coords = { map = 1951, x = 31.4, y = 57.8 }, note = "Aflever hos Gezhe." },
                 { kind = "turnin", quest = 9914, title = "A Head Full of Ivory",
@@ -116,12 +156,20 @@ ns.Q:RegisterRoute({
         }},
         { label = "Mag'har-kæden og afslutning", elements = {
                 { kind = "note", coords = { map = 1951, x = 55.4, y = 37.6 }, text = "Garrosh og Greatmother Geyah",
-                  note = "Lore-kæden fra Garrosh (via Kil'sorrow, Warmaul og elementerne) fører til 'A Visit With the Greatmother' og senere Thralls ankomst. Tryk 'Spring over', når du har fulgt den.", optional = true },
+                  note = "Lore-kæden fra Garrosh (via Kil'sorrow, Warmaul og elementerne) fører til 'A Visit With the Greatmother' og senere Thralls ankomst. Tryk 'Spring over', når du har fulgt den." },
+        }},
+        { label = "Mag'har-kæden og afslutning", elements = {
                 { kind = "note", coords = { map = 1951, x = 42.8, y = 20.7 }, text = "Ring of Blood (gruppe)",
-                  note = "The Ring of Blood ved Gurgthock: seks gladiator-kampe for en 5-mands gruppe - en af TBC's bedste XP-klumper plus et stærkt våben. Find en gruppe! Tryk 'Spring over', hvis du dropper den.", optional = true },
+                  note = "The Ring of Blood ved Gurgthock: seks gladiator-kampe for en 5-mands gruppe - en af TBC's bedste XP-klumper plus et stærkt våben. Find en gruppe! Tryk 'Spring over', hvis du dropper den." },
+        }},
+        { label = "Mag'har-kæden og afslutning", elements = {
                 { kind = "ding", level = 67 },
+        }},
+        { label = "Mag'har-kæden og afslutning", elements = {
                 { kind = "note", coords = { map = 1951, x = 55.4, y = 37.6 }, text = "Ryd op i Nagrand",
-                  note = "Valgfrit: gør Mastery-kæderne og resterende Garadar-quests færdige indtil ca. level 66-67.", optional = true },
+                  note = "Valgfrit: gør Mastery-kæderne og resterende Garadar-quests færdige indtil ca. level 66-67." },
+        }},
+        { label = "Mag'har-kæden og afslutning", elements = {
                 { kind = "travel", coords = { map = 1949, x = 51.9, y = 58.4 }, radius = 100,
                   text = "Mod Blade's Edge Mountains", note = "Flyv nordpå gennem bjergene til Thunderlord Stronghold i Blade's Edge Mountains. Qeasy skifter automatisk rute." },
         }},
