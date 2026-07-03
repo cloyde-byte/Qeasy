@@ -27,11 +27,16 @@ local function autostub(t)
     return t
 end
 function CreateFrame(ftype, name, parent, template)
-    local f = { scripts = {} }
+    local f = { scripts = {}, _w = 200, _h = 100 }
     function f:SetScript(k, fn) self.scripts[k] = fn end
     function f:GetScript(k) return self.scripts[k] end
     function f:RegisterEvent() end
     function f:UnregisterEvent() end
+    function f:SetSize(w, h) self._w, self._h = w, h end
+    function f:SetWidth(w) self._w = w end
+    function f:SetHeight(h) self._h = h end
+    function f:GetWidth() return self._w end
+    function f:GetHeight() return self._h end
     function f:GetPoint() return 'CENTER', nil, nil, 0, 0 end
     function f:Show() rawset(f, 'shown', true) end
     function f:Hide() rawset(f, 'shown', false) end
@@ -70,20 +75,35 @@ QLOG = {}; FLAGGED = {}
 function GetNumQuestLogEntries() return #QLOG end
 function GetQuestLogTitle(i)
     local q = QLOG[i]; if not q then return nil end
-    return q.title, 60, nil, false, false, q.complete and 1 or 0, nil, q.questID
+    if q.header then return q.title, 0, nil, true, false, nil, nil, nil end
+    return q.title, q.level or 60, nil, false, false, q.complete and 1 or 0, nil, q.questID
 end
+function GetNumQuestLeaderBoards(i)
+    local q = QLOG[i]; return (q and q.objectives) and #q.objectives or 0
+end
+function GetQuestLogLeaderBoard(j, i)
+    local q = QLOG[i]; local o = q and q.objectives and q.objectives[j]
+    if not o then return nil end
+    return o.text, 'monster', o.done and true or false
+end
+function GetQuestDifficultyColor(level) return { r = 1, g = 1, b = 0 } end
 C_QuestLog = { IsQuestFlaggedCompleted = function(id) return FLAGGED[id] or false end }
 function UnitFactionGroup() return PSTATE.faction end
 function UnitLevel() return PSTATE.level end
+function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return false end
-function GetAddOnMetadata() return '0.5.0' end
+function GetAddOnMetadata() return '0.7.0' end
+hooksecurefunc = function() end
+GameTooltip = { HookScript = function() end, GetUnit = function() return nil end,
+                AddLine = function() end, Show = function() end }
 """
 lua.execute(STUBS)
 g = lua.globals()
 
 ns = lua.eval("{}")
-for f in ["Locale.lua", "Engine.lua", "Arrow.lua", "Guide.lua", "Config.lua",
+for f in ["Locale.lua", "Engine.lua", "Arrow.lua", "Guide.lua",
+          "QuestLog.lua", "ObjectiveTracker.lua", "Tooltips.lua", "Config.lua",
           "Routes/HellfirePeninsula.lua", "Routes/Zangarmarsh.lua",
           "Routes/TerokkarForest.lua", "Routes/Nagrand.lua",
           "Routes/BladesEdge.lua", "Routes/Netherstorm.lua",
@@ -205,8 +225,33 @@ flush()
 check("fuldført netherstorm -> auto-skift til shadowmoon",
       Q.char.activeRoute == "shadowmoon-horde")
 
+# ---- Questie-agtig quest-tracker + tooltips ----
+lua.execute("""
+QLOG = {
+  { header = true, title = 'Terokkar Forest' },
+  { title = 'Kill the Shadow Council!', questID = 10043, level = 65,
+    objectives = { { text = 'Shadowy Executioner slain: 4/10', done = false } } },
+  { title = 'The Outcast\\'s Plight', questID = 99001, level = 65, complete = false,
+    objectives = { { text = 'Arakkoa Feather: 28/30', done = false } } },
+  { header = true, title = 'Nagrand' },
+  { title = 'Because Kilrath is a Coward', questID = 9891, level = 65, complete = true,
+    objectives = {} },
+}
+""")
+done, total = ns.QuestLog.Counts(ns.QuestLog)
+check("tracker tæller quests (1 færdig / 3 total)", done == 1 and total == 3)
+ns.ObjTracker.Update(ns.ObjTracker)
+check("quest-tracker synlig", g.QeasyObjectiveTracker.shown == True)
+
+hits = ns.QuestLog.ObjectivesForName(ns.QuestLog, "Shadowy Executioner")
+hitlist = list(hits.values())
+check("tooltip matcher mob -> quest ('Kill the Shadow Council!')",
+      len(hitlist) == 1 and hitlist[0].title == "Kill the Shadow Council!")
+none = list(ns.QuestLog.ObjectivesForName(ns.QuestLog, "Tilfældig Kanin").values())
+check("tooltip: ingen match for urelateret mob", len(none) == 0)
+
 # ---- slash ----
-for cmd in ("list","debug","","config","skip","back","help"):
+for cmd in ("list","debug","","config","skip","back","help","tracker","tooltips"):
     lua.eval("SlashCmdList['QEASY']")(cmd)
 
 print("\n--- chat (uddrag) ---")

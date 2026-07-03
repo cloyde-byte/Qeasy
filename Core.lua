@@ -46,6 +46,8 @@ Q:SetScript("OnEvent", function(self, event, arg1, arg2)
         end
         ns.Guide:RestorePosition()
         ns.Arrow:RestorePosition()
+        if ns.ObjTracker then ns.ObjTracker:RestorePosition() end
+        if ns.Tooltips then ns.Tooltips:Init() end
         if ns.Config and not self.blizzRegistered then
             self.blizzRegistered = true
             ns.Config:RegisterBlizzard()
@@ -129,6 +131,10 @@ SlashCmdList["QEASY"] = function(msg)
         ns.Arrow:SetShown(false)
     elseif cmd == "arrow" then
         ns.Arrow:SetShown(not Q.char.ui.arrowShown)
+    elseif cmd == "tracker" then
+        ns.ObjTracker:SetShown(not Q.char.ui.objTrackerShown)
+    elseif cmd == "tooltips" then
+        Q.char.ui.tooltipsEnabled = not Q.char.ui.tooltipsEnabled
     elseif cmd == "skip" then
         Q:SkipStep()
     elseif cmd == "back" then

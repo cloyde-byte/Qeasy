@@ -104,6 +104,12 @@ local cbArrow = checkbox(L.CFG_ARROW,
 local cbAuto = checkbox(L.CFG_AUTOROUTE,
     function() return ns.Q.char.ui.autoRoute ~= false end,
     function(v) ns.Q.char.ui.autoRoute = v end)
+local cbObjTracker = checkbox(L.CFG_OBJTRACKER,
+    function() return ns.Q.char.ui.objTrackerShown ~= false end,
+    function(v) ns.ObjTracker:SetShown(v) end)
+local cbTooltips = checkbox(L.CFG_TOOLTIPS,
+    function() return ns.Q.char.ui.tooltipsEnabled ~= false end,
+    function(v) ns.Q.char.ui.tooltipsEnabled = v end)
 
 local sGuide = slider(L.CFG_GUIDESCALE, 0.7, 1.6,
     function() return ns.Q.char.ui.guideScale or 1 end,
@@ -152,6 +158,8 @@ function Config:Refresh()
     cbGuide:SetChecked(cbGuide.qGet())
     cbArrow:SetChecked(cbArrow.qGet())
     cbAuto:SetChecked(cbAuto.qGet())
+    cbObjTracker:SetChecked(cbObjTracker.qGet())
+    cbTooltips:SetChecked(cbTooltips.qGet())
     for _, s in ipairs({ sGuide, sArrow }) do
         local v = s.qGet()
         s:SetValue(v)

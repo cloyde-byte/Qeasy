@@ -92,6 +92,23 @@ Hvert step består af handlinger af disse typer:
 | `ding` / `grind` | level-checkpoint / grind til level N |
 | `note` | info/påmindelse (fx en quest-kæde du selv følger) |
 
+### Questie-agtige funktioner
+
+Ud over den guidede rute fungerer Qeasy som et alment quest-addon:
+
+- **Quest-tracker**: et flytbart vindue (Shift + træk) der viser *alle*
+  dine aktive quests grupperet efter zone, med objectives og fremgang
+  (fx "Arakkoa Feather: 28/30") og farve efter sværhedsgrad. Klik en
+  quest-titel for at folde dens objectives sammen. Virker for enhver
+  quest — også dem uden for ruten.
+- **Mob-tooltips**: peger du på en skabning, viser Qeasy hvilke af dine
+  aktive quests den tæller til, og hvor langt du er (fx
+  "Kill the Shadow Council! — Shadowy Executioner slain: 4/10").
+
+Begge kan slås til/fra i indstillingsvinduet (eller `/qeasy tracker` /
+`/qeasy tooltips`). Data læses live fra din quest-log, så der følger ingen
+stor database med.
+
 ### Kommandoer
 
 ```
@@ -99,6 +116,8 @@ Hvert step består af handlinger af disse typer:
 /qeasy help          vis kommandoliste
 /qeasy show|hide     vis/skjul guide og pil
 /qeasy arrow         vis/skjul kun pilen
+/qeasy tracker       vis/skjul quest-trackeren
+/qeasy tooltips      slå quest-info i mob-tooltips til/fra
 /qeasy skip          spring det aktuelle step over
 /qeasy back          fortryd seneste spring/afkrydsning
 /qeasy list          vis alle ruter

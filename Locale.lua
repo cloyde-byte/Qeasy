@@ -27,11 +27,17 @@ ns.L = {
     TYPE_DO            = "Udfør",
     TYPE_TRAVEL        = "Rejs til",
     TYPE_NOTE          = "Info",
+    -- Quest-tracker & tooltips
+    QUEST_COMPLETE   = "Quest Complete!",
+    TRACKER_NOQUESTS = "Ingen aktive quests i loggen.",
+
     -- Config-vindue
     CFG_TITLE        = "Qeasy - Indstillinger",
     CFG_DISPLAY      = "Visning",
     CFG_GUIDE        = "Vis guide-vindue",
     CFG_ARROW        = "Vis GPS-pil",
+    CFG_OBJTRACKER   = "Vis quest-tracker (aktive quests)",
+    CFG_TOOLTIPS     = "Vis quest-info i mob-tooltips",
     CFG_AUTOROUTE    = "Vælg rute automatisk efter zone",
     CFG_GUIDESCALE   = "Guide-størrelse",
     CFG_ARROWSCALE   = "Pil-størrelse",
