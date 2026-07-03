@@ -104,10 +104,20 @@ Ud over den guidede rute fungerer Qeasy som et alment quest-addon:
 - **Mob-tooltips**: peger du på en skabning, viser Qeasy hvilke af dine
   aktive quests den tæller til, og hvor langt du er (fx
   "Kill the Shadow Council! — Shadowy Executioner slain: 4/10").
+- **Kort- og minimap-ikoner (kun Outland)**: på verdenskortet og
+  minimappet viser Qeasy quest-ikoner ligesom Questie:
+  - **!** = en quest du kan tage her (ikke i loggen, ikke klaret, du har
+    level og forudsætninger)
+  - **?** = en quest i din log der er *færdig* og skal afleveres her
+  - grøn prik = et objektiv for en quest du er i gang med
+  Ikonerne kommer fra en indbygget Outland-quest-database (1162 quests),
+  udtrukket fra pfQuest. Hold musen over et kort-ikon for at se questens
+  navn.
 
-Begge kan slås til/fra i indstillingsvinduet (eller `/qeasy tracker` /
-`/qeasy tooltips`). Data læses live fra din quest-log, så der følger ingen
-stor database med.
+Alt kan slås til/fra i indstillingsvinduet (eller `/qeasy tracker`,
+`/qeasy tooltips`, `/qeasy mapicons`, `/qeasy minimap`). Tracker og
+tooltips læses live fra din quest-log; kort-ikonerne bruger den indbyggede
+Outland-database.
 
 ### Kommandoer
 
@@ -118,6 +128,8 @@ stor database med.
 /qeasy arrow         vis/skjul kun pilen
 /qeasy tracker       vis/skjul quest-trackeren
 /qeasy tooltips      slå quest-info i mob-tooltips til/fra
+/qeasy mapicons      slå kort-ikoner til/fra (Outland)
+/qeasy minimap       slå minimap-ikoner til/fra (Outland)
 /qeasy skip          spring det aktuelle step over
 /qeasy back          fortryd seneste spring/afkrydsning
 /qeasy list          vis alle ruter

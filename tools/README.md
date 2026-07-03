@@ -34,6 +34,7 @@ Sæt evt. `PFQUEST_DB=/sti/til/pfQuest/db` hvis klonen ligger et andet sted.
 | `qdb.py` | Opslag mod pfQuest: titel, quest-giver, aflevering, objective-centroid, kæde-forudsætninger. Mapper klassiske areaID'er til TBC Classic uiMapID'er. |
 | `gen_route.py` | `Plan`-byggeren og `.lua`-serialiseringen. Trin: `S` (sektion), `T` (travel), `N` (note), `A`/`D`/`X` (accept/do/turn-in). |
 | `plans.py` | Selve ruterne som quest-id-sekvenser. **Rediger her.** |
+| `gen_db.py` | Genererer `../Data/OutlandQuests.lua` - quest-databasen til kort/minimap-ikoner (giver/aflever/objektiv-koordinater for alle Outland Horde/neutrale quests). Kør `PFQUEST_DB=... python3 gen_db.py`. |
 
 ## Sådan tilføjes/rettes en quest
 

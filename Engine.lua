@@ -55,6 +55,8 @@ function Q:InitDB()
     if c.ui.arrowShown == nil then c.ui.arrowShown = true end
     if c.ui.objTrackerShown == nil then c.ui.objTrackerShown = true end
     if c.ui.tooltipsEnabled == nil then c.ui.tooltipsEnabled = true end
+    if c.ui.mapIcons == nil then c.ui.mapIcons = true end
+    if c.ui.minimapIcons == nil then c.ui.minimapIcons = true end
     self.db = QeasyDB
     self.char = c
 end
@@ -414,4 +416,5 @@ function Q:DoRefresh()
     if ns.Guide then ns.Guide:Update() end
     if ns.Arrow then ns.Arrow:UpdateTarget() end
     if ns.ObjTracker then ns.ObjTracker:Update() end
+    if ns.Map then ns.Map:Rebuild() end
 end

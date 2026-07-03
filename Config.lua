@@ -110,6 +110,12 @@ local cbObjTracker = checkbox(L.CFG_OBJTRACKER,
 local cbTooltips = checkbox(L.CFG_TOOLTIPS,
     function() return ns.Q.char.ui.tooltipsEnabled ~= false end,
     function(v) ns.Q.char.ui.tooltipsEnabled = v end)
+local cbMapIcons = checkbox(L.CFG_MAPICONS,
+    function() return ns.Q.char.ui.mapIcons ~= false end,
+    function(v) ns.Q.char.ui.mapIcons = v; if ns.Map then ns.Map:UpdateWorldMap() end end)
+local cbMiniIcons = checkbox(L.CFG_MINIMAPICONS,
+    function() return ns.Q.char.ui.minimapIcons ~= false end,
+    function(v) ns.Q.char.ui.minimapIcons = v end)
 
 local sGuide = slider(L.CFG_GUIDESCALE, 0.7, 1.6,
     function() return ns.Q.char.ui.guideScale or 1 end,
@@ -160,6 +166,8 @@ function Config:Refresh()
     cbAuto:SetChecked(cbAuto.qGet())
     cbObjTracker:SetChecked(cbObjTracker.qGet())
     cbTooltips:SetChecked(cbTooltips.qGet())
+    cbMapIcons:SetChecked(cbMapIcons.qGet())
+    cbMiniIcons:SetChecked(cbMiniIcons.qGet())
     for _, s in ipairs({ sGuide, sArrow }) do
         local v = s.qGet()
         s:SetValue(v)

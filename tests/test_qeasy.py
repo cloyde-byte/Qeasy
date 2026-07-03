@@ -93,17 +93,23 @@ function UnitLevel() return PSTATE.level end
 function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return false end
-function GetAddOnMetadata() return '0.7.0' end
+function GetAddOnMetadata() return '0.8.0' end
 hooksecurefunc = function() end
 GameTooltip = { HookScript = function() end, GetUnit = function() return nil end,
-                AddLine = function() end, Show = function() end }
+                SetOwner = function() end, AddLine = function() end,
+                Show = function() end, Hide = function() end }
+Minimap = CreateFrame('Frame', 'Minimap')
+function Minimap:GetZoom() return 3 end
+GetCVar = function() return '0' end
+-- WorldMapFrame udeladt (nil) -> kort-pin-koden skal degradere pænt.
 """
 lua.execute(STUBS)
 g = lua.globals()
 
 ns = lua.eval("{}")
 for f in ["Locale.lua", "Engine.lua", "Arrow.lua", "Guide.lua",
-          "QuestLog.lua", "ObjectiveTracker.lua", "Tooltips.lua", "Config.lua",
+          "QuestLog.lua", "ObjectiveTracker.lua", "Tooltips.lua",
+          "Data/OutlandQuests.lua", "Map.lua", "Config.lua",
           "Routes/HellfirePeninsula.lua", "Routes/Zangarmarsh.lua",
           "Routes/TerokkarForest.lua", "Routes/Nagrand.lua",
           "Routes/BladesEdge.lua", "Routes/Netherstorm.lua",
@@ -250,8 +256,31 @@ check("tooltip matcher mob -> quest ('Kill the Shadow Council!')",
 none = list(ns.QuestLog.ObjectivesForName(ns.QuestLog, "Tilfældig Kanin").values())
 check("tooltip: ingen match for urelateret mob", len(none) == 0)
 
+# ---- kort/minimap-ikoner (Outland) ----
+check("Outland quest-DB indlæst (>500 quests)",
+      ns.QuestDB is not None and sum(1 for _ in ns.QuestDB.keys()) > 500)
+lua.execute("PSTATE.map=1944; PSTATE.level=70; QLOG={}; FLAGGED={}")
+icons = list(ns.Map.IconsForMap(ns.Map, 1944).values())
+kinds = set(i.kind for i in icons)
+check(f"kort-ikoner for Hellfire (1944): {len(icons)} stk", len(icons) > 20)
+check("indeholder giver-ikoner (!)", "giver" in kinds)
+
+# en available giver-quest må ikke længere vises som giver når den er i loggen
+some = int(next(i.qid for i in icons if i.kind == "giver"))
+title = ns.QuestDB[some].t
+lua.eval("function(t,id) QLOG = { { title=t, questID=id } } end")(title, some)
+icons2 = list(ns.Map.IconsForMap(ns.Map, 1944).values())
+still_giver = any(i.qid == some and i.kind == "giver" for i in icons2)
+check("quest i loggen vises ikke længere som available-giver", not still_giver)
+
+# minimap-OnUpdate kører uden fejl
+ns.Map.Rebuild(ns.Map)
+g.QeasyMinimapPins.scripts.OnUpdate(g.QeasyMinimapPins, 0.2)
+check("minimap-pins opdaterer uden fejl", True)
+
 # ---- slash ----
-for cmd in ("list","debug","","config","skip","back","help","tracker","tooltips"):
+for cmd in ("list","debug","","config","skip","back","help","tracker",
+            "tooltips","mapicons","minimap"):
     lua.eval("SlashCmdList['QEASY']")(cmd)
 
 print("\n--- chat (uddrag) ---")
