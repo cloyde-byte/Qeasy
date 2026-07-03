@@ -52,13 +52,7 @@ local function flagged(qid)
     return false
 end
 
--- onQuest[qid] = complete-bool hvis i loggen, ellers nil.
-local function questState(qid)
-    return ns.Q.snapshot.onQuest[qid]
-end
-
 local function giverAvailable(qid, d)
-    if questState(qid) ~= nil then return false end   -- allerede i loggen
     if flagged(qid) then return false end             -- allerede klaret
     if d.lvl and playerLevel() < d.lvl then return false end
     if d.pre then
@@ -69,23 +63,41 @@ local function giverAvailable(qid, d)
     return true
 end
 
+-- Byg quest-log-tilstand fra QuestLog (samme robuste "complete"-logik som
+-- trackeren: en quest er complete når ALLE objectives er det, også når
+-- klientens isComplete-flag mangler - fx redningsquests).
+--   st[qid] = "complete" | "active" (i loggen); nil = ikke i loggen
+local function buildState()
+    local st = {}
+    for _, e in ipairs(ns.QuestLog:Scan()) do
+        if e.questID then
+            st[e.questID] = e.isComplete and "complete" or "active"
+        end
+    end
+    return st
+end
+
 -- Hvilke ikoner skal vises på et bestemt map lige nu?
 function Map:IconsForMap(mapID)
     buildIndex()
-    ns.Q:ScanQuestLog()
+    local st = buildState()
     local list = {}
     for _, e in ipairs(byMap[mapID] or {}) do
         local d = ns.QuestDB[e.qid]
-        local show = false
+        local state = st[e.qid]
+        local show, npc = false, nil
         if e.kind == "giver" then
-            show = giverAvailable(e.qid, d)
+            show = (state == nil) and giverAvailable(e.qid, d)  -- ikke i loggen
+            npc = d.gn
         elseif e.kind == "turnin" then
-            show = (questState(e.qid) == true)      -- i log og færdig
+            show = (state == "complete")                        -- færdig, aflever
+            npc = d.en
         elseif e.kind == "objective" then
-            show = (questState(e.qid) == false)     -- i log, ikke færdig
+            show = (state == "active")                          -- i gang
         end
         if show then
-            list[#list + 1] = { qid = e.qid, kind = e.kind, x = e.x, y = e.y, title = d.t }
+            list[#list + 1] = { qid = e.qid, kind = e.kind, x = e.x, y = e.y,
+                                title = d.t, npc = npc }
         end
     end
     return list
@@ -133,8 +145,8 @@ local function getWorldPin(i, canvas)
     p:SetScript("OnEnter", function(self)
         if not self.title then return end
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        GameTooltip:AddLine("|cff69ccf0Qeasy|r")
-        GameTooltip:AddLine(self.title, 1, 1, 1)
+        GameTooltip:AddLine(self.title, 1, 0.85, 0.30)   -- questnavn, fremhævet
+        if self.sub then GameTooltip:AddLine(self.sub, 0.75, 0.82, 0.95) end
         GameTooltip:Show()
     end)
     p:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -162,6 +174,13 @@ function Map:UpdateWorldMap()
         p:SetSize(14, 14)
         p.title = ic.title
         p.qid = ic.qid
+        if ic.kind == "turnin" then
+            p.sub = "Aflever" .. (ic.npc and (" hos " .. ic.npc) or " her")
+        elseif ic.kind == "giver" then
+            p.sub = "Tilgængelig quest" .. (ic.npc and (" · " .. ic.npc) or "")
+        else
+            p.sub = "Objektiv her"
+        end
         p:ClearAllPoints()
         p:SetPoint("CENTER", canvas, "TOPLEFT", (ic.x / 100) * w, -(ic.y / 100) * h)
         p:Show()

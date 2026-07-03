@@ -21,17 +21,23 @@ HORDE_MASK = 2 + 16 + 32 + 128 + 512
 T = qdb.T
 
 
-def outland_centroid(node):
+def outland_endpoint(node):
+    """(navn, centroid) for en start/slut-node, begrænset til Outland."""
     if not node:
-        return None
-    pts = []
+        return None, None
     if node["U"]:
         for uid in node["U"].values():
-            pts += [p for p in qdb.spawns(qdb.udata, int(uid)) if p[0] in OUTLAND]
+            uid = int(uid)
+            pts = [p for p in qdb.spawns(qdb.udata, uid) if p[0] in OUTLAND]
+            if pts:
+                return qdb.loc_name(qdb.uloc, qdb.uloc_v, uid), qdb.centroid(pts)
     if node["O"]:
         for oid in node["O"].values():
-            pts += [p for p in qdb.spawns(qdb.odata, int(oid)) if p[0] in OUTLAND]
-    return qdb.centroid(pts)
+            oid = int(oid)
+            pts = [p for p in qdb.spawns(qdb.odata, oid) if p[0] in OUTLAND]
+            if pts:
+                return qdb.loc_name(qdb.oloc, qdb.oloc_v, oid), qdb.centroid(pts)
+    return None, None
 
 
 def outland_objective(qid):
@@ -73,8 +79,8 @@ def main():
         race = q["race"] and int(q["race"])
         if race and not (race & HORDE_MASK):
             continue  # ren Alliance
-        giver = outland_centroid(q["start"])
-        turnin = outland_centroid(q["end"])
+        giver_name, giver = outland_endpoint(q["start"])
+        turnin_name, turnin = outland_endpoint(q["end"])
         obj = outland_objective(qid)
         # medtag kun quests med mindst én Outland-koordinat
         if not (giver or turnin or obj):
@@ -84,11 +90,18 @@ def main():
             continue
         n_total += 1
         pre = sorted(int(p) for p in q["pre"].values()) if q["pre"] else []
-        parts = ['t="%s"' % title.replace("\\", "\\\\").replace('"', '\\"')]
+
+        def esc(s):
+            return s.replace("\\", "\\\\").replace('"', '\\"')
+        parts = ['t="%s"' % esc(title)]
         if giver:
             parts.append("g=" + coord_lua(giver))
+            if giver_name:
+                parts.append('gn="%s"' % esc(giver_name))
         if turnin:
             parts.append("e=" + coord_lua(turnin))
+            if turnin_name:
+                parts.append('en="%s"' % esc(turnin_name))
         if obj:
             parts.append("o=" + coord_lua(obj))
         if q["min"]:

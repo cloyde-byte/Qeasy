@@ -273,7 +273,18 @@ icons2 = list(ns.Map.IconsForMap(ns.Map, 1944).values())
 still_giver = any(i.qid == some and i.kind == "giver" for i in icons2)
 check("quest i loggen vises ikke længere som available-giver", not still_giver)
 
+# turnin-ikon ('?') for en quest der er complete via objectives (isComplete-flag = nil)
+lua.eval("""function()
+  QLOG = { { title='Missing Friends', questID=10852, complete=false,
+             objectives = { { text='Children Rescued: 12/12', done=true } } } }
+end""")()
+lua.execute("PSTATE.map=1952; PSTATE.level=70")
+mf = [i for i in list(ns.Map.IconsForMap(ns.Map, 1952).values()) if i.qid == 10852]
+check("'?' turnin-ikon for complete-via-objectives quest",
+      any(i.kind == "turnin" and i.npc == "Ethan" for i in mf))
+
 # minimap-OnUpdate kører uden fejl
+lua.execute("QLOG={}")
 ns.Map.Rebuild(ns.Map)
 g.QeasyMinimapPins.scripts.OnUpdate(g.QeasyMinimapPins, 0.2)
 check("minimap-pins opdaterer uden fejl", True)
