@@ -57,6 +57,8 @@ function Q:InitDB()
     if c.ui.tooltipsEnabled == nil then c.ui.tooltipsEnabled = true end
     if c.ui.mapIcons == nil then c.ui.mapIcons = true end
     if c.ui.minimapIcons == nil then c.ui.minimapIcons = true end
+    if c.ui.minimapButton == nil then c.ui.minimapButton = true end
+    if c.ui.minimapButtonAngle == nil then c.ui.minimapButtonAngle = 210 end
     self.db = QeasyDB
     self.char = c
 end

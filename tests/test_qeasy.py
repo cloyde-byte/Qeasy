@@ -93,7 +93,7 @@ function UnitLevel() return PSTATE.level end
 function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return false end
-function GetAddOnMetadata() return '0.8.0' end
+function GetAddOnMetadata() return '0.9.0' end
 hooksecurefunc = function() end
 GameTooltip = { HookScript = function() end, GetUnit = function() return nil end,
                 SetOwner = function() end, AddLine = function() end,

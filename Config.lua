@@ -32,10 +32,25 @@ if frame.SetBackdrop then
     })
 end
 
+-- Logo (Waypoint Q-medaljon) + gyldent ordmærke i headeren
+local logo = frame:CreateTexture(nil, "ARTWORK")
+logo:SetSize(52, 52)
+logo:SetPoint("TOPLEFT", frame, "TOPLEFT", 16, -12)
+logo:SetTexture("Interface\\AddOns\\Qeasy\\Media\\logo")
+
 local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-title:SetPoint("TOP", frame, "TOP", 0, -14)
-title:SetText(L.CFG_TITLE)
-title:SetTextColor(0.41, 0.80, 0.94)
+title:SetPoint("LEFT", logo, "RIGHT", 10, 9)
+title:SetText("Qeasy")
+title:SetTextColor(0.93, 0.72, 0.22)  -- WoW-guld
+if title.SetFont then
+    local f = title:GetFont()
+    if f then title:SetFont(f, 26, "") end
+end
+
+local subtitle = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+subtitle:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 1, -3)
+subtitle:SetText("Outland leveling, gjort let")
+subtitle:SetTextColor(0.42, 0.80, 0.94)  -- Qeasy-cyan
 
 local close = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
 close:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -6, -6)
@@ -44,7 +59,7 @@ close:SetScript("OnClick", function() frame:Hide() end)
 -- ---------------------------------------------------------------------
 -- Hjælpere til widgets
 -- ---------------------------------------------------------------------
-local y = -46
+local y = -74
 local function section(text)
     local fs = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     fs:SetPoint("TOPLEFT", frame, "TOPLEFT", 18, y)
@@ -116,6 +131,9 @@ local cbMapIcons = checkbox(L.CFG_MAPICONS,
 local cbMiniIcons = checkbox(L.CFG_MINIMAPICONS,
     function() return ns.Q.char.ui.minimapIcons ~= false end,
     function(v) ns.Q.char.ui.minimapIcons = v end)
+local cbMMButton = checkbox(L.CFG_MMBUTTON,
+    function() return ns.Q.char.ui.minimapButton ~= false end,
+    function(v) ns.Q.char.ui.minimapButton = v; ns.Config:UpdateMinimapButton() end)
 
 local sGuide = slider(L.CFG_GUIDESCALE, 0.7, 1.6,
     function() return ns.Q.char.ui.guideScale or 1 end,
@@ -168,6 +186,7 @@ function Config:Refresh()
     cbTooltips:SetChecked(cbTooltips.qGet())
     cbMapIcons:SetChecked(cbMapIcons.qGet())
     cbMiniIcons:SetChecked(cbMiniIcons.qGet())
+    cbMMButton:SetChecked(cbMMButton.qGet())
     for _, s in ipairs({ sGuide, sArrow }) do
         local v = s.qGet()
         s:SetValue(v)
@@ -213,5 +232,73 @@ function Config:RegisterBlizzard()
         Settings.RegisterAddOnCategory(cat)
     elseif InterfaceOptions_AddCategory then
         InterfaceOptions_AddCategory(panel)
+    end
+end
+
+-- ---------------------------------------------------------------------
+-- Minimap-knap (Waypoint Q) - venstreklik åbner indstillinger, træk flytter
+-- ---------------------------------------------------------------------
+local atan2 = math.atan2 or function(a, b) return math.atan(a, b) end
+
+local function positionMinimapButton(btn)
+    local ang = math.rad(ns.Q.char.ui.minimapButtonAngle or 210)
+    local r = 80
+    btn:SetPoint("CENTER", Minimap, "CENTER", math.cos(ang) * r, math.sin(ang) * r)
+end
+
+function Config:CreateMinimapButton()
+    if self.mmbtn or not Minimap then return end
+    local b = CreateFrame("Button", "QeasyMinimapButton", Minimap)
+    b:SetFrameStrata("MEDIUM")
+    b:SetFrameLevel(8)
+    b:SetSize(31, 31)
+    b:SetMovable(true)
+    b:RegisterForClicks("LeftButtonUp")
+    b:RegisterForDrag("LeftButton")
+
+    local icon = b:CreateTexture(nil, "BACKGROUND")
+    icon:SetSize(21, 21)
+    icon:SetPoint("CENTER", 0, 0)
+    icon:SetTexture("Interface\\AddOns\\Qeasy\\Media\\logo")
+
+    local border = b:CreateTexture(nil, "OVERLAY")
+    border:SetSize(53, 53)
+    border:SetPoint("TOPLEFT", 0, 0)
+    border:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
+
+    b:SetHighlightTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
+
+    b:SetScript("OnDragStart", function(self)
+        self:SetScript("OnUpdate", function()
+            local mx, my = GetCursorPosition()
+            local scale = Minimap:GetEffectiveScale()
+            local cx, cy = Minimap:GetCenter()
+            if not (mx and cx and scale and scale > 0) then return end
+            ns.Q.char.ui.minimapButtonAngle = math.deg(atan2(my / scale - cy, mx / scale - cx))
+            positionMinimapButton(self)
+        end)
+    end)
+    b:SetScript("OnDragStop", function(self) self:SetScript("OnUpdate", nil) end)
+    b:SetScript("OnClick", function() Config:Toggle() end)
+    b:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+        GameTooltip:AddLine("|cff69ccf0Qeasy|r")
+        GameTooltip:AddLine("Venstreklik: åbn indstillinger", 1, 1, 1)
+        GameTooltip:AddLine("Træk: flyt knappen", 0.7, 0.7, 0.7)
+        GameTooltip:Show()
+    end)
+    b:SetScript("OnLeave", function() GameTooltip:Hide() end)
+
+    positionMinimapButton(b)
+    self.mmbtn = b
+    self:UpdateMinimapButton()
+end
+
+function Config:UpdateMinimapButton()
+    if not self.mmbtn then return end
+    if ns.Q.char.ui.minimapButton == false then
+        self.mmbtn:Hide()
+    else
+        self.mmbtn:Show()
     end
 end

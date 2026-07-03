@@ -51,10 +51,11 @@ lægges sammen (fx "tag disse 2 quests fra samme NPC"). Så du render ikke
 frem og tilbage. Addonet starter automatisk på Horde-karakterer og vælger
 ruten ud fra din zone (eller Hellfire fra level 58).
 
-Åbn **indstillingsvinduet** med `/qeasy` (eller via Blizzards
-AddOn-menu): her kan du slå guide og pil til/fra, justere størrelsen,
-slå automatisk rutevalg fra og skifte aktiv rute — uden at bruge
-tekstkommandoer.
+Åbn **indstillingsvinduet** med `/qeasy`, via **Qeasy-knappen på
+minimappet** (Waypoint Q-medaljonen — venstreklik åbner, træk flytter),
+eller via Blizzards AddOn-menu. Her kan du slå guide, pil, tracker,
+tooltips og kort-ikoner til/fra, justere størrelsen, slå automatisk
+rutevalg fra og skifte aktiv rute — uden tekstkommandoer.
 
 - **Guide-vinduet** viser det aktuelle step som en liste af handlinger,
   hver med et ikon og et **grønt flueben**, der sættes automatisk, når du

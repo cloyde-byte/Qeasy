@@ -52,6 +52,7 @@ Q:SetScript("OnEvent", function(self, event, arg1, arg2)
         if ns.Config and not self.blizzRegistered then
             self.blizzRegistered = true
             ns.Config:RegisterBlizzard()
+            ns.Config:CreateMinimapButton()
         end
         if IsHorde() then
             if self.char.ui.autoRoute ~= false then self:AutoPickRoute() end
