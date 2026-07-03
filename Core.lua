@@ -28,6 +28,8 @@ Q:RegisterEvent("PLAYER_ENTERING_WORLD")
 Q:RegisterEvent("QUEST_ACCEPTED")
 Q:RegisterEvent("QUEST_TURNED_IN")
 Q:RegisterEvent("QUEST_LOG_UPDATE")
+Q:RegisterEvent("UNIT_QUEST_LOG_CHANGED")
+Q:RegisterEvent("PLAYER_LEVEL_UP")
 Q:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 
 Q:SetScript("OnEvent", function(self, event, arg1, arg2)
@@ -64,7 +66,13 @@ Q:SetScript("OnEvent", function(self, event, arg1, arg2)
     elseif event == "QUEST_TURNED_IN" then
         self:OnQuestTurnedIn(arg1)
 
-    elseif event == "QUEST_LOG_UPDATE" then
+    elseif event == "QUEST_LOG_UPDATE" or event == "UNIT_QUEST_LOG_CHANGED" then
+        -- Fyres bl.a. når et objective går fra 3/8 til 4/8 eller bliver
+        -- "complete" - så DO-handlinger krydses af automatisk.
+        self:Refresh()
+
+    elseif event == "PLAYER_LEVEL_UP" then
+        -- Så ding-steps rykker videre i det sekund du dinger.
         self:Refresh()
 
     elseif event == "ZONE_CHANGED_NEW_AREA" then
