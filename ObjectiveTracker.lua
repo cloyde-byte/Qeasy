@@ -221,6 +221,7 @@ function Tracker:Update()
                     local ui = ns.Q.char.ui                        -- fokusér (løft til top)
                     ui.trackerFocus = (ui.trackerFocus ~= qid) and qid or nil
                     Tracker:Update()
+                    if ns.Map then ns.Map:UpdateWorldMap() end      -- opdatér spawn-sky
                 end
             end)
             row:SetScript("OnEnter", function(self)

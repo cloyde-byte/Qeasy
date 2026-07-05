@@ -256,9 +256,9 @@ local function getAreaMark(i, canvas)
     if areaMarks[i] then return areaMarks[i] end
     local t = areaHost:CreateTexture(nil, "ARTWORK")
     t:SetTexture("Interface\\AddOns\\Qeasy\\Media\\blob")
-    t:SetBlendMode("ADD")
-    t:SetVertexColor(0.25, 0.55, 1.0)   -- gennemsigtig blå
-    t:SetAlpha(0.5)
+    t:SetBlendMode("BLEND")             -- normal alpha (ADD gav hvid blowout)
+    t:SetVertexColor(0.22, 0.51, 1.0)   -- gennemsigtig blå
+    t:SetAlpha(0.30)
     areaMarks[i] = t
     return t
 end
@@ -283,12 +283,14 @@ function Map:UpdateWorldMap()
         for _, fm in ipairs(self:FlightMastersForMap(mapID)) do list[#list + 1] = fm end
     end
 
-    -- Spawn-områder (blå sky) for aktive mål med oa-data - tegnes UNDER ikonerne.
+    -- Spawn-område (blå sky) - KUN for den quest du er fokuseret på i trackeren,
+    -- ellers dækker alle aktive quests hele kortet. Tegnes UNDER ikonerne.
     local am = 0
-    if ns.Q.char.ui.mapIcons ~= false and ns.Q.char.ui.spawnAreas ~= false then
-        local size = math.max(20, w * 0.05)   -- skalerer med zoom, så skyen hænger sammen
+    local focusQID = ns.ObjTracker and ns.ObjTracker.ActiveQuestID and ns.ObjTracker:ActiveQuestID()
+    if ns.Q.char.ui.mapIcons ~= false and ns.Q.char.ui.spawnAreas ~= false and focusQID then
+        local size = math.max(24, w * 0.06)   -- skalerer med zoom, så skyen hænger sammen
         for _, ic in ipairs(list) do
-            if ic.oa then
+            if ic.oa and ic.qid == focusQID then
                 for _, pt in ipairs(ic.oa) do
                     am = am + 1
                     local t = getAreaMark(am, canvas)
