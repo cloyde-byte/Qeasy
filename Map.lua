@@ -106,18 +106,17 @@ end
 -- ---------------------------------------------------------------------
 -- Ikon-pulje (fælles udseende for kort og minimap)
 -- ---------------------------------------------------------------------
+local ICON_OBJECTIVE = "Interface\\AddOns\\Qeasy\\Media\\objective"
+
 local function styleIcon(tex, kind, size)
     tex:SetSize(size, size)
+    tex:SetVertexColor(1, 1, 1)
     if kind == "giver" then
         tex:SetTexture(ICON_GIVER)
-        tex:SetVertexColor(1, 1, 1)
     elseif kind == "turnin" then
         tex:SetTexture(ICON_TURNIN)
-        tex:SetVertexColor(1, 1, 1)
     else
-        tex:SetTexture(nil)
-        tex:SetColorTexture(0.2, 1.0, 0.2, 0.9)
-        tex:SetSize(size * 0.6, size * 0.6)
+        tex:SetTexture(ICON_OBJECTIVE)  -- lille tandhjul (pulserer)
     end
 end
 
@@ -170,8 +169,11 @@ function Map:UpdateWorldMap()
     for _, ic in ipairs(self:IconsForMap(mapID)) do
         n = n + 1
         local p = getWorldPin(n, canvas)
-        styleIcon(p.tex, ic.kind, 14)
-        p:SetSize(14, 14)
+        local base = (ic.kind == "objective") and 15 or 14
+        styleIcon(p.tex, ic.kind, base)
+        p:SetSize(base, base)
+        p.base = base
+        p.isObjective = (ic.kind == "objective")
         p.title = ic.title
         p.qid = ic.qid
         if ic.kind == "turnin" then
@@ -252,7 +254,10 @@ mmFrame:SetScript("OnUpdate", function(_, dt)
             if dist < radius * 1.05 then
                 n = n + 1
                 local t = getMMPin(n)
-                styleIcon(t, ic.kind, 12)
+                local base = (ic.kind == "objective") and 13 or 12
+                styleIcon(t, ic.kind, base)
+                t.base = base
+                t.isObjective = (ic.kind == "objective")
                 -- nord = op (+y), vest = venstre (-x)
                 local sx = -(dW / radius) * half
                 local sy = (dN / radius) * half
@@ -265,6 +270,27 @@ mmFrame:SetScript("OnUpdate", function(_, dt)
 end)
 
 -- ---------------------------------------------------------------------
+-- Puls: objektiv-tandhjulene "popper" så de er nemme at få øje på.
+-- ---------------------------------------------------------------------
+local pulseT = 0
+local pulseDriver = CreateFrame("Frame")
+pulseDriver:SetScript("OnUpdate", function(_, dt)
+    pulseT = pulseT + dt
+    local s = 1 + 0.22 * (0.5 + 0.5 * math.sin(pulseT * 5))  -- 1.0 .. 1.22
+    for _, p in ipairs(worldPins) do
+        if p.isObjective and p:IsShown() then
+            local b = p.base or 15
+            p:SetSize(b * s, b * s)
+        end
+    end
+    for _, t in ipairs(minimapPins) do
+        if t.isObjective and t:IsShown() then
+            local b = t.base or 13
+            t:SetSize(b * s, b * s)
+        end
+    end
+end)
+
 function Map:Init()
     buildIndex()
     if WorldMapFrame then

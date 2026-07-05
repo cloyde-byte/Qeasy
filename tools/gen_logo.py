@@ -167,6 +167,36 @@ def gold_text(draw_img, text, font, xy):
     return bbox
 
 
+def render_gear(px=32):
+    """Lille grønt tandhjul til objektiv-markører (transparent baggrund)."""
+    S = px * SS
+    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    c = S / 2
+    teeth = 8
+    Rout, Rin = S * 0.46, S * 0.33
+    tw = (math.pi / teeth) * 0.55
+    pts = []
+    for k in range(teeth):
+        a = 2 * math.pi * k / teeth
+        av = 2 * math.pi * (k + 0.5) / teeth
+        pts += [(c + math.cos(a - tw) * Rout, c + math.sin(a - tw) * Rout),
+                (c + math.cos(a + tw) * Rout, c + math.sin(a + tw) * Rout),
+                (c + math.cos(av - tw) * Rin, c + math.sin(av - tw) * Rin),
+                (c + math.cos(av + tw) * Rin, c + math.sin(av + tw) * Rin)]
+    # mørk kant + grønt fyld
+    d.polygon(pts, fill=(58, 210, 82, 255), outline=(14, 74, 26, 255))
+    hi = ImageDraw.Draw(img)
+    hi.polygon(pts, outline=(150, 255, 170, 180))
+    # nav-ring
+    rr = Rin * 0.62
+    d.ellipse([c - rr, c - rr, c + rr, c + rr], outline=(18, 96, 34, 255), width=int(3 * SS / 2))
+    # center-hul (transparent)
+    r = S * 0.12
+    d.ellipse([c - r, c - r, c + r, c + r], fill=(0, 0, 0, 0))
+    return img.resize((px, px), Image.LANCZOS)
+
+
 def render_curseforge():
     W, H = 800, 260
     img = radial_disc((W, H), int(W * 0.3), int(H * 0.2), max(W, H) * 0.9,
@@ -193,6 +223,7 @@ def render_curseforge():
 def main():
     os.makedirs(MEDIA, exist_ok=True)
     write_tga(render_medallion(128), os.path.join(MEDIA, "logo.tga"))
+    write_tga(render_gear(32), os.path.join(MEDIA, "objective.tga"))
     render_curseforge()
 
 
