@@ -256,6 +256,22 @@ def render_bang(px=32):
     return img.resize((px, px), Image.LANCZOS)
 
 
+def render_glow(px=64):
+    """Blød gylden halo bag hero-item-knappen (pulserer)."""
+    S = px * SS
+    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    load = img.load()
+    c = S / 2
+    R = S / 2
+    for y in range(S):
+        for x in range(S):
+            dd = math.hypot(x - c, y - c) / R
+            if dd <= 1.0:
+                a = int(210 * (1 - dd) ** 2)
+                load[x, y] = (255, 210, 120, a)
+    return img.resize((px, px), Image.LANCZOS)
+
+
 def render_curseforge():
     W, H = 800, 260
     img = radial_disc((W, H), int(W * 0.3), int(H * 0.2), max(W, H) * 0.9,
@@ -285,6 +301,7 @@ def main():
     write_tga(render_gear(32), os.path.join(MEDIA, "objective.tga"))
     write_tga(render_sword(32), os.path.join(MEDIA, "slay.tga"))
     write_tga(render_bang(32), os.path.join(MEDIA, "flightpoint.tga"))
+    write_tga(render_glow(64), os.path.join(MEDIA, "glow.tga"))
     render_curseforge()
 
 

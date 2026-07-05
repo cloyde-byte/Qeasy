@@ -94,7 +94,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.12.0' end
+function GetAddOnMetadata() return '0.13.0' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -134,6 +134,7 @@ hooksecurefunc = function() end
 GameTooltip = { HookScript = function() end, GetUnit = function() return nil end,
                 SetOwner = function() end, AddLine = function() end,
                 ClearLines = function() end, AddDoubleLine = function() end,
+                SetHyperlink = function() end,
                 Show = function() end, Hide = function() end }
 ChatFrame1 = CreateFrame('Frame', 'ChatFrame1')
 Minimap = CreateFrame('Frame', 'Minimap')
@@ -415,6 +416,26 @@ ns.ItemBar.SetShown(ns.ItemBar, True)
 lua.execute("PSTATE.combat = true; QLOG = {}")
 ns.ItemBar.Update(ns.ItemBar)
 check("item-bar rører ikke secure-knapper i kamp (udskudt)", ns.ItemBar._pending == True)
+lua.execute("PSTATE.combat = false")
+
+# ---- hero-knap: dukker op midt på skærmen når du er tæt på målet ----
+lua.execute(r"""
+QLOG = {
+  { title='Blessing of Incineratus', questID=9805,
+    item = { link='|cffffffff|Hitem:30813:0:0:0:0:0:0:0:0|h[Living Fire]|h|r',
+             icon='Interface\\Icons\\Spell_Fire_Fire', charges=3 } },
+}
+PSTATE.map = 1951; PSTATE.x = 0.718; PSTATE.y = 0.523
+""")
+ns.ItemBar.UpdateHero(ns.ItemBar)
+check("hero-knap vises tæt på quest-item-målet", g.QeasyHeroButton.shown == True)
+check("hero-knap har rigtigt item (Living Fire)", "Living Fire" in (g.QeasyHeroButton.link or ""))
+lua.execute("PSTATE.x = 0.10; PSTATE.y = 0.10")
+ns.ItemBar.UpdateHero(ns.ItemBar)
+check("hero-knap skjules væk fra målet", g.QeasyHeroButton.shown == False)
+lua.execute("PSTATE.x = 0.718; PSTATE.y = 0.523; PSTATE.combat = true")
+ns.ItemBar.UpdateHero(ns.ItemBar)
+check("hero-knap udskydes i kamp (secure)", ns.ItemBar._heroPending == True)
 lua.execute("PSTATE.combat = false")
 
 # ---- slash ----

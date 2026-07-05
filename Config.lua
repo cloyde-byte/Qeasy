@@ -142,6 +142,9 @@ local cbPartyShare = checkbox(L.CFG_PARTYSHARE,
 local cbItemBar = checkbox(L.CFG_ITEMBAR,
     function() return ns.Q.char.ui.itemBar ~= false end,
     function(v) if ns.ItemBar then ns.ItemBar:SetShown(v) else ns.Q.char.ui.itemBar = v end end)
+local cbHero = checkbox(L.CFG_HERO,
+    function() return ns.Q.char.ui.heroButton ~= false end,
+    function(v) if ns.ItemBar then ns.ItemBar:SetHeroShown(v) else ns.Q.char.ui.heroButton = v end end)
 local cbMMButton = checkbox(L.CFG_MMBUTTON,
     function() return ns.Q.char.ui.minimapButton ~= false end,
     function(v) ns.Q.char.ui.minimapButton = v; ns.Config:UpdateMinimapButton() end)
@@ -200,6 +203,7 @@ function Config:Refresh()
     cbFlight:SetChecked(cbFlight.qGet())
     cbPartyShare:SetChecked(cbPartyShare.qGet())
     cbItemBar:SetChecked(cbItemBar.qGet())
+    cbHero:SetChecked(cbHero.qGet())
     cbMMButton:SetChecked(cbMMButton.qGet())
     for _, s in ipairs({ sGuide, sArrow }) do
         local v = s.qGet()

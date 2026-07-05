@@ -89,7 +89,9 @@ Q:SetScript("OnEvent", function(self, event, arg1, arg2, arg3, arg4)
 
     elseif event == "PLAYER_REGEN_ENABLED" then
         -- Kampen er slut: opsæt eventuelle udskudte secure-item-knapper.
-        if ns.ItemBar and ns.ItemBar._pending then ns.ItemBar:Update() end
+        if ns.ItemBar and (ns.ItemBar._pending or ns.ItemBar._heroPending) then
+            ns.ItemBar:Update()
+        end
 
     elseif event == "BAG_UPDATE_DELAYED" then
         if ns.ItemBar then ns.ItemBar:Update() end
@@ -166,6 +168,8 @@ SlashCmdList["QEASY"] = function(msg)
         ns.ObjTracker:SetShown(not Q.char.ui.objTrackerShown)
     elseif cmd == "items" then
         if ns.ItemBar then ns.ItemBar:SetShown(Q.char.ui.itemBar == false) end
+    elseif cmd == "hero" then
+        if ns.ItemBar then ns.ItemBar:SetHeroShown(Q.char.ui.heroButton == false) end
     elseif cmd == "tooltips" then
         Q.char.ui.tooltipsEnabled = not Q.char.ui.tooltipsEnabled
     elseif cmd == "mapicons" then
