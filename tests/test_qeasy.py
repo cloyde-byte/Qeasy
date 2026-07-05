@@ -94,7 +94,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.10.0' end
+function GetAddOnMetadata() return '0.11.0' end
 -- Party-comms + quest-links (Questie-agtigt)
 function wipe(t) for k in pairs(t) do t[k] = nil end return t end
 function GetTime() return PSTATE.time or 0 end
@@ -355,6 +355,20 @@ check("flight master-DB indlæst", ns.FlightMasters is not None)
 fms = list(ns.Map.FlightMastersForMap(ns.Map, 1944).values())
 check(f"flight masters i Hellfire (1944): {len(fms)} stk", len(fms) >= 3)
 check("flight master har navn + kind", all(f.kind == "flightmaster" and f.title for f in fms))
+
+# opdaget/uopdaget flyvemester: alle er ukendte til at starte med
+ns.Q.char.knownFlights = lua.eval("{}")
+fms = list(ns.Map.FlightMastersForMap(ns.Map, 1944).values())
+check("flyvemestre er uopdagede som standard (grønt '!')",
+      all(not f.known for f in fms))
+# lær den nærmeste ved at 'åbne rejsekortet' oven i Innalia (27.8, 60.0)
+lua.execute("PSTATE.map=1944; PSTATE.x=0.278; PSTATE.y=0.600")
+ns.Map.LearnFlightsFromTaxi(ns.Map)
+fms = list(ns.Map.FlightMastersForMap(ns.Map, 1944).values())
+innalia = next(f for f in fms if f.title == "Innalia")
+barley = next(f for f in fms if f.title == "Barley")
+check("flyvemester lært via rejsekort (Innalia kendt)", innalia.known == True)
+check("andre flyvemestre forbliver uopdagede", not barley.known)
 
 # minimap-OnUpdate kører uden fejl (nu også med flight masters)
 lua.execute("QLOG={}")

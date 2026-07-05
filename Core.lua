@@ -33,6 +33,7 @@ Q:RegisterEvent("PLAYER_LEVEL_UP")
 Q:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 Q:RegisterEvent("CHAT_MSG_ADDON")
 Q:RegisterEvent("GROUP_ROSTER_UPDATE")
+Q:RegisterEvent("TAXIMAP_OPENED")
 
 Q:SetScript("OnEvent", function(self, event, arg1, arg2, arg3, arg4)
     if event == "ADDON_LOADED" then
@@ -88,6 +89,9 @@ Q:SetScript("OnEvent", function(self, event, arg1, arg2, arg3, arg4)
     elseif event == "GROUP_ROSTER_UPDATE" then
         if ns.Comms then ns.Comms:OnRosterChange() end
         self:Refresh()
+
+    elseif event == "TAXIMAP_OPENED" then
+        if ns.Map then ns.Map:LearnFlightsFromTaxi() end
 
     elseif event == "PLAYER_LEVEL_UP" then
         -- Så ding-steps rykker videre i det sekund du dinger.

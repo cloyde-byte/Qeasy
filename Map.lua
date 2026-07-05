@@ -107,13 +107,14 @@ end
 -- ---------------------------------------------------------------------
 -- Ikon-pulje (fælles udseende for kort og minimap)
 -- ---------------------------------------------------------------------
-local ICON_OBJECTIVE = "Interface\\AddOns\\Qeasy\\Media\\objective"  -- tandhjul (interager)
-local ICON_SLAY      = "Interface\\AddOns\\Qeasy\\Media\\slay"       -- krydsede sværd (dræb)
+local ICON_OBJECTIVE   = "Interface\\AddOns\\Qeasy\\Media\\objective"    -- tandhjul (interager)
+local ICON_SLAY        = "Interface\\AddOns\\Qeasy\\Media\\slay"         -- krydsede sværd (dræb)
+local ICON_FLIGHTPOINT = "Interface\\AddOns\\Qeasy\\Media\\flightpoint"  -- grønt "!" (mangler)
 
 -- Er et objektiv et "dræb"-mål? (otype 'u' fra pfQuest = enheder).
 local function isSlay(otype) return otype == "u" end
 
-local function styleIcon(tex, kind, size, otype)
+local function styleIcon(tex, kind, size, otype, known)
     tex:SetSize(size, size)
     tex:SetVertexColor(1, 1, 1)
     if kind == "giver" then
@@ -121,7 +122,8 @@ local function styleIcon(tex, kind, size, otype)
     elseif kind == "turnin" then
         tex:SetTexture(ICON_TURNIN)
     elseif kind == "flightmaster" then
-        tex:SetTexture(ICON_FLIGHT)
+        -- Kendt flyvemester = gryf-ikon; uopdaget = grønt "!" (gå hen og tag den).
+        tex:SetTexture(known and ICON_FLIGHT or ICON_FLIGHTPOINT)
     elseif isSlay(otype) then
         tex:SetTexture(ICON_SLAY)       -- dræb-quest = røde krydsede sværd
     else
@@ -129,14 +131,22 @@ local function styleIcon(tex, kind, size, otype)
     end
 end
 
+-- Opdagede flyvemestre (per karakter): [navn] = true. Læres når du kommer
+-- tæt på en flyvemester eller åbner dens rejsekort (se Learn* nedenfor).
+local function knownFlights()
+    ns.Q.char.knownFlights = ns.Q.char.knownFlights or {}
+    return ns.Q.char.knownFlights
+end
+
 -- Flight masters på et bestemt map (fra ns.FlightMasters).
 function Map:FlightMastersForMap(mapID)
     local list = {}
     local fms = ns.FlightMasters and ns.FlightMasters[mapID]
+    local known = knownFlights()
     if fms then
         for _, fm in ipairs(fms) do
             list[#list + 1] = { kind = "flightmaster", x = fm[1], y = fm[2],
-                                title = fm[3], horde = fm[4] }
+                                title = fm[3], horde = fm[4], known = known[fm[3]] }
         end
     end
     return list
@@ -204,11 +214,12 @@ function Map:UpdateWorldMap()
     for _, ic in ipairs(list) do
         n = n + 1
         local p = getWorldPin(n, canvas)
-        -- Lidt mindre ikoner end før (særligt sværd/tandhjul).
-        local base = (ic.kind == "flightmaster") and 15
+        -- Lidt mindre ikoner end før (særligt sværd/tandhjul). Kendt flyvemester
+        -- vises mindre (gryf); uopdaget flyvemester som et tydeligt grønt "!".
+        local base = (ic.kind == "flightmaster") and (ic.known and 12 or 14)
             or (ic.kind == "objective") and (isSlay(ic.otype) and 13 or 12)
             or 13
-        styleIcon(p.tex, ic.kind, base, ic.otype)
+        styleIcon(p.tex, ic.kind, base, ic.otype, ic.known)
         p:SetSize(base, base)
         p.base = base
         -- Kun tandhjul (interager/saml) pulserer; sværd står stille og tydeligt.
@@ -220,7 +231,9 @@ function Map:UpdateWorldMap()
         elseif ic.kind == "giver" then
             p.sub = "Tilgængelig quest" .. (ic.npc and (" · " .. ic.npc) or "")
         elseif ic.kind == "flightmaster" then
-            p.sub = ic.horde and "Flyvemester (Horde)" or "Flyvemester (neutral)"
+            local fac = ic.horde and "Horde" or "neutral"
+            p.sub = ic.known and ("Flyvemester (" .. fac .. ")")
+                or ("Ny flyvemester her (" .. fac .. ") · mangler")
         elseif isSlay(ic.otype) then
             p.sub = "Dræb-mål her"
         else
@@ -304,11 +317,17 @@ mmFrame:SetScript("OnUpdate", function(_, dt)
                 dN, dW = dN * cos + dW * sin, -dN * sin + dW * cos
             end
             local dist = math.sqrt(dN * dN + dW * dW)
+            -- Auto-lær flyvemestre du kommer tæt på (≈opdagelses-afstand).
+            if ic.kind == "flightmaster" and not ic.known and dist < 40 then
+                knownFlights()[ic.title] = true
+                Map._flightsDirty = true
+            end
             if dist < radius * 1.05 then
                 n = n + 1
                 local t = getMMPin(n)
-                local base = (ic.kind == "objective") and (isSlay(ic.otype) and 12 or 11) or 12
-                styleIcon(t, ic.kind, base, ic.otype)
+                local base = (ic.kind == "flightmaster") and (ic.known and 10 or 12)
+                    or (ic.kind == "objective") and (isSlay(ic.otype) and 12 or 11) or 12
+                styleIcon(t, ic.kind, base, ic.otype, ic.known)
                 t.base = base
                 t.pulse = (ic.kind == "objective") and not isSlay(ic.otype)
                 -- nord = op (+y), vest = venstre (-x)
@@ -320,6 +339,9 @@ mmFrame:SetScript("OnUpdate", function(_, dt)
             end
         end
     end
+
+    -- Lærte vi en ny flyvemester? Genopbyg, så "!" bliver til gryf-ikonet.
+    if Map._flightsDirty then Map._flightsDirty = false; Map:Rebuild() end
 end)
 
 -- ---------------------------------------------------------------------
@@ -343,6 +365,34 @@ pulseDriver:SetScript("OnUpdate", function(_, dt)
         end
     end
 end)
+
+-- Når du åbner en flyvemesters rejsekort står du oven i den: markér den
+-- nærmeste kendte flyvemester i din zone som opdaget (præcist og sikkert).
+function Map:LearnFlightsFromTaxi()
+    if not (C_Map and C_Map.GetBestMapForUnit) then return end
+    local pmap = C_Map.GetBestMapForUnit("player")
+    local fms = pmap and ns.FlightMasters and ns.FlightMasters[pmap]
+    if not fms then return end
+    local pos = C_Map.GetPlayerMapPosition(pmap, "player")
+    if not pos then return end
+    local px, py = pos:GetXY()
+    if not px then return end
+    local _, pwx, pwy = worldPos(pmap, px * 100, py * 100)
+    if not pwx then return end
+
+    local bestD, bestName
+    for _, fm in ipairs(fms) do
+        local _, wx, wy = worldPos(pmap, fm[1], fm[2])
+        if wx then
+            local d = (wx - pwx) ^ 2 + (wy - pwy) ^ 2
+            if not bestD or d < bestD then bestD, bestName = d, fm[3] end
+        end
+    end
+    if bestName and not knownFlights()[bestName] then
+        knownFlights()[bestName] = true
+        self:Rebuild()
+    end
+end
 
 function Map:Init()
     buildIndex()

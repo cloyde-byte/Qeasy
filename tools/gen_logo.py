@@ -233,6 +233,29 @@ def render_sword(px=32):
     return img.resize((px, px), Image.LANCZOS)
 
 
+def render_bang(px=32):
+    """Simpelt grønt '!' til uopdagede flyvemestre (i stil med quest-ikonet)."""
+    S = px * SS
+    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    c = S / 2
+    GREEN = (58, 210, 82, 255)
+    EDGE = (14, 74, 26, 255)
+    HI = (150, 255, 170, 220)
+    w = max(1, int(SS))
+    bw = S * 0.15
+    top, bot = S * 0.13, S * 0.58
+    d.rounded_rectangle([c - bw, top, c + bw, bot], radius=bw * 0.8,
+                        fill=GREEN, outline=EDGE, width=w)
+    r = S * 0.155
+    dy = S * 0.80
+    d.ellipse([c - r, dy - r, c + r, dy + r], fill=GREEN, outline=EDGE, width=w)
+    # lys stribe på stangen (metallisk/pop)
+    d.line([(c - bw * 0.25, top + bw), (c - bw * 0.25, bot - bw)], fill=HI,
+           width=max(1, int(SS * 1.2)))
+    return img.resize((px, px), Image.LANCZOS)
+
+
 def render_curseforge():
     W, H = 800, 260
     img = radial_disc((W, H), int(W * 0.3), int(H * 0.2), max(W, H) * 0.9,
@@ -261,6 +284,7 @@ def main():
     write_tga(render_medallion(128), os.path.join(MEDIA, "logo.tga"))
     write_tga(render_gear(32), os.path.join(MEDIA, "objective.tga"))
     write_tga(render_sword(32), os.path.join(MEDIA, "slay.tga"))
+    write_tga(render_bang(32), os.path.join(MEDIA, "flightpoint.tga"))
     render_curseforge()
 
 
