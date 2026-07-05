@@ -46,9 +46,11 @@ ns.Q:RegisterRoute({
         }},
         { label = "Garadar", elements = {
                 { kind = "do", quest = 9935, title = "Wanted: Giselda the Crone",
-                  coords = { map = 1951, x = 22.0, y = 28.0 }, note = "Dræb Giselda the Crone på Warmaul Hill (nordvest)." },
+                  coords = { map = 1951, x = 71.0, y = 82.0 }, note = "Dræb Giselda the Crone ved Kil'sorrow Fortress (sydøst)." },
+        }},
+        { label = "Garadar", elements = {
                 { kind = "do", quest = 9939, title = "Wanted: Zorbo the Advisor",
-                  coords = { map = 1951, x = 21.0, y = 30.0 }, note = "Dræb Zorbo the Advisor på Warmaul Hill." },
+                  coords = { map = 1951, x = 46.0, y = 22.0 }, note = "Dræb Zorbo the Advisor ved Warmaul Hill (nord)." },
         }},
         { label = "Garadar", elements = {
                 { kind = "turnin", quest = 9863, title = "Vile Idolatry",

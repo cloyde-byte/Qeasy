@@ -94,7 +94,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.15.2' end
+function GetAddOnMetadata() return '0.15.3' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -402,6 +402,14 @@ cleft = [i for i in list(ns.Map.IconsForMap(ns.Map, 1951).values())
 check("aktivt dræb-mål har spawn-område (oa)",
       len(cleft) == 1 and cleft[0].oa is not None
       and len(list(cleft[0].oa.values())) >= 3)
+
+# do-mål bruger den data-afledte DB-objektiv-koordinat, ikke en håndsat
+# (upræcis) rute-coord (Giselda: DB ~66.9,79.3 vs gammel rute 22,28)
+nr = Q.routes["nagrand-horde"]
+sG, elG = find_el(nr, "do", "Wanted: Giselda the Crone")
+tgt = Q.ElementTarget(Q, elG) if elG else None
+check("do-mål bruger DB-objektiv-koordinat (Giselda SE, ikke NV)",
+      tgt is not None and abs(tgt.x - 66.9) < 1.5 and abs(tgt.y - 79.3) < 1.5)
 
 # minimap-OnUpdate kører uden fejl (nu også med flight masters + klynger)
 lua.execute("PSTATE.map=1944; QLOG={}")

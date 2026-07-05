@@ -264,6 +264,15 @@ function Q:ElementTarget(el)
         elseif el.kind == "turnin" then learned = self.db.learned.turnin[q.title] end
         if learned then return learned end
     end
+    -- Dræb/interager-mål ("do"): brug den data-afledte objektiv-koordinat fra
+    -- quest-databasen (spawn-centroid) i stedet for håndsatte rute-koordinater,
+    -- som nogle steder er upræcise (fx pegede Giselda 3000+ yd forkert).
+    if el.kind == "do" and q and q.id and ns.QuestDB then
+        local d = ns.QuestDB[q.id]
+        if d and d.o then
+            return { map = d.o[1], x = d.o[2], y = d.o[3] }
+        end
+    end
     return el.coords
 end
 
