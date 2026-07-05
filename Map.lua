@@ -154,11 +154,13 @@ end
 local function getWorldPin(i, canvas)
     if worldPins[i] then return worldPins[i] end
     local p = CreateFrame("Button", nil, canvas)
-    -- Højere strata + frame-level, så Qeasys ikoner tegnes OVER kortets egne
-    -- POI'er (fx dungeon-indgange) og ikke gemmer sig bag dem.
-    p:SetFrameStrata("DIALOG")
-    p:SetFrameLevel(3000)
+    -- Match kortets egen strata og læg os HØJT i frame-level, så ikonerne
+    -- altid tegnes OVER kortets egne POI'er (både i vindue og fullscreen).
+    -- (Fast DIALOG-strata virkede ikke, når kortet var maksimeret.)
+    if canvas.GetFrameStrata then p:SetFrameStrata(canvas:GetFrameStrata()) end
+    p:SetFrameLevel((canvas.GetFrameLevel and canvas:GetFrameLevel() or 0) + 900)
     p.tex = p:CreateTexture(nil, "OVERLAY")
+    p.tex:SetDrawLayer("OVERLAY", 7)
     p.tex:SetAllPoints(p)
     p:SetScript("OnEnter", function(self)
         if not self.title then return end

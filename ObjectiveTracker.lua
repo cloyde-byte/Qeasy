@@ -65,6 +65,55 @@ function Tracker:Collapsed()
     return ns.Q.char.ui.trackerCollapsed
 end
 
+-- Scroll-tilstand + max-højde, så trackeren ikke vokser ud af proportioner.
+local LINE_H, HEAD_H, PAD = 14, 24, 6
+Tracker.scroll = 0
+
+local scrollHint = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+scrollHint:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 10, 6)
+scrollHint:SetTextColor(0.55, 0.7, 0.85)
+
+frame:EnableMouseWheel(true)
+frame:SetScript("OnMouseWheel", function(_, delta)
+    Tracker.scroll = Tracker.scroll - delta
+    Tracker:Update()
+end)
+
+-- Byg en flad liste af linjer (så vi nemt kan vise et scroll-vindue).
+local function buildLines()
+    local lines = {}
+    local collapsed = Tracker:Collapsed()
+    local pendingHeader = nil
+    for _, e in ipairs(ns.QuestLog:Scan()) do
+        if e.isHeader then
+            pendingHeader = e.name
+        elseif e.questID then
+            if pendingHeader then
+                lines[#lines + 1] = { text = pendingHeader, r = 0.7, g = 0.7, b = 0.7 }
+                pendingHeader = nil
+            end
+            local isCol = collapsed[e.questID]
+            local r, g, b = ns.QuestLog:DiffColor(e.level)
+            lines[#lines + 1] = {
+                text = string.format("%s[%d] %s", isCol and "+ " or "- ", e.level, e.title),
+                r = r, g = g, b = b, qid = e.questID,
+            }
+            if not isCol then
+                if e.isComplete then
+                    lines[#lines + 1] = { text = "      " .. L.QUEST_COMPLETE, r = 0.2, g = 1, b = 0.2 }
+                else
+                    for _, obj in ipairs(e.objectives) do
+                        local oc = obj.done and 0.2 or 0.85
+                        lines[#lines + 1] = { text = "      " .. obj.text,
+                            r = oc, g = obj.done and 1 or 0.85, b = oc }
+                    end
+                end
+            end
+        end
+    end
+    return lines
+end
+
 function Tracker:Update()
     if not ns.Q.char.ui.objTrackerShown then frame:Hide() return end
     frame:Show()
@@ -72,90 +121,61 @@ function Tracker:Update()
     local done, total = ns.QuestLog:Counts()
     header:SetFormattedText("|cff69ccf0Qeasy|r Tracker: %d/%d", done, total)
 
-    local collapsed = self:Collapsed()
-    local data = ns.QuestLog:Scan()
-    local width = frame:GetWidth() - 20
-    local y = -26
-    local n = 0
-    local pendingHeader = nil  -- vis kun zone-overskrifter der har quests
-
-    local function place(row)
-        row:ClearAllPoints()
-        row:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, y)
-        row:SetWidth(width)
-        row:Show()
-        y = y - 14
+    local lines = buildLines()
+    if #lines == 0 then
+        lines[1] = { text = L.TRACKER_NOQUESTS, r = 0.6, g = 0.6, b = 0.6 }
     end
 
-    for _, e in ipairs(data) do
-        if e.isHeader then
-            pendingHeader = e.name
-        elseif e.questID then
-            if pendingHeader then
-                n = n + 1
-                local row = getRow(n)
-                row.text:SetText(pendingHeader)
-                row.text:SetTextColor(0.7, 0.7, 0.7)
-                row:SetScript("OnClick", nil)
-                row:EnableMouse(false)
-                place(row)
-                pendingHeader = nil
-            end
-            -- Quest-titel (klikbar: fold objectives)
-            n = n + 1
-            local row = getRow(n)
-            local isCol = collapsed[e.questID]
-            local prefix = isCol and "+ " or "- "
-            row.text:SetFormattedText("%s[%d] %s", prefix, e.level, e.title)
-            local r, g, b = ns.QuestLog:DiffColor(e.level)
-            row.text:SetTextColor(r, g, b)
+    -- Max-højde: konfigurerbar, men aldrig mere end 82% af skærmen.
+    local screenH = UIParent:GetHeight() or 768
+    local maxH = math.min(ns.Q.char.ui.trackerMaxHeight or 460, screenH * 0.82)
+    local maxLines = math.max(4, math.floor((maxH - HEAD_H - PAD) / LINE_H))
+
+    local clipped = #lines > maxLines
+    local visLines = clipped and (maxLines - 1) or #lines  -- reservér 1 linje til scroll-hint
+    local maxScroll = math.max(0, #lines - visLines)
+    if self.scroll > maxScroll then self.scroll = maxScroll end
+    if self.scroll < 0 then self.scroll = 0 end
+
+    local width = frame:GetWidth() - 20
+    local y = -HEAD_H
+    local shown = 0
+    for i = self.scroll + 1, math.min(#lines, self.scroll + visLines) do
+        shown = shown + 1
+        local ln = lines[i]
+        local row = getRow(shown)
+        row.text:SetText(ln.text)
+        row.text:SetTextColor(ln.r, ln.g, ln.b)
+        if ln.qid then
+            local qid = ln.qid
             row:EnableMouse(true)
-            local qid = e.questID
             row:SetScript("OnClick", function()
                 local c = Tracker:Collapsed()
                 c[qid] = (not c[qid]) or nil
                 Tracker:Update()
             end)
-            place(row)
-
-            if not isCol then
-                if e.isComplete then
-                    n = n + 1
-                    local o = getRow(n)
-                    o.text:SetText("      " .. L.QUEST_COMPLETE)
-                    o.text:SetTextColor(0.2, 1.0, 0.2)
-                    o:SetScript("OnClick", nil); o:EnableMouse(false)
-                    place(o)
-                else
-                    for _, obj in ipairs(e.objectives) do
-                        n = n + 1
-                        local o = getRow(n)
-                        o.text:SetText("      " .. obj.text)
-                        if obj.done then
-                            o.text:SetTextColor(0.2, 1.0, 0.2)
-                        else
-                            o.text:SetTextColor(0.85, 0.85, 0.85)
-                        end
-                        o:SetScript("OnClick", nil); o:EnableMouse(false)
-                        place(o)
-                    end
-                end
-            end
+        else
+            row:EnableMouse(false)
+            row:SetScript("OnClick", nil)
         end
+        row:ClearAllPoints()
+        row:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, y)
+        row:SetWidth(width)
+        row:Show()
+        y = y - LINE_H
+    end
+    hideRowsFrom(shown + 1)
+
+    if clipped then
+        scrollHint:SetFormattedText("%s %d-%d af %d  (scroll)", "\226\150\178\226\150\188",
+            self.scroll + 1, self.scroll + shown, #lines)
+        scrollHint:Show()
+        y = y - LINE_H
+    else
+        scrollHint:Hide()
     end
 
-    hideRowsFrom(n + 1)
-
-    if n == 0 then
-        n = 1
-        local row = getRow(1)
-        row.text:SetText(L.TRACKER_NOQUESTS)
-        row.text:SetTextColor(0.6, 0.6, 0.6)
-        row:SetScript("OnClick", nil); row:EnableMouse(false)
-        place(row)
-    end
-
-    frame:SetHeight(26 + (-y) + 6)
+    frame:SetHeight(HEAD_H + shown * LINE_H + (clipped and LINE_H or 0) + PAD)
 end
 
 function Tracker:SetShown(shown)
