@@ -40,27 +40,47 @@ def outland_endpoint(node):
     return None, None
 
 
+def _upts(src):
+    p = []
+    for uid in src.values():
+        p += [x for x in qdb.spawns(qdb.udata, int(uid)) if x[0] in OUTLAND]
+    return p
+
+
+def _opts(src):
+    p = []
+    for oid in src.values():
+        p += [x for x in qdb.spawns(qdb.odata, int(oid)) if x[0] in OUTLAND]
+    return p
+
+
 def outland_objective(qid):
     """Returnér (centroid, otype, pts). otype: 'u'=dræb enhed (sværd),
-    'o'=interager med objekt (tandhjul), 'i'=saml genstand (tandhjul).
-    pts = alle Outland-spawnpunkter for målet (til område-markering)."""
+    'o'=interager/brug item (tandhjul), 'i'=saml genstand (tandhjul).
+    pts = alle Outland-spawnpunkter for målet (til område-markering).
+
+    Vigtigt: et objektiv med et påkrævet/udleveret item (IR) eller et objekt
+    (O) er en INTERACT/brug-quest (tandhjul) - selv hvis der også er enheder
+    (fx 'brug banner ved Boulderfist-lejre'). Kun rene enheds-mål = dræb."""
     q = qdb.qdata[qid]
     if T(q) != "table" or not q["obj"]:
         return None, None, None
     obj = q["obj"]
-    # Enheder (dræb) prioriteres som objektivtype - det er "kill quests".
-    if obj["U"]:
-        pts = []
-        for uid in obj["U"].values():
-            pts += [p for p in qdb.spawns(qdb.udata, int(uid)) if p[0] in OUTLAND]
-        if pts:
-            return qdb.centroid(pts), "u", pts
-    if obj["O"]:
-        pts = []
-        for oid in obj["O"].values():
-            pts += [p for p in qdb.spawns(qdb.odata, int(oid)) if p[0] in OUTLAND]
+
+    # Brug-item (IR) eller interager-med-objekt (O) => tandhjul.
+    if obj["IR"] or obj["O"]:
+        pts = _opts(obj["O"]) if obj["O"] else []
+        if not pts and obj["U"]:
+            pts = _upts(obj["U"])          # fald tilbage på enheder for placering
         if pts:
             return qdb.centroid(pts), "o", pts
+
+    # Rent enheds-mål => dræb (sværd).
+    if obj["U"]:
+        pts = _upts(obj["U"])
+        if pts:
+            return qdb.centroid(pts), "u", pts
+
     if obj["I"]:
         pts, from_unit = [], False
         for iid in obj["I"].values():
