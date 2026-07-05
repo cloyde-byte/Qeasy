@@ -83,22 +83,23 @@ frame:SetScript("OnMouseWheel", function(_, delta)
     Tracker:Update()
 end)
 
--- Hvilken quest er spilleren "i gang med"? Løftes til toppen og fremhæves.
---  1) manuelt valgt (venstreklik)  2) klientens super-track
---  3) quest fra Qeasys aktuelle rute-step  4) første ufærdige quest
-function Tracker:ActiveQuestID()
-    local scan = ns.QuestLog:Scan()
-    local live = {}
-    for _, e in ipairs(scan) do if e.questID then live[e.questID] = e end end
+local MAX_FOCUS = 3
 
-    local f = ns.Q.char.ui.trackerFocus
-    if f and live[f] and not live[f].isComplete then return f end
+-- Normalisér fokus til en liste (migrerer gammelt enkelt-fokus-tal).
+local function focusRaw()
+    local ui = ns.Q.char.ui
+    if type(ui.trackerFocus) == "number" then ui.trackerFocus = { ui.trackerFocus } end
+    if type(ui.trackerFocus) ~= "table" then ui.trackerFocus = {} end
+    return ui.trackerFocus
+end
 
+-- Auto-valg af én quest når intet er manuelt fokuseret:
+--  klientens super-track -> Qeasys aktuelle rute-step -> første ufærdige.
+local function autoQuestID(scan, live)
     if C_SuperTrack and C_SuperTrack.GetSuperTrackedQuestID then
         local q = C_SuperTrack.GetSuperTrackedQuestID()
         if q and q ~= 0 and live[q] and not live[q].isComplete then return q end
     end
-
     if ns.Q.GetCurrentStep then
         local ok, step = pcall(function() return ns.Q:GetCurrentStep() end)
         if ok and step and step.elements then
@@ -108,11 +109,41 @@ function Tracker:ActiveQuestID()
             end
         end
     end
-
     for _, e in ipairs(scan) do
         if e.questID and not e.isComplete then return e.questID end
     end
     return nil
+end
+
+-- De quests der er "i gang med" (op til 3). Løftes til top + fremhæves, og
+-- får hver sit blå spawn-område på kortet. Tom manuel-liste => auto-vælg én.
+function Tracker:FocusList()
+    local scan = ns.QuestLog:Scan()
+    local live = {}
+    for _, e in ipairs(scan) do if e.questID then live[e.questID] = e end end
+
+    local out = {}
+    for _, qid in ipairs(focusRaw()) do
+        if live[qid] and not live[qid].isComplete then out[#out + 1] = qid end
+    end
+    if #out > 0 then return out end
+    local a = autoQuestID(scan, live)
+    return a and { a } or {}
+end
+
+-- Bagudkompatibelt: den primære aktive quest (første i fokus).
+function Tracker:ActiveQuestID()
+    return self:FocusList()[1]
+end
+
+-- Slå en quest til/fra som fokus (max 3, ældste ryger ud).
+function Tracker:ToggleFocus(qid)
+    local f = focusRaw()
+    for i, q in ipairs(f) do
+        if q == qid then table.remove(f, i); return end
+    end
+    f[#f + 1] = qid
+    while #f > MAX_FOCUS do table.remove(f, 1) end
 end
 
 -- Tilføj én quest (titel + objectives) til linjelisten.
@@ -144,25 +175,25 @@ end
 local function buildLines()
     local lines = {}
     local scan = ns.QuestLog:Scan()
-    local activeQID = Tracker:ActiveQuestID()
+    local focus = Tracker:FocusList()
+    local focusSet, byID = {}, {}
+    for _, qid in ipairs(focus) do focusSet[qid] = true end
+    for _, e in ipairs(scan) do if e.questID then byID[e.questID] = e end end
 
-    -- Aktiv quest øverst, fremhævet.
-    if activeQID then
-        for _, e in ipairs(scan) do
-            if e.questID == activeQID then
-                lines[#lines + 1] = { text = L.TRACKER_ACTIVE, r = 0.42, g = 0.80, b = 0.94 }
-                questBlock(lines, e, true)
-                break
-            end
+    -- Fokuserede quests øverst (i fokus-rækkefølge), fremhævet.
+    if #focus > 0 then
+        lines[#lines + 1] = { text = L.TRACKER_ACTIVE, r = 0.42, g = 0.80, b = 0.94 }
+        for _, qid in ipairs(focus) do
+            if byID[qid] then questBlock(lines, byID[qid], true) end
         end
     end
 
-    -- Resten, grupperet efter zone (den aktive springes over).
+    -- Resten, grupperet efter zone (de fokuserede springes over).
     local pendingHeader = nil
     for _, e in ipairs(scan) do
         if e.isHeader then
             pendingHeader = e.name
-        elseif e.questID and e.questID ~= activeQID then
+        elseif e.questID and not focusSet[e.questID] then
             if pendingHeader then
                 lines[#lines + 1] = { text = pendingHeader, r = 0.7, g = 0.7, b = 0.7 }
                 pendingHeader = nil
@@ -218,10 +249,9 @@ function Tracker:Update()
                     c[qid] = (not c[qid]) or nil                  -- fold sammen
                     Tracker:Update()
                 else
-                    local ui = ns.Q.char.ui                        -- fokusér (løft til top)
-                    ui.trackerFocus = (ui.trackerFocus ~= qid) and qid or nil
+                    Tracker:ToggleFocus(qid)                       -- fokusér (op til 3)
                     Tracker:Update()
-                    if ns.Map then ns.Map:UpdateWorldMap() end      -- opdatér spawn-sky
+                    if ns.Map then ns.Map:UpdateWorldMap() end      -- opdatér blå områder
                 end
             end)
             row:SetScript("OnEnter", function(self)

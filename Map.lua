@@ -14,6 +14,8 @@ ns.Map = Map
 local ICON_GIVER  = "Interface\\GossipFrame\\AvailableQuestIcon"
 local ICON_TURNIN = "Interface\\GossipFrame\\ActiveQuestIcon"
 local ICON_FLIGHT = "Interface\\Icons\\Ability_Mount_Gryphon_01"
+local ICON_INN    = "Interface\\Minimap\\Tracking\\Innkeeper"
+local ICON_MAIL   = "Interface\\Minimap\\Tracking\\Mailbox"
 
 -- Zoom-radius i yards (udendørs) pr. Minimap:GetZoom()-trin.
 local MM_RADIUS = { [0] = 466.6, [1] = 400.0, [2] = 333.3, [3] = 266.6, [4] = 200.0, [5] = 133.3 }
@@ -125,6 +127,10 @@ local function styleIcon(tex, kind, size, otype, known)
     elseif kind == "flightmaster" then
         -- Kendt flyvemester = gryf-ikon; uopdaget = grønt "!" (gå hen og tag den).
         tex:SetTexture(known and ICON_FLIGHT or ICON_FLIGHTPOINT)
+    elseif kind == "innkeeper" then
+        tex:SetTexture(ICON_INN)
+    elseif kind == "mailbox" then
+        tex:SetTexture(ICON_MAIL)
     elseif isSlay(otype) then
         tex:SetTexture(ICON_SLAY)       -- dræb-quest = røde krydsede sværd
     else
@@ -171,6 +177,8 @@ local function clusterHeader(kind)
     if kind == "giver" then return "Tilgængelige quests her:" end
     if kind == "turnin" then return "Aflever her:" end
     if kind == "flightmaster" then return "Flyvemestre her:" end
+    if kind == "innkeeper" then return "Kroværter her:" end
+    if kind == "mailbox" then return "Postkasser her:" end
     return "Mål her:"
 end
 
@@ -190,6 +198,19 @@ function Map:ClusterIcons(list)
         c.entries[#c.entries + 1] = { title = ic.title, npc = ic.npc }
     end
     return clusters
+end
+
+-- Kroværter og postkasser på et bestemt map (fra ns.POI) - a la Questie.
+function Map:POIForMap(mapID)
+    local list = {}
+    if not ns.POI then return list end
+    for _, ik in ipairs((ns.POI.innkeepers and ns.POI.innkeepers[mapID]) or {}) do
+        list[#list + 1] = { kind = "innkeeper", x = ik[1], y = ik[2], title = ik[3] }
+    end
+    for _, mb in ipairs((ns.POI.mailboxes and ns.POI.mailboxes[mapID]) or {}) do
+        list[#list + 1] = { kind = "mailbox", x = mb[1], y = mb[2], title = "Postkasse" }
+    end
+    return list
 end
 
 -- =====================================================================
@@ -247,6 +268,13 @@ end
 -- Spawn-område-markering: en sky af bløde blå pletter, der viser HVOR målets
 -- mobs står (fx alle clefthoof for "Clefthoof Mastery"), i stedet for kun ét
 -- sværd. Pletterne ligger under quest-ikonerne.
+-- Farver til op til 3 fokuserede quests' spawn-skyer (alle blålige, men
+-- adskillelige - fx Talbuk vs Clefthoof vs Windroc).
+local AREA_COLORS = {
+    { 0.22, 0.51, 1.00 },   -- blå
+    { 0.20, 0.82, 0.95 },   -- cyan
+    { 0.58, 0.45, 1.00 },   -- indigo
+}
 local areaHost, areaMarks = nil, {}
 local function getAreaMark(i, canvas)
     if not areaHost or (areaHost.GetParent and areaHost:GetParent() ~= canvas) then
@@ -282,26 +310,33 @@ function Map:UpdateWorldMap()
     if ns.Q.char.ui.flightMasters ~= false then
         for _, fm in ipairs(self:FlightMastersForMap(mapID)) do list[#list + 1] = fm end
     end
+    if ns.Q.char.ui.poiIcons ~= false then
+        for _, p in ipairs(self:POIForMap(mapID)) do list[#list + 1] = p end
+    end
 
-    -- Spawn-område (blå sky) - KUN for den quest du er fokuseret på i trackeren,
-    -- ellers dækker alle aktive quests hele kortet. Tegnes UNDER ikonerne.
+    -- Spawn-områder (blå skyer) - KUN for de quests du er fokuseret på i
+    -- trackeren (op til 3), hver i sin nuance. Tegnes UNDER ikonerne.
     local am = 0
-    local focusQID = ns.ObjTracker and ns.ObjTracker.ActiveQuestID and ns.ObjTracker:ActiveQuestID()
-    if ns.Q.char.ui.mapIcons ~= false and ns.Q.char.ui.spawnAreas ~= false and focusQID then
-        local size = math.max(24, w * 0.06)   -- skalerer med zoom, så skyen hænger sammen
+    local focus = ns.ObjTracker and ns.ObjTracker.FocusList and ns.ObjTracker:FocusList()
+    if ns.Q.char.ui.mapIcons ~= false and ns.Q.char.ui.spawnAreas ~= false and focus and #focus > 0 then
+        local colorOf = {}                       -- qid -> farve efter fokus-rækkefølge
+        for i, qid in ipairs(focus) do colorOf[qid] = AREA_COLORS[i] or AREA_COLORS[1] end
+        local size = math.max(24, w * 0.06)      -- skalerer med zoom
         for _, ic in ipairs(list) do
-            if ic.oa and ic.qid == focusQID then
+            local col = ic.oa and colorOf[ic.qid]
+            if col then
                 for _, pt in ipairs(ic.oa) do
                     am = am + 1
                     local t = getAreaMark(am, canvas)
                     t:SetSize(size, size)
+                    t:SetVertexColor(col[1], col[2], col[3])
                     t:ClearAllPoints()
                     t:SetPoint("CENTER", canvas, "TOPLEFT", (pt[1] / 100) * w, -(pt[2] / 100) * h)
                     t:Show()
                 end
             end
         end
-        if am > 0 and areaHost then   -- løft skyen over kortet (men under ikonerne)
+        if am > 0 and areaHost then   -- løft skyerne over kortet (men under ikonerne)
             if canvas.GetFrameStrata then areaHost:SetFrameStrata(canvas:GetFrameStrata()) end
             areaHost:SetFrameLevel((canvas.GetFrameLevel and canvas:GetFrameLevel() or 0) + 2400)
         end
@@ -317,6 +352,7 @@ function Map:UpdateWorldMap()
         -- vises mindre (gryf); uopdaget flyvemester som et tydeligt grønt "!".
         local base = (ic.kind == "flightmaster") and (ic.known and 12 or 14)
             or (ic.kind == "objective") and (isSlay(ic.otype) and 13 or 12)
+            or (ic.kind == "innkeeper" or ic.kind == "mailbox") and 14
             or 13
         styleIcon(p.tex, ic.kind, base, ic.otype, ic.known)
         p:SetSize(base, base)
@@ -336,6 +372,10 @@ function Map:UpdateWorldMap()
             local fac = ic.horde and "Horde" or "neutral"
             p.sub = ic.known and ("Flyvemester (" .. fac .. ")")
                 or ("Ny flyvemester her (" .. fac .. ") · mangler")
+        elseif ic.kind == "innkeeper" then
+            p.sub = "Kroværter (sæt hearthstone)"
+        elseif ic.kind == "mailbox" then
+            p.sub = "Postkasse"
         elseif isSlay(ic.otype) then
             p.sub = "Dræb-mål her"
         else
@@ -379,6 +419,9 @@ function Map:Rebuild()
         end
         if ns.Q.char.ui.flightMasters ~= false then
             for _, fm in ipairs(self:FlightMastersForMap(self.zoneMap)) do icons[#icons + 1] = fm end
+        end
+        if ns.Q.char.ui.poiIcons ~= false then
+            for _, p in ipairs(self:POIForMap(self.zoneMap)) do icons[#icons + 1] = p end
         end
     end
     self.zoneIcons = self:ClusterIcons(icons)
@@ -428,7 +471,8 @@ mmFrame:SetScript("OnUpdate", function(_, dt)
                 n = n + 1
                 local t = getMMPin(n)
                 local base = (ic.kind == "flightmaster") and (ic.known and 10 or 12)
-                    or (ic.kind == "objective") and (isSlay(ic.otype) and 12 or 11) or 12
+                    or (ic.kind == "objective") and (isSlay(ic.otype) and 12 or 11)
+                    or (ic.kind == "innkeeper" or ic.kind == "mailbox") and 13 or 12
                 styleIcon(t, ic.kind, base, ic.otype, ic.known)
                 t.base = base
                 t.pulse = (ic.kind == "objective") and not isSlay(ic.otype)

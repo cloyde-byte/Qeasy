@@ -184,6 +184,9 @@ SlashCmdList["QEASY"] = function(msg)
     elseif cmd == "flightmasters" or cmd == "fm" then
         Q.char.ui.flightMasters = not Q.char.ui.flightMasters
         if ns.Map then ns.Map:Rebuild(); ns.Map:UpdateWorldMap() end
+    elseif cmd == "poi" then
+        Q.char.ui.poiIcons = not Q.char.ui.poiIcons
+        if ns.Map then ns.Map:Rebuild(); ns.Map:UpdateWorldMap() end
     elseif cmd == "skip" then
         Q:SkipStep()
     elseif cmd == "back" then

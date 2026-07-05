@@ -46,6 +46,7 @@ ns.L = {
     CFG_SPAWNAREAS   = "Vis mob-område (blå sky) for aktive mål",
     CFG_MINIMAPICONS = "Vis quest-ikoner på minimappet (Outland)",
     CFG_FLIGHT       = "Vis flyvemestre på kort og minimap (Outland)",
+    CFG_POI          = "Vis kroværter og postkasser (Outland)",
     CFG_PARTYSHARE   = "Del quest-fremgang med party (Qeasy-brugere)",
     CFG_ITEMBAR      = "Vis knap for quest-items (fx Living Fire)",
     CFG_HERO         = "Fremhæv quest-item midt på skærmen når du er tæt på",

@@ -138,6 +138,10 @@ local cbFlight = checkbox(L.CFG_FLIGHT,
     function() return ns.Q.char.ui.flightMasters ~= false end,
     function(v) ns.Q.char.ui.flightMasters = v
         if ns.Map then ns.Map:Rebuild(); ns.Map:UpdateWorldMap() end end)
+local cbPOI = checkbox(L.CFG_POI,
+    function() return ns.Q.char.ui.poiIcons ~= false end,
+    function(v) ns.Q.char.ui.poiIcons = v
+        if ns.Map then ns.Map:Rebuild(); ns.Map:UpdateWorldMap() end end)
 local cbPartyShare = checkbox(L.CFG_PARTYSHARE,
     function() return ns.Q.char.ui.partyShare ~= false end,
     function(v) ns.Q.char.ui.partyShare = v
@@ -205,6 +209,7 @@ function Config:Refresh()
     cbSpawnAreas:SetChecked(cbSpawnAreas.qGet())
     cbMiniIcons:SetChecked(cbMiniIcons.qGet())
     cbFlight:SetChecked(cbFlight.qGet())
+    cbPOI:SetChecked(cbPOI.qGet())
     cbPartyShare:SetChecked(cbPartyShare.qGet())
     cbItemBar:SetChecked(cbItemBar.qGet())
     cbHero:SetChecked(cbHero.qGet())

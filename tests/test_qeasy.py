@@ -94,7 +94,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.15.4' end
+function GetAddOnMetadata() return '0.16.0' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -150,6 +150,7 @@ for f in ["Locale.lua", "Engine.lua", "Arrow.lua", "Guide.lua",
           "QuestLog.lua", "ObjectiveTracker.lua", "Tooltips.lua",
           "Comms.lua", "Links.lua",
           "Data/OutlandQuests.lua", "Data/OutlandFlightMasters.lua",
+          "Data/OutlandPOI.lua",
           "Map.lua", "ItemButton.lua", "Config.lua",
           "Routes/HellfirePeninsula.lua", "Routes/Zangarmarsh.lua",
           "Routes/TerokkarForest.lua", "Routes/Nagrand.lua",
@@ -377,6 +378,33 @@ check("flight master-DB indlæst", ns.FlightMasters is not None)
 fms = list(ns.Map.FlightMastersForMap(ns.Map, 1944).values())
 check(f"flight masters i Hellfire (1944): {len(fms)} stk", len(fms) >= 3)
 check("flight master har navn + kind", all(f.kind == "flightmaster" and f.title for f in fms))
+
+# kroværter + postkasser (a la Questie)
+check("POI-DB indlæst", ns.POI is not None)
+poi = list(ns.Map.POIForMap(ns.Map, 1944).values())
+kinds_poi = set(p.kind for p in poi)
+check("kroværter + postkasser på kortet (Hellfire)",
+      "innkeeper" in kinds_poi and "mailbox" in kinds_poi)
+check("kroværter har navn", all(p.title for p in poi if p.kind == "innkeeper"))
+
+# multi-fokus: op til 3 quests kan fokuseres samtidigt
+lua.eval("""function() QLOG = {
+  { title='Talbuk Mastery', questID=9857, objectives={{text='Talbuk slain: 0/30'}} },
+  { title='Clefthoof Mastery', questID=9789, objectives={{text='Clefthoof slain: 0/30'}} },
+  { title='Windroc Mastery', questID=9854, objectives={{text='Windroc slain: 0/30'}} },
+  { title='Extra', questID=9891, objectives={{text='x: 0/1'}} },
+} end""")()
+ns.Q.char.ui.trackerFocus = lua.eval("{}")
+for q in (9857, 9789, 9854):
+    ns.ObjTracker.ToggleFocus(ns.ObjTracker, q)
+fl = list(ns.ObjTracker.FocusList(ns.ObjTracker).values())
+check("3 quests kan fokuseres samtidigt", sorted(int(x) for x in fl) == [9789, 9854, 9857])
+ns.ObjTracker.ToggleFocus(ns.ObjTracker, 9891)   # 4. -> ældste (9857) ryger ud
+fl2 = sorted(int(x) for x in list(ns.ObjTracker.FocusList(ns.ObjTracker).values()))
+check("max 3 fokus (ældste falder ud)", fl2 == [9789, 9854, 9891])
+ns.ObjTracker.ToggleFocus(ns.ObjTracker, 9789)   # slå fra igen
+fl3 = sorted(int(x) for x in list(ns.ObjTracker.FocusList(ns.ObjTracker).values()))
+check("fokus kan slås fra", fl3 == [9854, 9891])
 
 # opdaget/uopdaget flyvemester: alle er ukendte til at starte med
 ns.Q.char.knownFlights = lua.eval("{}")
