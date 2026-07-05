@@ -197,6 +197,42 @@ def render_gear(px=32):
     return img.resize((px, px), Image.LANCZOS)
 
 
+def render_sword(px=32):
+    """Røde krydsede sværd til 'dræb'-objektiver (a la Questie). Transparent."""
+    S = px * SS
+    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    c = S / 2
+
+    STEEL = (222, 226, 234, 255)
+    STEEL_EDGE = (150, 156, 168, 255)
+    RED = (196, 32, 32, 255)
+    RED_HI = (240, 90, 70, 255)
+    DARK = (40, 8, 8, 255)
+
+    def one_sword(ang):
+        # lokalt sværd, spids opad; y ned. Roteres om centrum med `ang`.
+        bw = S * 0.052   # klingebredde
+        gw = S * 0.20    # parérstang halvbredde
+        hw = S * 0.030   # skæftebredde
+        tipY, guY, guY2, pomY = 0.07 * S, 0.60 * S, 0.66 * S, 0.90 * S
+        blade = [(c, tipY), (c + bw, 0.19 * S), (c + bw, guY),
+                 (c - bw, guY), (c - bw, 0.19 * S)]
+        guard = [(c - gw, guY), (c + gw, guY), (c + gw, guY2), (c - gw, guY2)]
+        handle = [(c - hw, guY2), (c + hw, guY2), (c + hw, pomY), (c - hw, pomY)]
+        R = lambda pts: [rot(c, c, x, y, math.radians(ang)) for x, y in pts]
+        d.polygon(R(blade), fill=STEEL, outline=STEEL_EDGE)
+        d.polygon(R(guard), fill=RED, outline=DARK)
+        d.polygon(R(handle), fill=(92, 52, 22, 255), outline=DARK)
+        pc = rot(c, c, c, pomY + S * 0.02, math.radians(ang))
+        pr = S * 0.05
+        d.ellipse([pc[0] - pr, pc[1] - pr, pc[0] + pr, pc[1] + pr], fill=RED_HI, outline=DARK)
+
+    one_sword(-38)   # spids op mod venstre
+    one_sword(38)    # spids op mod højre
+    return img.resize((px, px), Image.LANCZOS)
+
+
 def render_curseforge():
     W, H = 800, 260
     img = radial_disc((W, H), int(W * 0.3), int(H * 0.2), max(W, H) * 0.9,
@@ -224,6 +260,7 @@ def main():
     os.makedirs(MEDIA, exist_ok=True)
     write_tga(render_medallion(128), os.path.join(MEDIA, "logo.tga"))
     write_tga(render_gear(32), os.path.join(MEDIA, "objective.tga"))
+    write_tga(render_sword(32), os.path.join(MEDIA, "slay.tga"))
     render_curseforge()
 
 

@@ -92,12 +92,42 @@ function UnitFactionGroup() return PSTATE.faction end
 function UnitLevel() return PSTATE.level end
 function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
-function IsShiftKeyDown() return false end
-function GetAddOnMetadata() return '0.9.4' end
+function IsShiftKeyDown() return PSTATE.shift end
+function IsControlKeyDown() return PSTATE.ctrl end
+function GetAddOnMetadata() return '0.10.0' end
+-- Party-comms + quest-links (Questie-agtigt)
+function wipe(t) for k in pairs(t) do t[k] = nil end return t end
+function GetTime() return PSTATE.time or 0 end
+function IsInGroup() return PSTATE.inGroup end
+function IsInRaid() return false end
+function Ambiguate(name) return name end
+SENT = {}
+C_ChatInfo = {
+    RegisterAddonMessagePrefix = function() end,
+    SendAddonMessage = function(prefix, msg, chan)
+        SENT[#SENT+1] = { prefix = prefix, msg = msg, chan = chan }
+    end,
+}
+strsplit = function(sep, s)
+    local out = {}
+    for part in tostring(s):gmatch('[^' .. sep .. ']+') do out[#out+1] = part end
+    return table.unpack(out)
+end
+EDITBOX = { _text = '' }
+function EDITBOX:IsShown() return true end
+function EDITBOX:Insert(s) self._text = self._text .. s end
+function EDITBOX:SetFocus() end
+function EDITBOX:Show() end
+function ChatEdit_ChooseBoxForSend() return EDITBOX end
+function ChatEdit_ActivateChat() end
+DEFAULT_CHAT_FRAME = { AddMessage = function() end }
+NUM_CHAT_WINDOWS = 1
 hooksecurefunc = function() end
 GameTooltip = { HookScript = function() end, GetUnit = function() return nil end,
                 SetOwner = function() end, AddLine = function() end,
+                ClearLines = function() end, AddDoubleLine = function() end,
                 Show = function() end, Hide = function() end }
+ChatFrame1 = CreateFrame('Frame', 'ChatFrame1')
 Minimap = CreateFrame('Frame', 'Minimap')
 function Minimap:GetZoom() return 3 end
 GetCVar = function() return '0' end
@@ -109,6 +139,7 @@ g = lua.globals()
 ns = lua.eval("{}")
 for f in ["Locale.lua", "Engine.lua", "Arrow.lua", "Guide.lua",
           "QuestLog.lua", "ObjectiveTracker.lua", "Tooltips.lua",
+          "Comms.lua", "Links.lua",
           "Data/OutlandQuests.lua", "Data/OutlandFlightMasters.lua",
           "Map.lua", "Config.lua",
           "Routes/HellfirePeninsula.lua", "Routes/Zangarmarsh.lua",
@@ -118,7 +149,7 @@ for f in ["Locale.lua", "Engine.lua", "Arrow.lua", "Guide.lua",
     src = open(os.path.join(ADDON_DIR, f), encoding="utf-8").read()
     lua.eval("function(s,n) return assert(load(s,'@'..n)) end")(src, f)("Qeasy", ns)
 
-fire = lua.eval("function(e,a,b) QeasyEngineFrame.scripts.OnEvent(QeasyEngineFrame,e,a,b) end")
+fire = lua.eval("function(e,a,b,c,d) QeasyEngineFrame.scripts.OnEvent(QeasyEngineFrame,e,a,b,c,d) end")
 flush = g.FlushTimers
 Q = ns.Q
 
@@ -250,6 +281,41 @@ check("tracker tæller quests (1 færdig / 3 total)", done == 1 and total == 3)
 ns.ObjTracker.Update(ns.ObjTracker)
 check("quest-tracker synlig", g.QeasyObjectiveTracker.shown == True)
 
+# aktiv quest = første ufærdige (løftes til toppen + fremhæves)
+active = ns.ObjTracker.ActiveQuestID(ns.ObjTracker)
+check("tracker vælger aktiv quest (10043)", int(active) == 10043)
+Q.char.ui.trackerFocus = 99001
+check("manuelt fokus vinder (99001)",
+      int(ns.ObjTracker.ActiveQuestID(ns.ObjTracker)) == 99001)
+Q.char.ui.trackerFocus = None
+ns.ObjTracker.Update(ns.ObjTracker)  # må ikke fejle med fremhævet aktiv quest
+
+# ---- quest-links i chat (Questie-agtigt) ----
+link = ns.Links.QuestLink(ns.Links, 10043, "Kill the Shadow Council!", 65)
+check("quest-link har korrekt format",
+      "Hquest:10043:65" in link and "[Kill the Shadow Council!]" in link)
+ns.Links.Init(ns.Links)
+check("Links:Init hooker ChatFrame1", ns.Links.hooked[g.ChatFrame1] == True)
+g.EDITBOX._text = ""
+ns.Links.Insert(ns.Links, 10043, "Kill the Shadow Council!", 65)
+check("Links:Insert lægger link i editbox", "Hquest:10043:65" in g.EDITBOX._text)
+
+# ---- party quest-sync ('snakke med Questie') ----
+lua.execute("PSTATE.unitName='Me'; PSTATE.inGroup=true")
+ns.Comms.Init(ns.Comms)
+ns.Comms.OnMessage(ns.Comms, "Qeasy", "1S|10043:C;99001:3/30", "PARTY", "Bob")
+bob = ns.Comms.party["Bob"]
+check("party-comms modtager Bobs quests", bob is not None
+      and bob[10043] == "C" and bob[99001] == "3/30")
+ns.Comms.OnMessage(ns.Comms, "Qeasy", "1S|10043:C", "PARTY", "Me")
+check("party-comms ignorerer sig selv", ns.Comms.party["Me"] is None)
+prog = list(ns.Comms.ProgressFor(ns.Comms, 10043).values())
+check("ProgressFor: Bob er 'færdig' med 10043",
+      len(prog) == 1 and prog[0].name == "Bob" and prog[0].text == "færdig")
+lua.execute("PSTATE.inGroup=true; PSTATE.time=100")
+ns.Comms.Broadcast(ns.Comms, True)
+check("Broadcast sender addon-besked i gruppe", len(list(g.SENT.values())) >= 1)
+
 hits = ns.QuestLog.ObjectivesForName(ns.QuestLog, "Shadowy Executioner")
 hitlist = list(hits.values())
 check("tooltip matcher mob -> quest ('Kill the Shadow Council!')",
@@ -298,7 +364,7 @@ check("minimap-pins opdaterer uden fejl", True)
 
 # ---- slash ----
 for cmd in ("list","debug","","config","skip","back","help","tracker",
-            "tooltips","mapicons","minimap"):
+            "tooltips","mapicons","minimap","party"):
     lua.eval("SlashCmdList['QEASY']")(cmd)
 
 print("\n--- chat (uddrag) ---")

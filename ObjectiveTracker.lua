@@ -47,6 +47,10 @@ local function getRow(i)
     if rows[i] then return rows[i] end
     local b = CreateFrame("Button", nil, frame)
     b:SetHeight(13)
+    b.bg = b:CreateTexture(nil, "BACKGROUND")
+    b.bg:SetAllPoints(b)
+    b.bg:SetColorTexture(0.42, 0.80, 0.94, 0.14)  -- Qeasy-cyan highlight for aktiv quest
+    b.bg:Hide()
     b.text = b:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     b.text:SetPoint("LEFT", b, "LEFT", 0, 0)
     b.text:SetPoint("RIGHT", b, "RIGHT", 0, 0)
@@ -79,36 +83,91 @@ frame:SetScript("OnMouseWheel", function(_, delta)
     Tracker:Update()
 end)
 
+-- Hvilken quest er spilleren "i gang med"? Løftes til toppen og fremhæves.
+--  1) manuelt valgt (venstreklik)  2) klientens super-track
+--  3) quest fra Qeasys aktuelle rute-step  4) første ufærdige quest
+function Tracker:ActiveQuestID()
+    local scan = ns.QuestLog:Scan()
+    local live = {}
+    for _, e in ipairs(scan) do if e.questID then live[e.questID] = e end end
+
+    local f = ns.Q.char.ui.trackerFocus
+    if f and live[f] and not live[f].isComplete then return f end
+
+    if C_SuperTrack and C_SuperTrack.GetSuperTrackedQuestID then
+        local q = C_SuperTrack.GetSuperTrackedQuestID()
+        if q and q ~= 0 and live[q] and not live[q].isComplete then return q end
+    end
+
+    if ns.Q.GetCurrentStep then
+        local ok, step = pcall(function() return ns.Q:GetCurrentStep() end)
+        if ok and step and step.elements then
+            for _, el in ipairs(step.elements) do
+                local qid = el.q and el.q.id
+                if qid and live[qid] and not live[qid].isComplete then return qid end
+            end
+        end
+    end
+
+    for _, e in ipairs(scan) do
+        if e.questID and not e.isComplete then return e.questID end
+    end
+    return nil
+end
+
+-- Tilføj én quest (titel + objectives) til linjelisten.
+local function questBlock(lines, e, active)
+    local collapsed = Tracker:Collapsed()
+    local isCol = collapsed[e.questID] and not active
+    local r, g, b = ns.QuestLog:DiffColor(e.level)
+    if active then r, g, b = 1, 0.9, 0.35 end   -- fremhævet guld
+    local mark = active and "\226\150\182 " or (isCol and "+ " or "- ")  -- ▶ / + / -
+    lines[#lines + 1] = {
+        text = string.format("%s[%d] %s", mark, e.level, e.title),
+        r = r, g = g, b = b, qid = e.questID, qtitle = e.title, qlevel = e.level,
+        active = active,
+    }
+    if not isCol then
+        if e.isComplete then
+            lines[#lines + 1] = { text = "      " .. L.QUEST_COMPLETE, r = 0.2, g = 1, b = 0.2 }
+        else
+            for _, obj in ipairs(e.objectives) do
+                local oc = obj.done and 0.2 or 0.85
+                lines[#lines + 1] = { text = "      " .. obj.text,
+                    r = oc, g = obj.done and 1 or 0.85, b = oc }
+            end
+        end
+    end
+end
+
 -- Byg en flad liste af linjer (så vi nemt kan vise et scroll-vindue).
 local function buildLines()
     local lines = {}
-    local collapsed = Tracker:Collapsed()
+    local scan = ns.QuestLog:Scan()
+    local activeQID = Tracker:ActiveQuestID()
+
+    -- Aktiv quest øverst, fremhævet.
+    if activeQID then
+        for _, e in ipairs(scan) do
+            if e.questID == activeQID then
+                lines[#lines + 1] = { text = L.TRACKER_ACTIVE, r = 0.42, g = 0.80, b = 0.94 }
+                questBlock(lines, e, true)
+                break
+            end
+        end
+    end
+
+    -- Resten, grupperet efter zone (den aktive springes over).
     local pendingHeader = nil
-    for _, e in ipairs(ns.QuestLog:Scan()) do
+    for _, e in ipairs(scan) do
         if e.isHeader then
             pendingHeader = e.name
-        elseif e.questID then
+        elseif e.questID and e.questID ~= activeQID then
             if pendingHeader then
                 lines[#lines + 1] = { text = pendingHeader, r = 0.7, g = 0.7, b = 0.7 }
                 pendingHeader = nil
             end
-            local isCol = collapsed[e.questID]
-            local r, g, b = ns.QuestLog:DiffColor(e.level)
-            lines[#lines + 1] = {
-                text = string.format("%s[%d] %s", isCol and "+ " or "- ", e.level, e.title),
-                r = r, g = g, b = b, qid = e.questID,
-            }
-            if not isCol then
-                if e.isComplete then
-                    lines[#lines + 1] = { text = "      " .. L.QUEST_COMPLETE, r = 0.2, g = 1, b = 0.2 }
-                else
-                    for _, obj in ipairs(e.objectives) do
-                        local oc = obj.done and 0.2 or 0.85
-                        lines[#lines + 1] = { text = "      " .. obj.text,
-                            r = oc, g = obj.done and 1 or 0.85, b = oc }
-                    end
-                end
-            end
+            questBlock(lines, e)
         end
     end
     return lines
@@ -146,17 +205,44 @@ function Tracker:Update()
         local row = getRow(shown)
         row.text:SetText(ln.text)
         row.text:SetTextColor(ln.r, ln.g, ln.b)
+        if ln.active then row.bg:Show() else row.bg:Hide() end
         if ln.qid then
-            local qid = ln.qid
+            local qid, qtitle, qlevel = ln.qid, ln.qtitle, ln.qlevel
             row:EnableMouse(true)
+            row:RegisterForClicks("LeftButtonUp")
             row:SetScript("OnClick", function()
-                local c = Tracker:Collapsed()
-                c[qid] = (not c[qid]) or nil
-                Tracker:Update()
+                if IsShiftKeyDown() and ns.Links then
+                    ns.Links:Insert(qid, qtitle, qlevel)          -- link i chat
+                elseif IsControlKeyDown() then
+                    local c = Tracker:Collapsed()
+                    c[qid] = (not c[qid]) or nil                  -- fold sammen
+                    Tracker:Update()
+                else
+                    local ui = ns.Q.char.ui                        -- fokusér (løft til top)
+                    ui.trackerFocus = (ui.trackerFocus ~= qid) and qid or nil
+                    Tracker:Update()
+                end
             end)
+            row:SetScript("OnEnter", function(self)
+                GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+                GameTooltip:AddLine(qtitle or "", 1, 0.85, 0.30)
+                local prog = ns.Comms and ns.Comms:ProgressFor(qid)
+                if prog and #prog > 0 then
+                    GameTooltip:AddLine("|cff69ccf0Gruppe:|r")
+                    for _, p in ipairs(prog) do
+                        GameTooltip:AddDoubleLine("  " .. p.name, p.text, 0.9, 0.9, 0.9, 0.6, 0.85, 1)
+                    end
+                end
+                GameTooltip:AddLine(L.TRACKER_ROWHINT, 0.5, 0.5, 0.5)
+                GameTooltip:Show()
+            end)
+            row:SetScript("OnLeave", function() GameTooltip:Hide() end)
         else
+            row.bg:Hide()
             row:EnableMouse(false)
             row:SetScript("OnClick", nil)
+            row:SetScript("OnEnter", nil)
+            row:SetScript("OnLeave", nil)
         end
         row:ClearAllPoints()
         row:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, y)

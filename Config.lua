@@ -135,6 +135,10 @@ local cbFlight = checkbox(L.CFG_FLIGHT,
     function() return ns.Q.char.ui.flightMasters ~= false end,
     function(v) ns.Q.char.ui.flightMasters = v
         if ns.Map then ns.Map:Rebuild(); ns.Map:UpdateWorldMap() end end)
+local cbPartyShare = checkbox(L.CFG_PARTYSHARE,
+    function() return ns.Q.char.ui.partyShare ~= false end,
+    function(v) ns.Q.char.ui.partyShare = v
+        if v and ns.Comms then ns.Comms:Broadcast(true) end end)
 local cbMMButton = checkbox(L.CFG_MMBUTTON,
     function() return ns.Q.char.ui.minimapButton ~= false end,
     function(v) ns.Q.char.ui.minimapButton = v; ns.Config:UpdateMinimapButton() end)
@@ -191,6 +195,7 @@ function Config:Refresh()
     cbMapIcons:SetChecked(cbMapIcons.qGet())
     cbMiniIcons:SetChecked(cbMiniIcons.qGet())
     cbFlight:SetChecked(cbFlight.qGet())
+    cbPartyShare:SetChecked(cbPartyShare.qGet())
     cbMMButton:SetChecked(cbMMButton.qGet())
     for _, s in ipairs({ sGuide, sArrow }) do
         local v = s.qGet()

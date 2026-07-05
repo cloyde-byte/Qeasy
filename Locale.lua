@@ -30,6 +30,10 @@ ns.L = {
     -- Quest-tracker & tooltips
     QUEST_COMPLETE   = "Quest Complete!",
     TRACKER_NOQUESTS = "Ingen aktive quests i loggen.",
+    TRACKER_ACTIVE   = "▶ I gang med",
+    TRACKER_ROWHINT  = "Klik: fokusér · Shift-klik: link i chat · Ctrl-klik: fold",
+    PARTY_HEADER     = "|cff69ccf0Qeasy|r gruppe-fremgang:",
+    PARTY_NONE       = "|cff69ccf0Qeasy|r: Ingen party-medlemmer med Qeasy (eller du er ikke i en gruppe).",
 
     -- Config-vindue
     CFG_TITLE        = "Qeasy - Indstillinger",
@@ -41,6 +45,7 @@ ns.L = {
     CFG_MAPICONS     = "Vis quest-ikoner på verdenskortet (Outland)",
     CFG_MINIMAPICONS = "Vis quest-ikoner på minimappet (Outland)",
     CFG_FLIGHT       = "Vis flyvemestre på kort og minimap (Outland)",
+    CFG_PARTYSHARE   = "Del quest-fremgang med party (Qeasy-brugere)",
     CFG_MMBUTTON     = "Vis Qeasy-knap på minimappet",
     CFG_AUTOROUTE    = "Vælg rute automatisk efter zone",
     CFG_GUIDESCALE   = "Guide-størrelse",
@@ -59,6 +64,7 @@ ns.L = {
         "  /qeasy back - fortryd seneste spring/afkrydsning",
         "  /qeasy list - vis alle ruter",
         "  /qeasy route <navn> - skift rute",
+        "  /qeasy party - vis gruppens quest-fremgang",
         "  /qeasy reset - nulstil den aktive rute",
         "  /qeasy debug - vis info om det aktuelle step",
     },

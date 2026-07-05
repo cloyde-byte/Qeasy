@@ -70,6 +70,23 @@ function QuestLog:DiffColor(level)
     else return 0.6, 0.6, 0.6 end
 end
 
+-- Objectives for et bestemt quest-id (hvis questen er i loggen).
+-- Returnerer { {text=, done=}, ... } eller nil.
+function QuestLog:ObjectivesForID(questID)
+    for _, e in ipairs(self:Scan()) do
+        if e.questID == questID then return e.objectives end
+    end
+    return nil
+end
+
+-- Titel for et quest-id fra loggen (hvis questen er i loggen).
+function QuestLog:TitleForID(questID)
+    for _, e in ipairs(self:Scan()) do
+        if e.questID == questID then return e.title end
+    end
+    return nil
+end
+
 -- Til tooltips: hvilke aktive (ufærdige) quest-objectives nævner `name`?
 -- Returnerer { {title=, level=, text=}, ... }.
 function QuestLog:ObjectivesForName(name)

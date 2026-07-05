@@ -98,7 +98,7 @@ function Map:IconsForMap(mapID)
         end
         if show then
             list[#list + 1] = { qid = e.qid, kind = e.kind, x = e.x, y = e.y,
-                                title = d.t, npc = npc }
+                                title = d.t, npc = npc, otype = d.ot }
         end
     end
     return list
@@ -107,9 +107,13 @@ end
 -- ---------------------------------------------------------------------
 -- Ikon-pulje (fælles udseende for kort og minimap)
 -- ---------------------------------------------------------------------
-local ICON_OBJECTIVE = "Interface\\AddOns\\Qeasy\\Media\\objective"
+local ICON_OBJECTIVE = "Interface\\AddOns\\Qeasy\\Media\\objective"  -- tandhjul (interager)
+local ICON_SLAY      = "Interface\\AddOns\\Qeasy\\Media\\slay"       -- krydsede sværd (dræb)
 
-local function styleIcon(tex, kind, size)
+-- Er et objektiv et "dræb"-mål? (otype 'u' fra pfQuest = enheder).
+local function isSlay(otype) return otype == "u" end
+
+local function styleIcon(tex, kind, size, otype)
     tex:SetSize(size, size)
     tex:SetVertexColor(1, 1, 1)
     if kind == "giver" then
@@ -118,8 +122,10 @@ local function styleIcon(tex, kind, size)
         tex:SetTexture(ICON_TURNIN)
     elseif kind == "flightmaster" then
         tex:SetTexture(ICON_FLIGHT)
+    elseif isSlay(otype) then
+        tex:SetTexture(ICON_SLAY)       -- dræb-quest = røde krydsede sværd
     else
-        tex:SetTexture(ICON_OBJECTIVE)  -- lille tandhjul (pulserer)
+        tex:SetTexture(ICON_OBJECTIVE)  -- interager/saml = tandhjul (pulserer)
     end
 end
 
@@ -198,11 +204,15 @@ function Map:UpdateWorldMap()
     for _, ic in ipairs(list) do
         n = n + 1
         local p = getWorldPin(n, canvas)
-        local base = (ic.kind == "objective") and 15 or (ic.kind == "flightmaster") and 16 or 14
-        styleIcon(p.tex, ic.kind, base)
+        -- Lidt mindre ikoner end før (særligt sværd/tandhjul).
+        local base = (ic.kind == "flightmaster") and 15
+            or (ic.kind == "objective") and (isSlay(ic.otype) and 13 or 12)
+            or 13
+        styleIcon(p.tex, ic.kind, base, ic.otype)
         p:SetSize(base, base)
         p.base = base
-        p.isObjective = (ic.kind == "objective")
+        -- Kun tandhjul (interager/saml) pulserer; sværd står stille og tydeligt.
+        p.pulse = (ic.kind == "objective") and not isSlay(ic.otype)
         p.title = ic.title
         p.qid = ic.qid
         if ic.kind == "turnin" then
@@ -211,6 +221,8 @@ function Map:UpdateWorldMap()
             p.sub = "Tilgængelig quest" .. (ic.npc and (" · " .. ic.npc) or "")
         elseif ic.kind == "flightmaster" then
             p.sub = ic.horde and "Flyvemester (Horde)" or "Flyvemester (neutral)"
+        elseif isSlay(ic.otype) then
+            p.sub = "Dræb-mål her"
         else
             p.sub = "Objektiv her"
         end
@@ -295,10 +307,10 @@ mmFrame:SetScript("OnUpdate", function(_, dt)
             if dist < radius * 1.05 then
                 n = n + 1
                 local t = getMMPin(n)
-                local base = (ic.kind == "objective") and 13 or 12
-                styleIcon(t, ic.kind, base)
+                local base = (ic.kind == "objective") and (isSlay(ic.otype) and 12 or 11) or 12
+                styleIcon(t, ic.kind, base, ic.otype)
                 t.base = base
-                t.isObjective = (ic.kind == "objective")
+                t.pulse = (ic.kind == "objective") and not isSlay(ic.otype)
                 -- nord = op (+y), vest = venstre (-x)
                 local sx = -(dW / radius) * half
                 local sy = (dN / radius) * half
@@ -319,14 +331,14 @@ pulseDriver:SetScript("OnUpdate", function(_, dt)
     pulseT = pulseT + dt
     local s = 1 + 0.22 * (0.5 + 0.5 * math.sin(pulseT * 5))  -- 1.0 .. 1.22
     for _, p in ipairs(worldPins) do
-        if p.isObjective and p:IsShown() then
-            local b = p.base or 15
+        if p.pulse and p:IsShown() then
+            local b = p.base or 12
             p:SetSize(b * s, b * s)
         end
     end
     for _, t in ipairs(minimapPins) do
-        if t.isObjective and t:IsShown() then
-            local b = t.base or 13
+        if t.pulse and t:IsShown() then
+            local b = t.base or 11
             t:SetSize(b * s, b * s)
         end
     end

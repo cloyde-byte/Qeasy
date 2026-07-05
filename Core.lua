@@ -31,8 +31,10 @@ Q:RegisterEvent("QUEST_LOG_UPDATE")
 Q:RegisterEvent("UNIT_QUEST_LOG_CHANGED")
 Q:RegisterEvent("PLAYER_LEVEL_UP")
 Q:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+Q:RegisterEvent("CHAT_MSG_ADDON")
+Q:RegisterEvent("GROUP_ROSTER_UPDATE")
 
-Q:SetScript("OnEvent", function(self, event, arg1, arg2)
+Q:SetScript("OnEvent", function(self, event, arg1, arg2, arg3, arg4)
     if event == "ADDON_LOADED" then
         if arg1 == ADDON then
             self:InitDB()
@@ -49,6 +51,8 @@ Q:SetScript("OnEvent", function(self, event, arg1, arg2)
         if ns.ObjTracker then ns.ObjTracker:RestorePosition() end
         if ns.Tooltips then ns.Tooltips:Init() end
         if ns.Map then ns.Map:Init() end
+        if ns.Comms then ns.Comms:Init() end
+        if ns.Links then ns.Links:Init() end
         if ns.Config and not self.blizzRegistered then
             self.blizzRegistered = true
             ns.Config:RegisterBlizzard()
@@ -66,13 +70,23 @@ Q:SetScript("OnEvent", function(self, event, arg1, arg2)
         -- Klassisk klient: (questLogIndex, questID). Nyere: (questID).
         local questID = arg2 or arg1
         self:OnQuestAccepted(questID)
+        if ns.Comms then ns.Comms:Broadcast() end
 
     elseif event == "QUEST_TURNED_IN" then
         self:OnQuestTurnedIn(arg1)
+        if ns.Comms then ns.Comms:Broadcast(true) end
 
     elseif event == "QUEST_LOG_UPDATE" or event == "UNIT_QUEST_LOG_CHANGED" then
         -- Fyres bl.a. når et objective går fra 3/8 til 4/8 eller bliver
         -- "complete" - så DO-handlinger krydses af automatisk.
+        self:Refresh()
+        if ns.Comms then ns.Comms:Broadcast() end
+
+    elseif event == "CHAT_MSG_ADDON" then
+        if ns.Comms then ns.Comms:OnMessage(arg1, arg2, arg3, arg4) end
+
+    elseif event == "GROUP_ROSTER_UPDATE" then
+        if ns.Comms then ns.Comms:OnRosterChange() end
         self:Refresh()
 
     elseif event == "PLAYER_LEVEL_UP" then
@@ -161,6 +175,27 @@ SlashCmdList["QEASY"] = function(msg)
         end
     elseif cmd == "route" then
         Q:SetActiveRoute(rest)
+    elseif cmd == "party" then
+        -- Vis hvor langt party-medlemmer (med Qeasy) er med deres quests.
+        local lines = {}
+        if ns.Comms then
+            for name, quests in pairs(ns.Comms.party) do
+                local done, total = 0, 0
+                for _, p in pairs(quests) do
+                    total = total + 1
+                    if p == "C" then done = done + 1 end
+                end
+                lines[#lines + 1] = string.format(
+                    "  |cffffff00%s|r: %d/%d quests klar til aflevering", name, done, total)
+            end
+            if ns.Comms.Broadcast then ns.Comms:Broadcast(true) end
+        end
+        if #lines > 0 then
+            print(L.PARTY_HEADER)
+            for _, ln in ipairs(lines) do print(ln) end
+        else
+            print(L.PARTY_NONE)
+        end
     elseif cmd == "debug" then
         Debug()
     else

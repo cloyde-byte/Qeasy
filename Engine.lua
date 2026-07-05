@@ -61,6 +61,7 @@ function Q:InitDB()
     if c.ui.minimapButtonAngle == nil then c.ui.minimapButtonAngle = 210 end
     if c.ui.flightMasters == nil then c.ui.flightMasters = true end
     if c.ui.trackerMaxHeight == nil then c.ui.trackerMaxHeight = 460 end
+    if c.ui.partyShare == nil then c.ui.partyShare = true end
     self.db = QeasyDB
     self.char = c
 end

@@ -41,18 +41,27 @@ def outland_endpoint(node):
 
 
 def outland_objective(qid):
+    """Returnér (centroid, otype). otype: 'u'=dræb enhed (sværd),
+    'o'=interager med objekt (tandhjul), 'i'=saml genstand (tandhjul)."""
     q = qdb.qdata[qid]
     if T(q) != "table" or not q["obj"]:
-        return None
-    pts = []
+        return None, None
     obj = q["obj"]
+    # Enheder (dræb) prioriteres som objektivtype - det er "kill quests".
     if obj["U"]:
+        pts = []
         for uid in obj["U"].values():
             pts += [p for p in qdb.spawns(qdb.udata, int(uid)) if p[0] in OUTLAND]
+        if pts:
+            return qdb.centroid(pts), "u"
     if obj["O"]:
+        pts = []
         for oid in obj["O"].values():
             pts += [p for p in qdb.spawns(qdb.odata, int(oid)) if p[0] in OUTLAND]
-    if obj["I"] and not pts:
+        if pts:
+            return qdb.centroid(pts), "o"
+    if obj["I"]:
+        pts = []
         for iid in obj["I"].values():
             it = qdb.idata[int(iid)]
             if it is not None and T(it) == "table":
@@ -62,7 +71,10 @@ def outland_objective(qid):
                 if it["O"]:
                     for oid in it["O"].keys():
                         pts += [p for p in qdb.spawns(qdb.odata, int(oid)) if p[0] in OUTLAND]
-    return qdb.centroid(pts)
+        if pts:
+            # genstand fra en enhed = reelt et dræb; ellers indsamling
+            return qdb.centroid(pts), ("u" if it and it["U"] else "i")
+    return None, None
 
 
 def coord_lua(c):
@@ -81,7 +93,7 @@ def main():
             continue  # ren Alliance
         giver_name, giver = outland_endpoint(q["start"])
         turnin_name, turnin = outland_endpoint(q["end"])
-        obj = outland_objective(qid)
+        obj, otype = outland_objective(qid)
         # medtag kun quests med mindst én Outland-koordinat
         if not (giver or turnin or obj):
             continue
@@ -104,6 +116,8 @@ def main():
                 parts.append('en="%s"' % esc(turnin_name))
         if obj:
             parts.append("o=" + coord_lua(obj))
+            if otype:
+                parts.append('ot="%s"' % otype)
         if q["min"]:
             parts.append("lvl=%d" % int(q["min"]))
         if race:
