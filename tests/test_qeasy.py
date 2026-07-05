@@ -94,7 +94,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.14.1' end
+function GetAddOnMetadata() return '0.15.0' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -393,6 +393,15 @@ for c in clusters:
             camp = c; break
 check("Nesingwary-camp givere samles i ét pin (>=3 quests)", camp is not None)
 check("klyngedannelse reducerer antal pins", len(clusters) < len(nag))
+
+# spawn-område: et aktivt dræb-mål (Clefthoof Mastery) har en sky af punkter
+lua.eval("""function() QLOG = { { title='Clefthoof Mastery', questID=9789,
+  objectives = { { text='Clefthoof slain: 0/10', done=false } } } } end""")()
+cleft = [i for i in list(ns.Map.IconsForMap(ns.Map, 1951).values())
+         if i.qid == 9789 and i.kind == "objective"]
+check("aktivt dræb-mål har spawn-område (oa)",
+      len(cleft) == 1 and cleft[0].oa is not None
+      and len(list(cleft[0].oa.values())) >= 3)
 
 # minimap-OnUpdate kører uden fejl (nu også med flight masters + klynger)
 lua.execute("PSTATE.map=1944; QLOG={}")

@@ -128,6 +128,9 @@ local cbTooltips = checkbox(L.CFG_TOOLTIPS,
 local cbMapIcons = checkbox(L.CFG_MAPICONS,
     function() return ns.Q.char.ui.mapIcons ~= false end,
     function(v) ns.Q.char.ui.mapIcons = v; if ns.Map then ns.Map:UpdateWorldMap() end end)
+local cbSpawnAreas = checkbox(L.CFG_SPAWNAREAS,
+    function() return ns.Q.char.ui.spawnAreas ~= false end,
+    function(v) ns.Q.char.ui.spawnAreas = v; if ns.Map then ns.Map:UpdateWorldMap() end end)
 local cbMiniIcons = checkbox(L.CFG_MINIMAPICONS,
     function() return ns.Q.char.ui.minimapIcons ~= false end,
     function(v) ns.Q.char.ui.minimapIcons = v; if ns.Map then ns.Map:Rebuild() end end)
@@ -199,6 +202,7 @@ function Config:Refresh()
     cbObjTracker:SetChecked(cbObjTracker.qGet())
     cbTooltips:SetChecked(cbTooltips.qGet())
     cbMapIcons:SetChecked(cbMapIcons.qGet())
+    cbSpawnAreas:SetChecked(cbSpawnAreas.qGet())
     cbMiniIcons:SetChecked(cbMiniIcons.qGet())
     cbFlight:SetChecked(cbFlight.qGet())
     cbPartyShare:SetChecked(cbPartyShare.qGet())

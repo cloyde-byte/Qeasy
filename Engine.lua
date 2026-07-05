@@ -64,6 +64,7 @@ function Q:InitDB()
     if c.ui.partyShare == nil then c.ui.partyShare = true end
     if c.ui.itemBar == nil then c.ui.itemBar = true end
     if c.ui.heroButton == nil then c.ui.heroButton = true end
+    if c.ui.spawnAreas == nil then c.ui.spawnAreas = true end
     c.knownFlights = c.knownFlights or {}   -- opdagede flyvemestre (per karakter)
     self.db = QeasyDB
     self.char = c

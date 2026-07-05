@@ -256,6 +256,22 @@ def render_bang(px=32):
     return img.resize((px, px), Image.LANCZOS)
 
 
+def render_blob(px=64):
+    """Blød hvid radial-plet (tintes blå i Lua) til spawn-område-markering."""
+    S = px * SS
+    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    load = img.load()
+    c = S / 2
+    R = S / 2
+    for y in range(S):
+        for x in range(S):
+            dd = math.hypot(x - c, y - c) / R
+            if dd <= 1.0:
+                a = int(255 * (1 - dd * dd))   # fyldig midte, blød kant
+                load[x, y] = (255, 255, 255, a)
+    return img.resize((px, px), Image.LANCZOS)
+
+
 def render_slot(px=64):
     """Afrundet firkant-ramme med gennemsigtigt hul, så et firkantet ikon
     bagved fremstår som en pæn afrundet firkant (hjørnerne maskeres af rammen)."""
@@ -328,6 +344,7 @@ def main():
     write_tga(render_bang(32), os.path.join(MEDIA, "flightpoint.tga"))
     write_tga(render_glow(64), os.path.join(MEDIA, "glow.tga"))
     write_tga(render_slot(64), os.path.join(MEDIA, "slot.tga"))
+    write_tga(render_blob(64), os.path.join(MEDIA, "blob.tga"))
     render_curseforge()
 
 

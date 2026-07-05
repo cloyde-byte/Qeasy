@@ -43,6 +43,7 @@ ns.L = {
     CFG_OBJTRACKER   = "Vis quest-tracker (aktive quests)",
     CFG_TOOLTIPS     = "Vis quest-info i mob-tooltips",
     CFG_MAPICONS     = "Vis quest-ikoner på verdenskortet (Outland)",
+    CFG_SPAWNAREAS   = "Vis mob-område (blå sky) for aktive mål",
     CFG_MINIMAPICONS = "Vis quest-ikoner på minimappet (Outland)",
     CFG_FLIGHT       = "Vis flyvemestre på kort og minimap (Outland)",
     CFG_PARTYSHARE   = "Del quest-fremgang med party (Qeasy-brugere)",

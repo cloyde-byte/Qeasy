@@ -41,11 +41,12 @@ def outland_endpoint(node):
 
 
 def outland_objective(qid):
-    """Returnér (centroid, otype). otype: 'u'=dræb enhed (sværd),
-    'o'=interager med objekt (tandhjul), 'i'=saml genstand (tandhjul)."""
+    """Returnér (centroid, otype, pts). otype: 'u'=dræb enhed (sværd),
+    'o'=interager med objekt (tandhjul), 'i'=saml genstand (tandhjul).
+    pts = alle Outland-spawnpunkter for målet (til område-markering)."""
     q = qdb.qdata[qid]
     if T(q) != "table" or not q["obj"]:
-        return None, None
+        return None, None, None
     obj = q["obj"]
     # Enheder (dræb) prioriteres som objektivtype - det er "kill quests".
     if obj["U"]:
@@ -53,19 +54,20 @@ def outland_objective(qid):
         for uid in obj["U"].values():
             pts += [p for p in qdb.spawns(qdb.udata, int(uid)) if p[0] in OUTLAND]
         if pts:
-            return qdb.centroid(pts), "u"
+            return qdb.centroid(pts), "u", pts
     if obj["O"]:
         pts = []
         for oid in obj["O"].values():
             pts += [p for p in qdb.spawns(qdb.odata, int(oid)) if p[0] in OUTLAND]
         if pts:
-            return qdb.centroid(pts), "o"
+            return qdb.centroid(pts), "o", pts
     if obj["I"]:
-        pts = []
+        pts, from_unit = [], False
         for iid in obj["I"].values():
             it = qdb.idata[int(iid)]
             if it is not None and T(it) == "table":
                 if it["U"]:
+                    from_unit = True
                     for uid in it["U"].keys():
                         pts += [p for p in qdb.spawns(qdb.udata, int(uid)) if p[0] in OUTLAND]
                 if it["O"]:
@@ -73,8 +75,29 @@ def outland_objective(qid):
                         pts += [p for p in qdb.spawns(qdb.odata, int(oid)) if p[0] in OUTLAND]
         if pts:
             # genstand fra en enhed = reelt et dræb; ellers indsamling
-            return qdb.centroid(pts), ("u" if it and it["U"] else "i")
-    return None, None
+            return qdb.centroid(pts), ("u" if from_unit else "i"), pts
+    return None, None, None
+
+
+def build_area(pts, mapid, cap=24):
+    """Nedsampl spawnpunkter (på målets kort) til en lille sky, der viser
+    området. Grid-dedup så vi ikke gemmer hundredvis af punkter."""
+    same = [(round(p[1], 1), round(p[2], 1)) for p in pts if p[0] == mapid]
+    if len(same) < 2:
+        return None
+    seen, grid = set(), []
+    for x, y in same:
+        key = (round(x / 1.5), round(y / 1.5))
+        if key in seen:
+            continue
+        seen.add(key)
+        grid.append((x, y))
+    if len(grid) < 2:
+        return None
+    if len(grid) > cap:
+        step = len(grid) / cap
+        grid = [grid[int(i * step)] for i in range(cap)]
+    return ",".join("{%.1f,%.1f}" % (x, y) for x, y in grid)
 
 
 def coord_lua(c):
@@ -93,7 +116,7 @@ def main():
             continue  # ren Alliance
         giver_name, giver = outland_endpoint(q["start"])
         turnin_name, turnin = outland_endpoint(q["end"])
-        obj, otype = outland_objective(qid)
+        obj, otype, opts = outland_objective(qid)
         # medtag kun quests med mindst én Outland-koordinat
         if not (giver or turnin or obj):
             continue
@@ -118,6 +141,9 @@ def main():
             parts.append("o=" + coord_lua(obj))
             if otype:
                 parts.append('ot="%s"' % otype)
+            area = build_area(opts, obj[0])
+            if area:
+                parts.append("oa={%s}" % area)
         if q["min"]:
             parts.append("lvl=%d" % int(q["min"]))
         if race:

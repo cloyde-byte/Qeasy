@@ -175,6 +175,9 @@ SlashCmdList["QEASY"] = function(msg)
     elseif cmd == "mapicons" then
         Q.char.ui.mapIcons = not Q.char.ui.mapIcons
         if ns.Map then ns.Map:UpdateWorldMap() end
+    elseif cmd == "areas" then
+        Q.char.ui.spawnAreas = not Q.char.ui.spawnAreas
+        if ns.Map then ns.Map:UpdateWorldMap() end
     elseif cmd == "minimap" then
         Q.char.ui.minimapIcons = not Q.char.ui.minimapIcons
         if ns.Map then ns.Map:Rebuild() end

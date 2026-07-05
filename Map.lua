@@ -98,7 +98,8 @@ function Map:IconsForMap(mapID)
         end
         if show then
             list[#list + 1] = { qid = e.qid, kind = e.kind, x = e.x, y = e.y,
-                                title = d.t, npc = npc, otype = d.ot }
+                                title = d.t, npc = npc, otype = d.ot,
+                                oa = (e.kind == "objective") and d.oa or nil }
         end
     end
     return list
@@ -243,6 +244,25 @@ local function getWorldPin(i, canvas)
     return p
 end
 
+-- Spawn-område-markering: en sky af bløde blå pletter, der viser HVOR målets
+-- mobs står (fx alle clefthoof for "Clefthoof Mastery"), i stedet for kun ét
+-- sværd. Pletterne ligger under quest-ikonerne.
+local areaHost, areaMarks = nil, {}
+local function getAreaMark(i, canvas)
+    if not areaHost or (areaHost.GetParent and areaHost:GetParent() ~= canvas) then
+        areaHost = CreateFrame("Frame", nil, canvas)
+        areaMarks = {}
+    end
+    if areaMarks[i] then return areaMarks[i] end
+    local t = areaHost:CreateTexture(nil, "ARTWORK")
+    t:SetTexture("Interface\\AddOns\\Qeasy\\Media\\blob")
+    t:SetBlendMode("ADD")
+    t:SetVertexColor(0.25, 0.55, 1.0)   -- gennemsigtig blå
+    t:SetAlpha(0.5)
+    areaMarks[i] = t
+    return t
+end
+
 function Map:UpdateWorldMap()
     local canvas = worldCanvas()
     if not canvas then return end
@@ -262,6 +282,29 @@ function Map:UpdateWorldMap()
     if ns.Q.char.ui.flightMasters ~= false then
         for _, fm in ipairs(self:FlightMastersForMap(mapID)) do list[#list + 1] = fm end
     end
+
+    -- Spawn-områder (blå sky) for aktive mål med oa-data - tegnes UNDER ikonerne.
+    local am = 0
+    if ns.Q.char.ui.mapIcons ~= false and ns.Q.char.ui.spawnAreas ~= false then
+        local size = math.max(20, w * 0.05)   -- skalerer med zoom, så skyen hænger sammen
+        for _, ic in ipairs(list) do
+            if ic.oa then
+                for _, pt in ipairs(ic.oa) do
+                    am = am + 1
+                    local t = getAreaMark(am, canvas)
+                    t:SetSize(size, size)
+                    t:ClearAllPoints()
+                    t:SetPoint("CENTER", canvas, "TOPLEFT", (pt[1] / 100) * w, -(pt[2] / 100) * h)
+                    t:Show()
+                end
+            end
+        end
+        if am > 0 and areaHost then   -- løft skyen over kortet (men under ikonerne)
+            if canvas.GetFrameStrata then areaHost:SetFrameStrata(canvas:GetFrameStrata()) end
+            areaHost:SetFrameLevel((canvas.GetFrameLevel and canvas:GetFrameLevel() or 0) + 2400)
+        end
+    end
+    for i = am + 1, #areaMarks do areaMarks[i]:Hide() end
 
     local n = 0
     for _, ic in ipairs(self:ClusterIcons(list)) do
