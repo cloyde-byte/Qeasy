@@ -94,7 +94,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.15.3' end
+function GetAddOnMetadata() return '0.15.4' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -331,6 +331,19 @@ check("tooltip matcher mob -> quest ('Kill the Shadow Council!')",
       len(hitlist) == 1 and hitlist[0].title == "Kill the Shadow Council!")
 none = list(ns.QuestLog.ObjectivesForName(ns.QuestLog, "Tilfældig Kanin").values())
 check("tooltip: ingen match for urelateret mob", len(none) == 0)
+
+# kategori-mål: en mob hvis navn IKKE står i objektiv-teksten ("Kil'sorrow
+# Agent slain") skal stadig matche via DB-listen af tællende enheder (ou)
+lua.eval("""function() QLOG = { { title='Wanted: Giselda the Crone', questID=9935,
+  objectives = { { text='Giselda the Crone slain: 0/1', done=false },
+                 { text="Kil'sorrow Agent slain: 8/15", done=false } } } } end""")()
+kh = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Kil'sorrow Deathsworn").values())
+check("kategori-mob matcher quest via DB (Kil'sorrow -> Agent-linje)",
+      len(kh) == 1 and kh[0].title == "Wanted: Giselda the Crone"
+      and "Kil'sorrow Agent" in kh[0].text)
+dh = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Giselda the Crone").values())
+check("direkte mob-navn matcher stadig (Giselda)",
+      len(dh) == 1 and "Giselda" in dh[0].text)
 
 # ---- kort/minimap-ikoner (Outland) ----
 check("Outland quest-DB indlæst (>500 quests)",

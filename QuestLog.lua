@@ -87,6 +87,51 @@ function QuestLog:TitleForID(questID)
     return nil
 end
 
+-- Vælg den mest relevante objektiv-linje for en mob: en ufærdig linje hvis
+-- tekst deler et ord med mob-navnet (fx "sorrow" i "Kil'sorrow Agent slain"),
+-- ellers den første ufærdige linje.
+local function pickObjLine(e, name)
+    local fallback
+    for _, o in ipairs(e.objectives) do
+        if not o.done then
+            for word in name:gmatch("%a+") do
+                if #word >= 4 and o.text:find(word, 1, true) then return o.text end
+            end
+            fallback = fallback or o.text
+        end
+    end
+    return fallback
+end
+
+-- Hvilke aktive quests tæller mobben `name` til, med objektiv-linje?
+-- Matcher enten mob-navnet direkte i objektiv-teksten ELLER via quest-databasens
+-- liste af tællende enheder (ou) - så kategori-mål som "Kil'sorrow Agent" fanger
+-- de faktiske mobs (Kil'sorrow Deathsworn/Cultist/Spellbinder/...).
+function QuestLog:MobObjectives(name)
+    local res = {}
+    if not name or name == "" then return res end
+    for _, e in ipairs(self:Scan()) do
+        if e.questID and not e.isComplete then
+            local text
+            for _, o in ipairs(e.objectives) do
+                if not o.done and o.text:find(name, 1, true) then text = o.text; break end
+            end
+            if not text then
+                local d = ns.QuestDB and ns.QuestDB[e.questID]
+                if d and d.ou then
+                    for _, un in ipairs(d.ou) do
+                        if un == name then text = pickObjLine(e, name); break end
+                    end
+                end
+            end
+            if text then
+                res[#res + 1] = { title = e.title, level = e.level, text = text }
+            end
+        end
+    end
+    return res
+end
+
 -- Til tooltips: hvilke aktive (ufærdige) quest-objectives nævner `name`?
 -- Returnerer { {title=, level=, text=}, ... }.
 function QuestLog:ObjectivesForName(name)

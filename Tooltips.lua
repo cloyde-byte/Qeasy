@@ -15,7 +15,7 @@ local lastUnitName = nil
 local function addQuestLines(tooltip, name)
     if not ns.Q.char.ui.tooltipsEnabled then return end
     if not name or name == "" then return end
-    local hits = ns.QuestLog:ObjectivesForName(name)
+    local hits = ns.QuestLog:MobObjectives(name)
     if #hits == 0 then return end
     tooltip:AddLine(" ")
     for _, h in ipairs(hits) do

@@ -64,7 +64,7 @@ def outland_objective(qid):
     (fx 'brug banner ved Boulderfist-lejre'). Kun rene enheds-mål = dræb."""
     q = qdb.qdata[qid]
     if T(q) != "table" or not q["obj"]:
-        return None, None, None
+        return None, None, None, None
     obj = q["obj"]
 
     # Brug-item (IR) eller interager-med-objekt (O) => tandhjul.
@@ -73,13 +73,20 @@ def outland_objective(qid):
         if not pts and obj["U"]:
             pts = _upts(obj["U"])          # fald tilbage på enheder for placering
         if pts:
-            return qdb.centroid(pts), "o", pts
+            return qdb.centroid(pts), "o", pts, None
 
-    # Rent enheds-mål => dræb (sværd).
+    # Rent enheds-mål => dræb (sværd). Gem også navnene på de enheder der
+    # tæller (til mob-tooltips - fx kategori-mål som "Kil'sorrow Agent").
     if obj["U"]:
-        pts = _upts(obj["U"])
+        pts, names = [], set()
+        for uid in obj["U"].values():
+            uid = int(uid)
+            sp = [p for p in qdb.spawns(qdb.udata, uid) if p[0] in OUTLAND]
+            if sp:
+                pts += sp
+                names.add(qdb.loc_name(qdb.uloc, qdb.uloc_v, uid))
         if pts:
-            return qdb.centroid(pts), "u", pts
+            return qdb.centroid(pts), "u", pts, sorted(names)
 
     if obj["I"]:
         pts, from_unit = [], False
@@ -95,8 +102,8 @@ def outland_objective(qid):
                         pts += [p for p in qdb.spawns(qdb.odata, int(oid)) if p[0] in OUTLAND]
         if pts:
             # genstand fra en enhed = reelt et dræb; ellers indsamling
-            return qdb.centroid(pts), ("u" if from_unit else "i"), pts
-    return None, None, None
+            return qdb.centroid(pts), ("u" if from_unit else "i"), pts, None
+    return None, None, None, None
 
 
 def build_area(pts, mapid, cap=24):
@@ -136,7 +143,7 @@ def main():
             continue  # ren Alliance
         giver_name, giver = outland_endpoint(q["start"])
         turnin_name, turnin = outland_endpoint(q["end"])
-        obj, otype, opts = outland_objective(qid)
+        obj, otype, opts, onames = outland_objective(qid)
         # medtag kun quests med mindst én Outland-koordinat
         if not (giver or turnin or obj):
             continue
@@ -164,6 +171,12 @@ def main():
             area = build_area(opts, obj[0])
             if area:
                 parts.append("oa={%s}" % area)
+            # ou = navne på enheder der tæller (kun hvis de tilføjer noget ud
+            # over selve titlen - fx kategori-mål). Sparer plads på de trivielle.
+            if onames:
+                extra = [n for n in onames if n and n not in title]
+                if extra:
+                    parts.append("ou={%s}" % ",".join('"%s"' % esc(n) for n in onames))
         if q["min"]:
             parts.append("lvl=%d" % int(q["min"]))
         if race:
