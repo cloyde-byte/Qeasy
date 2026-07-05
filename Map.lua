@@ -152,6 +152,45 @@ function Map:FlightMastersForMap(mapID)
     return list
 end
 
+-- ---------------------------------------------------------------------
+-- Klyngedannelse: flere ikoner af samme slags oven på hinanden (fx flere
+-- quests hos samme questgiver) samles til ÉT pin, så de ikke skjuler
+-- hinanden. Tooltip'et lister så alle quests på stedet (a la Questie).
+-- ---------------------------------------------------------------------
+local function visualClass(ic)
+    if ic.kind == "objective" then
+        return isSlay(ic.otype) and "obj-slay" or "obj-gear"
+    elseif ic.kind == "flightmaster" then
+        return ic.known and "fm-known" or "fm-new"
+    end
+    return ic.kind
+end
+
+local function clusterHeader(kind)
+    if kind == "giver" then return "Tilgængelige quests her:" end
+    if kind == "turnin" then return "Aflever her:" end
+    if kind == "flightmaster" then return "Flyvemestre her:" end
+    return "Mål her:"
+end
+
+function Map:ClusterIcons(list)
+    local clusters, index = {}, {}
+    for _, ic in ipairs(list) do
+        local key = string.format("%s:%d:%d", visualClass(ic),
+            math.floor(ic.x / 1.5 + 0.5), math.floor(ic.y / 1.5 + 0.5))
+        local c = index[key]
+        if not c then
+            c = { kind = ic.kind, x = ic.x, y = ic.y, otype = ic.otype,
+                  known = ic.known, horde = ic.horde, qid = ic.qid,
+                  title = ic.title, npc = ic.npc, entries = {} }
+            index[key] = c
+            clusters[#clusters + 1] = c
+        end
+        c.entries[#c.entries + 1] = { title = ic.title, npc = ic.npc }
+    end
+    return clusters
+end
+
 -- =====================================================================
 -- VERDENSKORT
 -- =====================================================================
@@ -181,8 +220,18 @@ local function getWorldPin(i, canvas)
     p:SetScript("OnEnter", function(self)
         if not self.title then return end
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        GameTooltip:AddLine(self.title, 1, 0.85, 0.30)   -- questnavn, fremhævet
-        if self.sub then GameTooltip:AddLine(self.sub, 0.75, 0.82, 0.95) end
+        if self.count and self.count > 1 then
+            -- Flere quests/mål på samme sted: list dem alle.
+            GameTooltip:AddLine(clusterHeader(self.kind), 1, 0.85, 0.30)
+            for _, e in ipairs(self.entries) do
+                local line = "• " .. (e.title or "")
+                if e.npc then line = line .. "  |cff9fb8cc(" .. e.npc .. ")|r" end
+                GameTooltip:AddLine(line, 0.9, 0.9, 0.9)
+            end
+        else
+            GameTooltip:AddLine(self.title, 1, 0.85, 0.30)   -- questnavn, fremhævet
+            if self.sub then GameTooltip:AddLine(self.sub, 0.75, 0.82, 0.95) end
+        end
         GameTooltip:Show()
     end)
     p:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -211,7 +260,7 @@ function Map:UpdateWorldMap()
     end
 
     local n = 0
-    for _, ic in ipairs(list) do
+    for _, ic in ipairs(self:ClusterIcons(list)) do
         n = n + 1
         local p = getWorldPin(n, canvas)
         -- Lidt mindre ikoner end før (særligt sværd/tandhjul). Kendt flyvemester
@@ -226,6 +275,9 @@ function Map:UpdateWorldMap()
         p.pulse = (ic.kind == "objective") and not isSlay(ic.otype)
         p.title = ic.title
         p.qid = ic.qid
+        p.kind = ic.kind
+        p.entries = ic.entries
+        p.count = ic.entries and #ic.entries or 1
         if ic.kind == "turnin" then
             p.sub = "Aflever" .. (ic.npc and (" hos " .. ic.npc) or " her")
         elseif ic.kind == "giver" then
@@ -279,7 +331,7 @@ function Map:Rebuild()
             for _, fm in ipairs(self:FlightMastersForMap(self.zoneMap)) do icons[#icons + 1] = fm end
         end
     end
-    self.zoneIcons = icons
+    self.zoneIcons = self:ClusterIcons(icons)
     self:UpdateWorldMap()
 end
 

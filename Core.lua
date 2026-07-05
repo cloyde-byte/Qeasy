@@ -34,6 +34,8 @@ Q:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 Q:RegisterEvent("CHAT_MSG_ADDON")
 Q:RegisterEvent("GROUP_ROSTER_UPDATE")
 Q:RegisterEvent("TAXIMAP_OPENED")
+Q:RegisterEvent("PLAYER_REGEN_ENABLED")
+Q:RegisterEvent("BAG_UPDATE_DELAYED")
 
 Q:SetScript("OnEvent", function(self, event, arg1, arg2, arg3, arg4)
     if event == "ADDON_LOADED" then
@@ -54,6 +56,7 @@ Q:SetScript("OnEvent", function(self, event, arg1, arg2, arg3, arg4)
         if ns.Map then ns.Map:Init() end
         if ns.Comms then ns.Comms:Init() end
         if ns.Links then ns.Links:Init() end
+        if ns.ItemBar then ns.ItemBar:RestorePosition(); ns.ItemBar:Update() end
         if ns.Config and not self.blizzRegistered then
             self.blizzRegistered = true
             ns.Config:RegisterBlizzard()
@@ -82,6 +85,14 @@ Q:SetScript("OnEvent", function(self, event, arg1, arg2, arg3, arg4)
         -- "complete" - så DO-handlinger krydses af automatisk.
         self:Refresh()
         if ns.Comms then ns.Comms:Broadcast() end
+        if ns.ItemBar then ns.ItemBar:Update() end
+
+    elseif event == "PLAYER_REGEN_ENABLED" then
+        -- Kampen er slut: opsæt eventuelle udskudte secure-item-knapper.
+        if ns.ItemBar and ns.ItemBar._pending then ns.ItemBar:Update() end
+
+    elseif event == "BAG_UPDATE_DELAYED" then
+        if ns.ItemBar then ns.ItemBar:Update() end
 
     elseif event == "CHAT_MSG_ADDON" then
         if ns.Comms then ns.Comms:OnMessage(arg1, arg2, arg3, arg4) end
@@ -153,6 +164,8 @@ SlashCmdList["QEASY"] = function(msg)
         ns.Arrow:SetShown(not Q.char.ui.arrowShown)
     elseif cmd == "tracker" then
         ns.ObjTracker:SetShown(not Q.char.ui.objTrackerShown)
+    elseif cmd == "items" then
+        if ns.ItemBar then ns.ItemBar:SetShown(Q.char.ui.itemBar == false) end
     elseif cmd == "tooltips" then
         Q.char.ui.tooltipsEnabled = not Q.char.ui.tooltipsEnabled
     elseif cmd == "mapicons" then

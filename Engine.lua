@@ -62,6 +62,7 @@ function Q:InitDB()
     if c.ui.flightMasters == nil then c.ui.flightMasters = true end
     if c.ui.trackerMaxHeight == nil then c.ui.trackerMaxHeight = 460 end
     if c.ui.partyShare == nil then c.ui.partyShare = true end
+    if c.ui.itemBar == nil then c.ui.itemBar = true end
     c.knownFlights = c.knownFlights or {}   -- opdagede flyvemestre (per karakter)
     self.db = QeasyDB
     self.char = c

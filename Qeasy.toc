@@ -2,7 +2,7 @@
 ## Title: Qeasy |cff69ccf0Quest Helper|r
 ## Notes: Trin-for-trin leveling-ruter for Horde i Outland med GPS-pil. Baseret på Wowheads leveling-guides.
 ## Author: Qeasy
-## Version: 0.11.0
+## Version: 0.12.0
 ## SavedVariables: QeasyDB
 ## SavedVariablesPerCharacter: QeasyCharDB
 
@@ -18,6 +18,7 @@ Links.lua
 Data\OutlandQuests.lua
 Data\OutlandFlightMasters.lua
 Map.lua
+ItemButton.lua
 Config.lua
 Routes\HellfirePeninsula.lua
 Routes\Zangarmarsh.lua

@@ -94,7 +94,15 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.11.0' end
+function GetAddOnMetadata() return '0.12.0' end
+-- Quest-item-knap (secure) + kamp-gate
+function InCombatLockdown() return PSTATE.combat end
+function GetQuestLogSpecialItemInfo(i)
+    local q = QLOG[i]
+    if q and q.item then return q.item.link, q.item.icon, q.item.charges or 1 end
+    return nil
+end
+function GetQuestLogSpecialItemCooldown() return 0, 0, 0 end
 -- Party-comms + quest-links (Questie-agtigt)
 function wipe(t) for k in pairs(t) do t[k] = nil end return t end
 function GetTime() return PSTATE.time or 0 end
@@ -141,7 +149,7 @@ for f in ["Locale.lua", "Engine.lua", "Arrow.lua", "Guide.lua",
           "QuestLog.lua", "ObjectiveTracker.lua", "Tooltips.lua",
           "Comms.lua", "Links.lua",
           "Data/OutlandQuests.lua", "Data/OutlandFlightMasters.lua",
-          "Map.lua", "Config.lua",
+          "Map.lua", "ItemButton.lua", "Config.lua",
           "Routes/HellfirePeninsula.lua", "Routes/Zangarmarsh.lua",
           "Routes/TerokkarForest.lua", "Routes/Nagrand.lua",
           "Routes/BladesEdge.lua", "Routes/Netherstorm.lua",
@@ -370,11 +378,44 @@ barley = next(f for f in fms if f.title == "Barley")
 check("flyvemester lært via rejsekort (Innalia kendt)", innalia.known == True)
 check("andre flyvemestre forbliver uopdagede", not barley.known)
 
-# minimap-OnUpdate kører uden fejl (nu også med flight masters)
-lua.execute("QLOG={}")
+# klyngedannelse: Nesingwary-camp givere (samme sted) samles til ét pin
+lua.execute("PSTATE.map=1951; PSTATE.level=70; QLOG={}; FLAGGED={}")
+nag_lua = ns.Map.IconsForMap(ns.Map, 1951)
+nag = list(nag_lua.values())
+clusters = list(ns.Map.ClusterIcons(ns.Map, nag_lua).values())
+camp = None
+for c in clusters:
+    ents = list(c.entries.values())
+    if c.kind == "giver" and len(ents) >= 3:
+        names = set(e.npc for e in ents)
+        if "Hemet Nesingwary" in names or "Shado 'Fitz' Farstrider" in names:
+            camp = c; break
+check("Nesingwary-camp givere samles i ét pin (>=3 quests)", camp is not None)
+check("klyngedannelse reducerer antal pins", len(clusters) < len(nag))
+
+# minimap-OnUpdate kører uden fejl (nu også med flight masters + klynger)
+lua.execute("PSTATE.map=1944; QLOG={}")
 ns.Map.Rebuild(ns.Map)
 g.QeasyMinimapPins.scripts.OnUpdate(g.QeasyMinimapPins, 0.2)
 check("minimap-pins opdaterer uden fejl", True)
+
+# ---- quest-item-knap (fx Living Fire) ----
+lua.execute(r"""
+QLOG = {
+  { title='Blessing of Incineratus', questID=10286,
+    item = { link='item:30813', icon='Interface\\Icons\\INV_Torch_01', charges=5 } },
+}
+""")
+ns.ItemBar.Update(ns.ItemBar)
+check("item-bar viser knap for quest-item",
+      g.QeasyItemBar.shown == True and g.QeasyItemButton1.link == "item:30813")
+ns.ItemBar.SetShown(ns.ItemBar, False)
+check("item-bar skjules når slået fra", g.QeasyItemBar.shown == False)
+ns.ItemBar.SetShown(ns.ItemBar, True)
+lua.execute("PSTATE.combat = true; QLOG = {}")
+ns.ItemBar.Update(ns.ItemBar)
+check("item-bar rører ikke secure-knapper i kamp (udskudt)", ns.ItemBar._pending == True)
+lua.execute("PSTATE.combat = false")
 
 # ---- slash ----
 for cmd in ("list","debug","","config","skip","back","help","tracker",
