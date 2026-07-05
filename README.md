@@ -111,9 +111,13 @@ Ud over den guidede rute fungerer Qeasy som et alment quest-addon:
     level og forudsætninger)
   - **?** = en quest i din log der er *færdig* og skal afleveres her
   - grøn prik = et objektiv for en quest du er i gang med
+  grøn prik = et objektiv (vises som et lille **pulserende tandhjul**)
   Ikonerne kommer fra en indbygget Outland-quest-database (1162 quests),
   udtrukket fra pfQuest. Hold musen over et kort-ikon for at se questens
-  navn.
+  navn og NPC.
+- **Flyvemestre (kun Outland)**: alle Horde- og neutrale flyvemestre vises
+  med et gryf-ikon på kort og minimap, så du nemt kan finde dem (19 stk,
+  med præcise koordinater fra pfQuest).
 
 Alt kan slås til/fra i indstillingsvinduet (eller `/qeasy tracker`,
 `/qeasy tooltips`, `/qeasy mapicons`, `/qeasy minimap`). Tracker og
@@ -131,6 +135,7 @@ Outland-database.
 /qeasy tooltips      slå quest-info i mob-tooltips til/fra
 /qeasy mapicons      slå kort-ikoner til/fra (Outland)
 /qeasy minimap       slå minimap-ikoner til/fra (Outland)
+/qeasy flightmasters slå flyvemester-ikoner til/fra (Outland)
 /qeasy skip          spring det aktuelle step over
 /qeasy back          fortryd seneste spring/afkrydsning
 /qeasy list          vis alle ruter

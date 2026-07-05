@@ -59,6 +59,7 @@ function Q:InitDB()
     if c.ui.minimapIcons == nil then c.ui.minimapIcons = true end
     if c.ui.minimapButton == nil then c.ui.minimapButton = true end
     if c.ui.minimapButtonAngle == nil then c.ui.minimapButtonAngle = 210 end
+    if c.ui.flightMasters == nil then c.ui.flightMasters = true end
     self.db = QeasyDB
     self.char = c
 end

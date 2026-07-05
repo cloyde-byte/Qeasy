@@ -13,6 +13,7 @@ ns.Map = Map
 
 local ICON_GIVER  = "Interface\\GossipFrame\\AvailableQuestIcon"
 local ICON_TURNIN = "Interface\\GossipFrame\\ActiveQuestIcon"
+local ICON_FLIGHT = "Interface\\Icons\\Ability_Mount_Gryphon_01"
 
 -- Zoom-radius i yards (udendørs) pr. Minimap:GetZoom()-trin.
 local MM_RADIUS = { [0] = 466.6, [1] = 400.0, [2] = 333.3, [3] = 266.6, [4] = 200.0, [5] = 133.3 }
@@ -115,9 +116,24 @@ local function styleIcon(tex, kind, size)
         tex:SetTexture(ICON_GIVER)
     elseif kind == "turnin" then
         tex:SetTexture(ICON_TURNIN)
+    elseif kind == "flightmaster" then
+        tex:SetTexture(ICON_FLIGHT)
     else
         tex:SetTexture(ICON_OBJECTIVE)  -- lille tandhjul (pulserer)
     end
+end
+
+-- Flight masters på et bestemt map (fra ns.FlightMasters).
+function Map:FlightMastersForMap(mapID)
+    local list = {}
+    local fms = ns.FlightMasters and ns.FlightMasters[mapID]
+    if fms then
+        for _, fm in ipairs(fms) do
+            list[#list + 1] = { kind = "flightmaster", x = fm[1], y = fm[2],
+                                title = fm[3], horde = fm[4] }
+        end
+    end
+    return list
 end
 
 -- =====================================================================
@@ -138,7 +154,10 @@ end
 local function getWorldPin(i, canvas)
     if worldPins[i] then return worldPins[i] end
     local p = CreateFrame("Button", nil, canvas)
-    p:SetFrameStrata("HIGH")
+    -- Højere strata + frame-level, så Qeasys ikoner tegnes OVER kortets egne
+    -- POI'er (fx dungeon-indgange) og ikke gemmer sig bag dem.
+    p:SetFrameStrata("DIALOG")
+    p:SetFrameLevel(3000)
     p.tex = p:CreateTexture(nil, "OVERLAY")
     p.tex:SetAllPoints(p)
     p:SetScript("OnEnter", function(self)
@@ -157,19 +176,27 @@ function Map:UpdateWorldMap()
     local canvas = worldCanvas()
     if not canvas then return end
     for _, p in ipairs(worldPins) do p:Hide() end
-    if not ns.Q.char.ui.mapIcons then return end
     local wmf = WorldMapFrame
-    if not (wmf:IsShown() and wmf.GetMapID) then return end
+    if not (wmf and wmf:IsShown() and wmf.GetMapID) then return end
     local mapID = wmf:GetMapID()
     if not mapID then return end
 
     local w, h = canvas:GetWidth(), canvas:GetHeight()
     if not w or w == 0 then return end
+
+    local list = {}
+    if ns.Q.char.ui.mapIcons ~= false then
+        for _, ic in ipairs(self:IconsForMap(mapID)) do list[#list + 1] = ic end
+    end
+    if ns.Q.char.ui.flightMasters ~= false then
+        for _, fm in ipairs(self:FlightMastersForMap(mapID)) do list[#list + 1] = fm end
+    end
+
     local n = 0
-    for _, ic in ipairs(self:IconsForMap(mapID)) do
+    for _, ic in ipairs(list) do
         n = n + 1
         local p = getWorldPin(n, canvas)
-        local base = (ic.kind == "objective") and 15 or 14
+        local base = (ic.kind == "objective") and 15 or (ic.kind == "flightmaster") and 16 or 14
         styleIcon(p.tex, ic.kind, base)
         p:SetSize(base, base)
         p.base = base
@@ -180,6 +207,8 @@ function Map:UpdateWorldMap()
             p.sub = "Aflever" .. (ic.npc and (" hos " .. ic.npc) or " her")
         elseif ic.kind == "giver" then
             p.sub = "Tilgængelig quest" .. (ic.npc and (" · " .. ic.npc) or "")
+        elseif ic.kind == "flightmaster" then
+            p.sub = ic.horde and "Flyvemester (Horde)" or "Flyvemester (neutral)"
         else
             p.sub = "Objektiv her"
         end
@@ -210,10 +239,20 @@ local function getMMPin(i)
     return t
 end
 
--- Genberegn hvilke ikoner der er relevante i spillerens nuværende zone.
+-- Genberegn hvilke ikoner der er relevante i spillerens nuværende zone
+-- (quest-ikoner + flight masters, hver styret af sin toggle).
 function Map:Rebuild()
     self.zoneMap = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
-    self.zoneIcons = self.zoneMap and self:IconsForMap(self.zoneMap) or {}
+    local icons = {}
+    if self.zoneMap then
+        if ns.Q.char.ui.minimapIcons ~= false then
+            for _, ic in ipairs(self:IconsForMap(self.zoneMap)) do icons[#icons + 1] = ic end
+        end
+        if ns.Q.char.ui.flightMasters ~= false then
+            for _, fm in ipairs(self:FlightMastersForMap(self.zoneMap)) do icons[#icons + 1] = fm end
+        end
+    end
+    self.zoneIcons = icons
     self:UpdateWorldMap()
 end
 
@@ -223,7 +262,7 @@ mmFrame:SetScript("OnUpdate", function(_, dt)
     if elapsed < 0.1 then return end
     elapsed = 0
     for _, t in ipairs(minimapPins) do t:Hide() end
-    if not ns.Q.char.ui.minimapIcons or not Map.zoneIcons then return end
+    if not Map.zoneIcons then return end  -- toggles er allerede anvendt i Rebuild
     if not (C_Map and C_Map.GetBestMapForUnit) then return end
     local map = C_Map.GetBestMapForUnit("player")
     if map ~= Map.zoneMap then Map:Rebuild() end

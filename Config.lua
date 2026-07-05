@@ -130,7 +130,11 @@ local cbMapIcons = checkbox(L.CFG_MAPICONS,
     function(v) ns.Q.char.ui.mapIcons = v; if ns.Map then ns.Map:UpdateWorldMap() end end)
 local cbMiniIcons = checkbox(L.CFG_MINIMAPICONS,
     function() return ns.Q.char.ui.minimapIcons ~= false end,
-    function(v) ns.Q.char.ui.minimapIcons = v end)
+    function(v) ns.Q.char.ui.minimapIcons = v; if ns.Map then ns.Map:Rebuild() end end)
+local cbFlight = checkbox(L.CFG_FLIGHT,
+    function() return ns.Q.char.ui.flightMasters ~= false end,
+    function(v) ns.Q.char.ui.flightMasters = v
+        if ns.Map then ns.Map:Rebuild(); ns.Map:UpdateWorldMap() end end)
 local cbMMButton = checkbox(L.CFG_MMBUTTON,
     function() return ns.Q.char.ui.minimapButton ~= false end,
     function(v) ns.Q.char.ui.minimapButton = v; ns.Config:UpdateMinimapButton() end)
@@ -186,6 +190,7 @@ function Config:Refresh()
     cbTooltips:SetChecked(cbTooltips.qGet())
     cbMapIcons:SetChecked(cbMapIcons.qGet())
     cbMiniIcons:SetChecked(cbMiniIcons.qGet())
+    cbFlight:SetChecked(cbFlight.qGet())
     cbMMButton:SetChecked(cbMMButton.qGet())
     for _, s in ipairs({ sGuide, sArrow }) do
         local v = s.qGet()

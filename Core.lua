@@ -142,6 +142,10 @@ SlashCmdList["QEASY"] = function(msg)
         if ns.Map then ns.Map:UpdateWorldMap() end
     elseif cmd == "minimap" then
         Q.char.ui.minimapIcons = not Q.char.ui.minimapIcons
+        if ns.Map then ns.Map:Rebuild() end
+    elseif cmd == "flightmasters" or cmd == "fm" then
+        Q.char.ui.flightMasters = not Q.char.ui.flightMasters
+        if ns.Map then ns.Map:Rebuild(); ns.Map:UpdateWorldMap() end
     elseif cmd == "skip" then
         Q:SkipStep()
     elseif cmd == "back" then

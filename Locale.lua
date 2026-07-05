@@ -40,6 +40,7 @@ ns.L = {
     CFG_TOOLTIPS     = "Vis quest-info i mob-tooltips",
     CFG_MAPICONS     = "Vis quest-ikoner på verdenskortet (Outland)",
     CFG_MINIMAPICONS = "Vis quest-ikoner på minimappet (Outland)",
+    CFG_FLIGHT       = "Vis flyvemestre på kort og minimap (Outland)",
     CFG_MMBUTTON     = "Vis Qeasy-knap på minimappet",
     CFG_AUTOROUTE    = "Vælg rute automatisk efter zone",
     CFG_GUIDESCALE   = "Guide-størrelse",

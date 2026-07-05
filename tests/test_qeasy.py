@@ -93,7 +93,7 @@ function UnitLevel() return PSTATE.level end
 function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return false end
-function GetAddOnMetadata() return '0.9.0' end
+function GetAddOnMetadata() return '0.9.3' end
 hooksecurefunc = function() end
 GameTooltip = { HookScript = function() end, GetUnit = function() return nil end,
                 SetOwner = function() end, AddLine = function() end,
@@ -109,7 +109,8 @@ g = lua.globals()
 ns = lua.eval("{}")
 for f in ["Locale.lua", "Engine.lua", "Arrow.lua", "Guide.lua",
           "QuestLog.lua", "ObjectiveTracker.lua", "Tooltips.lua",
-          "Data/OutlandQuests.lua", "Map.lua", "Config.lua",
+          "Data/OutlandQuests.lua", "Data/OutlandFlightMasters.lua",
+          "Map.lua", "Config.lua",
           "Routes/HellfirePeninsula.lua", "Routes/Zangarmarsh.lua",
           "Routes/TerokkarForest.lua", "Routes/Nagrand.lua",
           "Routes/BladesEdge.lua", "Routes/Netherstorm.lua",
@@ -283,7 +284,13 @@ mf = [i for i in list(ns.Map.IconsForMap(ns.Map, 1952).values()) if i.qid == 108
 check("'?' turnin-ikon for complete-via-objectives quest",
       any(i.kind == "turnin" and i.npc == "Ethan" for i in mf))
 
-# minimap-OnUpdate kører uden fejl
+# flight masters på kortet (Outland)
+check("flight master-DB indlæst", ns.FlightMasters is not None)
+fms = list(ns.Map.FlightMastersForMap(ns.Map, 1944).values())
+check(f"flight masters i Hellfire (1944): {len(fms)} stk", len(fms) >= 3)
+check("flight master har navn + kind", all(f.kind == "flightmaster" and f.title for f in fms))
+
+# minimap-OnUpdate kører uden fejl (nu også med flight masters)
 lua.execute("QLOG={}")
 ns.Map.Rebuild(ns.Map)
 g.QeasyMinimapPins.scripts.OnUpdate(g.QeasyMinimapPins, 0.2)
