@@ -161,27 +161,42 @@ local function getHero()
         ns.Q.char.ui.heroPos = { point = p, x = x, y = y }
     end)
 
+    -- Blød gylden glød bagved (pulserer i drivéren).
     b.glow = b:CreateTexture(nil, "BACKGROUND")
-    b.glow:SetSize(HERO_SIZE * 1.7, HERO_SIZE * 1.7)
+    b.glow:SetSize(HERO_SIZE * 2.3, HERO_SIZE * 2.3)
     b.glow:SetPoint("CENTER")
     b.glow:SetTexture("Interface\\AddOns\\Qeasy\\Media\\glow")
     b.glow:SetBlendMode("ADD")
+    b.glow:SetVertexColor(1.0, 0.82, 0.35)
+
+    -- Sort baggrund bag ikonet (så gennemsigtige ikon-kanter ser rene ud).
+    local bg = b:CreateTexture(nil, "BACKGROUND", nil, 1)
+    bg:SetPoint("TOPLEFT", 2, -2)
+    bg:SetPoint("BOTTOMRIGHT", -2, 2)
+    bg:SetColorTexture(0, 0, 0, 0.9)
 
     b.icon = b:CreateTexture(nil, "ARTWORK")
     b.icon:SetPoint("TOPLEFT", 3, -3)
     b.icon:SetPoint("BOTTOMRIGHT", -3, 3)
     b.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 
+    -- Standard metalramme (samme som handling-knapper) for et rent, kendt look.
     local border = b:CreateTexture(nil, "OVERLAY")
-    border:SetPoint("TOPLEFT", -3, 3)
-    border:SetPoint("BOTTOMRIGHT", 3, -3)
+    border:SetPoint("TOPLEFT", -6, 6)
+    border:SetPoint("BOTTOMRIGHT", 6, -6)
     border:SetTexture("Interface\\Buttons\\UI-Quickslot2")
 
     b.count = b:CreateFontString(nil, "OVERLAY", "NumberFontNormalLarge")
-    b.count:SetPoint("BOTTOMRIGHT", -3, 4)
+    b.count:SetPoint("BOTTOMRIGHT", -2, 3)
 
-    b.label = b:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    b.label:SetPoint("TOP", b, "BOTTOM", 0, -4)
+    -- Tekst under knappen, med en mørk plade bagved for læsbarhed.
+    b.textbg = b:CreateTexture(nil, "BACKGROUND")
+    b.textbg:SetColorTexture(0, 0, 0, 0.55)
+    b.textbg:SetPoint("TOP", b, "BOTTOM", 0, -2)
+    b.textbg:SetSize(190, 34)
+
+    b.label = b:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    b.label:SetPoint("TOP", b, "BOTTOM", 0, -5)
     b.label:SetTextColor(1, 0.82, 0)
 
     b.hint = b:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
@@ -202,8 +217,14 @@ end
 
 local function setHeroShown(v)
     local h = getHero()
-    if v and not h:IsShown() then h:Show()
-    elseif not v and h:IsShown() then h:Hide() end
+    if v and not h:IsShown() then
+        h:Show()
+        -- Blizzards "brug nu"-glød (samme som når en evne lyser op), hvis den findes.
+        if ActionButton_ShowOverlayGlow then ActionButton_ShowOverlayGlow(h) end
+    elseif not v and h:IsShown() then
+        if ActionButton_HideOverlayGlow then ActionButton_HideOverlayGlow(h) end
+        h:Hide()
+    end
 end
 
 function ItemBar:UpdateHero()
@@ -246,6 +267,8 @@ function ItemBar:UpdateHero()
         h.count:SetText((best.charges and best.charges > 1) and best.charges or "")
         h.label:SetText(best.title)
         h.hint:SetText("Klik: brug " .. itemName(best.link))
+        local w = math.max(h.label:GetStringWidth() or 150, h.hint:GetStringWidth() or 150)
+        h.textbg:SetSize(w + 24, 34)
         setHeroShown(true)
     else
         setHeroShown(false)
@@ -285,9 +308,9 @@ local acc, pulseT = 0, 0
 driver:SetScript("OnUpdate", function(_, dt)
     pulseT = pulseT + dt
     if hero and hero:IsShown() and hero.glow then
-        local s = 1 + 0.16 * (0.5 + 0.5 * math.sin(pulseT * 4))
-        hero.glow:SetSize(HERO_SIZE * 1.7 * s, HERO_SIZE * 1.7 * s)
-        hero.glow:SetAlpha(0.55 + 0.35 * (0.5 + 0.5 * math.sin(pulseT * 4)))
+        local s = 1 + 0.14 * (0.5 + 0.5 * math.sin(pulseT * 4))
+        hero.glow:SetSize(HERO_SIZE * 2.3 * s, HERO_SIZE * 2.3 * s)
+        hero.glow:SetAlpha(0.6 + 0.35 * (0.5 + 0.5 * math.sin(pulseT * 4)))
     end
     acc = acc + dt
     if acc < 0.3 then return end

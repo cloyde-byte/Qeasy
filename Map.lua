@@ -206,14 +206,18 @@ local function worldCanvas()
     return nil
 end
 
+-- Løft et pin over kortets egne POI'er. GØRES HVER opdatering (ikke kun ved
+-- oprettelse), for kortets strata/frame-level skifter når det maksimeres, og
+-- Blizzards POI-pins (fx Ring of Trials-arenaen) ligger højt i frame-level.
+local function raisePin(p, canvas)
+    if canvas.GetFrameStrata then p:SetFrameStrata(canvas:GetFrameStrata()) end
+    local lvl = (canvas.GetFrameLevel and canvas:GetFrameLevel() or 0) + 2500
+    p:SetFrameLevel(lvl)
+end
+
 local function getWorldPin(i, canvas)
     if worldPins[i] then return worldPins[i] end
     local p = CreateFrame("Button", nil, canvas)
-    -- Match kortets egen strata og læg os HØJT i frame-level, så ikonerne
-    -- altid tegnes OVER kortets egne POI'er (både i vindue og fullscreen).
-    -- (Fast DIALOG-strata virkede ikke, når kortet var maksimeret.)
-    if canvas.GetFrameStrata then p:SetFrameStrata(canvas:GetFrameStrata()) end
-    p:SetFrameLevel((canvas.GetFrameLevel and canvas:GetFrameLevel() or 0) + 900)
     p.tex = p:CreateTexture(nil, "OVERLAY")
     p.tex:SetDrawLayer("OVERLAY", 7)
     p.tex:SetAllPoints(p)
@@ -263,6 +267,7 @@ function Map:UpdateWorldMap()
     for _, ic in ipairs(self:ClusterIcons(list)) do
         n = n + 1
         local p = getWorldPin(n, canvas)
+        raisePin(p, canvas)
         -- Lidt mindre ikoner end før (særligt sværd/tandhjul). Kendt flyvemester
         -- vises mindre (gryf); uopdaget flyvemester som et tydeligt grønt "!".
         local base = (ic.kind == "flightmaster") and (ic.known and 12 or 14)
@@ -451,6 +456,9 @@ function Map:Init()
     if WorldMapFrame then
         if WorldMapFrame.HookScript then
             WorldMapFrame:HookScript("OnShow", function() Map:UpdateWorldMap() end)
+            -- Maksimering/minimering ændrer størrelse OG strata -> gen-tegn,
+            -- så ikonerne løftes korrekt over kortet igen.
+            WorldMapFrame:HookScript("OnSizeChanged", function() Map:UpdateWorldMap() end)
         end
         if hooksecurefunc and WorldMapFrame.OnMapChanged then
             hooksecurefunc(WorldMapFrame, "OnMapChanged", function() Map:UpdateWorldMap() end)
