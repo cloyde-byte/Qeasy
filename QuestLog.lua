@@ -112,16 +112,18 @@ function QuestLog:MobObjectives(name)
     if not name or name == "" then return res end
     for _, e in ipairs(self:Scan()) do
         if e.questID and not e.isComplete then
+            local d = ns.QuestDB and ns.QuestDB[e.questID]
             local text
-            for _, o in ipairs(e.objectives) do
-                if not o.done and o.text:find(name, 1, true) then text = o.text; break end
-            end
-            if not text then
-                local d = ns.QuestDB and ns.QuestDB[e.questID]
-                if d and d.ou then
-                    for _, un in ipairs(d.ou) do
-                        if un == name then text = pickObjLine(e, name); break end
-                    end
+            if d and d.ou then
+                -- Autoritativ liste: mobben tæller KUN hvis navnet står præcist i
+                -- ou. (Undgår at "Clefthoof" fejlagtigt matcher "Clefthoof Bull".)
+                for _, un in ipairs(d.ou) do
+                    if un == name then text = pickObjLine(e, name); break end
+                end
+            else
+                -- Ingen DB-liste: fald tilbage på mob-navn i objektiv-teksten.
+                for _, o in ipairs(e.objectives) do
+                    if not o.done and o.text:find(name, 1, true) then text = o.text; break end
                 end
             end
             if text then

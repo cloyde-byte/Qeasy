@@ -94,7 +94,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.16.0' end
+function GetAddOnMetadata() return '0.16.1' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -345,6 +345,20 @@ check("kategori-mob matcher quest via DB (Kil'sorrow -> Agent-linje)",
 dh = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Giselda the Crone").values())
 check("direkte mob-navn matcher stadig (Giselda)",
       len(dh) == 1 and "Giselda" in dh[0].text)
+
+# ou er autoritativ: en almindelig "Clefthoof" må IKKE tælle til "Clefthoof
+# Bull"-quest (9850 har ou={"Clefthoof Bull"}); kun den præcise mob tæller
+lua.eval("""function() QLOG = { { title='Clefthoof Mastery', questID=9850,
+  objectives = { { text='Clefthoof Bull slain: 0/30', done=false } } } } end""")()
+plain = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Clefthoof").values())
+check("almindelig 'Clefthoof' tæller IKKE til 'Clefthoof Bull'", len(plain) == 0)
+bull = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Clefthoof Bull").values())
+check("'Clefthoof Bull' tæller til Bull-quest", len(bull) == 1)
+# tier-1 (9789, ingen ou) matcher stadig via objektiv-tekst
+lua.eval("""function() QLOG = { { title='Clefthoof Mastery', questID=9789,
+  objectives = { { text='Clefthoof slain: 0/30', done=false } } } } end""")()
+t1 = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Clefthoof").values())
+check("tier-1 'Clefthoof' matcher via tekst (ingen ou)", len(t1) == 1)
 
 # ---- kort/minimap-ikoner (Outland) ----
 check("Outland quest-DB indlæst (>500 quests)",
