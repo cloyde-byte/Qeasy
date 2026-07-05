@@ -256,6 +256,31 @@ def render_bang(px=32):
     return img.resize((px, px), Image.LANCZOS)
 
 
+def render_slot(px=64):
+    """Afrundet firkant-ramme med gennemsigtigt hul, så et firkantet ikon
+    bagved fremstår som en pæn afrundet firkant (hjørnerne maskeres af rammen)."""
+    import PIL.ImageChops as IC
+    S = px * SS
+    frame = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(frame)
+    rad = S * 0.20
+    # metallisk kant: lys yderkant -> mørk inderflade
+    d.rounded_rectangle([0, 0, S - 1, S - 1], radius=rad, fill=(96, 124, 150, 255))
+    d.rounded_rectangle([SS, SS, S - 1 - SS, S - 1 - SS], radius=rad * 0.92,
+                        fill=(150, 190, 220, 255))
+    d.rounded_rectangle([2.2 * SS, 2.2 * SS, S - 1 - 2.2 * SS, S - 1 - 2.2 * SS],
+                        radius=rad * 0.82, fill=(18, 26, 36, 255))
+    # gennemsigtigt hul (afrundet), lidt inde
+    inset = S * 0.10
+    hole = Image.new("L", (S, S), 0)
+    ImageDraw.Draw(hole).rounded_rectangle(
+        [inset, inset, S - 1 - inset, S - 1 - inset], radius=rad * 0.62, fill=255)
+    r, g, b, a = frame.split()
+    a = IC.subtract(a, hole)
+    frame = Image.merge("RGBA", (r, g, b, a))
+    return frame.resize((px, px), Image.LANCZOS)
+
+
 def render_glow(px=64):
     """Blød gylden halo bag hero-item-knappen (pulserer)."""
     S = px * SS
@@ -302,6 +327,7 @@ def main():
     write_tga(render_sword(32), os.path.join(MEDIA, "slay.tga"))
     write_tga(render_bang(32), os.path.join(MEDIA, "flightpoint.tga"))
     write_tga(render_glow(64), os.path.join(MEDIA, "glow.tga"))
+    write_tga(render_slot(64), os.path.join(MEDIA, "slot.tga"))
     render_curseforge()
 
 

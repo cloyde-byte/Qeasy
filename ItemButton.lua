@@ -71,10 +71,10 @@ local function getButton(i)
     b.icon:SetAllPoints(b)
     b.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 
+    -- Afrundet slot-ramme der maskerer ikonets firkantede hjørner.
     local border = b:CreateTexture(nil, "OVERLAY")
-    border:SetPoint("TOPLEFT", -3, 3)
-    border:SetPoint("BOTTOMRIGHT", 3, -3)
-    border:SetTexture("Interface\\Buttons\\UI-Quickslot2")
+    border:SetAllPoints(b)
+    border:SetTexture("Interface\\AddOns\\Qeasy\\Media\\slot")
 
     b.count = b:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
     b.count:SetPoint("BOTTOMRIGHT", -3, 3)
@@ -176,15 +176,14 @@ local function getHero()
     bg:SetColorTexture(0, 0, 0, 0.9)
 
     b.icon = b:CreateTexture(nil, "ARTWORK")
-    b.icon:SetPoint("TOPLEFT", 3, -3)
-    b.icon:SetPoint("BOTTOMRIGHT", -3, 3)
+    b.icon:SetPoint("TOPLEFT", 2, -2)
+    b.icon:SetPoint("BOTTOMRIGHT", -2, 2)
     b.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 
-    -- Standard metalramme (samme som handling-knapper) for et rent, kendt look.
+    -- Afrundet slot-ramme der maskerer ikonets firkantede hjørner.
     local border = b:CreateTexture(nil, "OVERLAY")
-    border:SetPoint("TOPLEFT", -6, 6)
-    border:SetPoint("BOTTOMRIGHT", 6, -6)
-    border:SetTexture("Interface\\Buttons\\UI-Quickslot2")
+    border:SetAllPoints(b)
+    border:SetTexture("Interface\\AddOns\\Qeasy\\Media\\slot")
 
     b.count = b:CreateFontString(nil, "OVERLAY", "NumberFontNormalLarge")
     b.count:SetPoint("BOTTOMRIGHT", -2, 3)
