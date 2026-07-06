@@ -89,25 +89,26 @@ def outland_objective(qid):
             return qdb.centroid(pts), "u", pts, sorted(names)
 
     if obj["I"]:
-        pts, from_unit, names = [], False, set()
+        upts, opts_, unames = [], [], set()
         for iid in obj["I"].values():
             it = qdb.idata[int(iid)]
             if it is not None and T(it) == "table":
+                if it["O"]:
+                    for oid in it["O"].keys():
+                        opts_ += [p for p in qdb.spawns(qdb.odata, int(oid)) if p[0] in OUTLAND]
                 if it["U"]:
-                    from_unit = True
                     for uid in it["U"].keys():
                         uid = int(uid)
                         sp = [p for p in qdb.spawns(qdb.udata, uid) if p[0] in OUTLAND]
                         if sp:
-                            pts += sp
-                            names.add(qdb.loc_name(qdb.uloc, qdb.uloc_v, uid))
-                if it["O"]:
-                    for oid in it["O"].keys():
-                        pts += [p for p in qdb.spawns(qdb.odata, int(oid)) if p[0] in OUTLAND]
-        if pts:
-            # genstand fra en enhed = reelt et dræb (vis kilde-mobs); ellers indsamling
-            return (qdb.centroid(pts), ("u" if from_unit else "i"), pts,
-                    sorted(names) if names else None)
+                            upts += sp
+                            unames.add(qdb.loc_name(qdb.uloc, qdb.uloc_v, uid))
+        # Genstand fra et OBJEKT (fx kister/knuder) = loot/interager (tandhjul).
+        # Kun fra ENHEDER = reelt et dræb (sværd, vis kilde-mobs). Ellers indsamling.
+        if opts_:
+            return qdb.centroid(opts_), "o", opts_, None
+        if upts:
+            return qdb.centroid(upts), "u", upts, sorted(unames) if unames else None
     return None, None, None, None
 
 

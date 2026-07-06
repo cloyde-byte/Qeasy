@@ -309,14 +309,15 @@ local function getAreaMark(i, canvas)
     areaMarks[i] = t
     return t
 end
--- Waypoint-linje (fra dig til et fokuseret mål) - a la Questie.
+-- Waypoint-linje (fra dig til et fokuseret mål) - a la Questie. Bruger en
+-- roteret tekstur i stedet for CreateLine (virker på alle klient-versioner).
 local function getAreaLine(i, canvas)
     ensureAreaHost(canvas)
     if areaLines[i] then return areaLines[i] end
-    local ln = areaHost:CreateLine(nil, "OVERLAY")
-    ln:SetThickness(2.4)
-    areaLines[i] = ln
-    return ln
+    local t = areaHost:CreateTexture(nil, "OVERLAY")
+    t:SetTexture("Interface\\Buttons\\WHITE8X8")
+    areaLines[i] = t
+    return t
 end
 
 -- Mål (objektiv-centroid) for de fokuserede quests på et bestemt kort.
@@ -435,26 +436,30 @@ end
 -- Farvet linje fra din position til hvert fokuseret mål (samme farve som
 -- skyen). Pakket ind i pcall, da CreateLine/SetStartPoint varierer lidt
 -- mellem klientversioner.
+local atan2 = math.atan2 or function(y, x) return math.atan(y, x) end
 function Map:DrawFocusLines(canvas, mapID, w, h)
     local ln = 0
     local ok = pcall(function()
         if ns.Q.char.ui.mapIcons == false or ns.Q.char.ui.spawnAreas == false then return end
-        if not (canvas.CreateLine and C_Map and C_Map.GetBestMapForUnit) then return end
+        if not (canvas.CreateTexture and C_Map and C_Map.GetBestMapForUnit) then return end
         if C_Map.GetBestMapForUnit("player") ~= mapID then return end
         local ppos = C_Map.GetPlayerMapPosition and C_Map.GetPlayerMapPosition(mapID, "player")
         local px, py = ppos and ppos:GetXY()
         if not px or px == 0 then return end
+        local x1, y1 = px * w, -py * h                       -- kanvas-pixel (TOPLEFT-anker)
         for _, tgt in ipairs(self:FocusPathTargets(mapID)) do
             ln = ln + 1
-            local line = getAreaLine(ln, canvas)
             local c = tgt.color
-            line:SetThickness(2.4)
-            -- Solid, farvet linje via hvid tekstur + vertexfarve (mest kompatibelt).
-            line:SetTexture("Interface\\Buttons\\WHITE8X8")
-            line:SetVertexColor(c[1], c[2], c[3], 0.85)
+            local x2, y2 = (tgt.x / 100) * w, -(tgt.y / 100) * h
+            local dx, dy = x2 - x1, y2 - y1
+            local len = math.max(1, math.sqrt(dx * dx + dy * dy))
+            -- roteret tynd tekstur = linje fra dig til målet
+            local line = getAreaLine(ln, canvas)
+            line:SetVertexColor(c[1], c[2], c[3], 0.8)
+            line:SetSize(len, 2.5)
             line:ClearAllPoints()
-            line:SetStartPoint("TOPLEFT", canvas, px * w, -py * h)
-            line:SetEndPoint("TOPLEFT", canvas, (tgt.x / 100) * w, -(tgt.y / 100) * h)
+            line:SetPoint("CENTER", canvas, "TOPLEFT", (x1 + x2) / 2, (y1 + y2) / 2)
+            line:SetRotation(atan2(dy, dx))
             line:Show()
         end
     end)
