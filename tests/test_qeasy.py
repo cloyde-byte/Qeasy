@@ -94,7 +94,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.16.2' end
+function GetAddOnMetadata() return '0.17.0' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -419,6 +419,18 @@ check("max 3 fokus (ældste falder ud)", fl2 == [9789, 9854, 9891])
 ns.ObjTracker.ToggleFocus(ns.ObjTracker, 9789)   # slå fra igen
 fl3 = sorted(int(x) for x in list(ns.ObjTracker.FocusList(ns.ObjTracker).values()))
 check("fokus kan slås fra", fl3 == [9854, 9891])
+
+# waypoint-linjer: mål (objektiv) for de fokuserede quests på kortet
+ns.Q.char.ui.trackerFocus = lua.eval("{}")
+lua.eval("""function() QLOG = {
+  { title='Talbuk Mastery', questID=9857, objectives={{text='x:0/1'}} },
+  { title='Clefthoof Mastery', questID=9789, objectives={{text='x:0/1'}} },
+} end""")()
+ns.ObjTracker.ToggleFocus(ns.ObjTracker, 9857)
+ns.ObjTracker.ToggleFocus(ns.ObjTracker, 9789)
+tps = list(ns.Map.FocusPathTargets(ns.Map, 1951).values())
+check("waypoint-mål for 2 fokuserede quests (Nagrand)",
+      len(tps) == 2 and all(t.color is not None and t.x for t in tps))
 
 # opdaget/uopdaget flyvemester: alle er ukendte til at starte med
 ns.Q.char.knownFlights = lua.eval("{}")

@@ -275,12 +275,16 @@ local AREA_COLORS = {
     { 0.20, 0.82, 0.95 },   -- cyan
     { 0.58, 0.45, 1.00 },   -- indigo
 }
-local areaHost, areaMarks = nil, {}
-local function getAreaMark(i, canvas)
+local areaHost, areaMarks, areaLines = nil, {}, {}
+local function ensureAreaHost(canvas)
     if not areaHost or (areaHost.GetParent and areaHost:GetParent() ~= canvas) then
         areaHost = CreateFrame("Frame", nil, canvas)
-        areaMarks = {}
+        areaMarks, areaLines = {}, {}
     end
+    return areaHost
+end
+local function getAreaMark(i, canvas)
+    ensureAreaHost(canvas)
     if areaMarks[i] then return areaMarks[i] end
     local t = areaHost:CreateTexture(nil, "ARTWORK")
     t:SetTexture("Interface\\AddOns\\Qeasy\\Media\\blob")
@@ -289,6 +293,30 @@ local function getAreaMark(i, canvas)
     t:SetAlpha(0.30)
     areaMarks[i] = t
     return t
+end
+-- Waypoint-linje (fra dig til et fokuseret mål) - a la Questie.
+local function getAreaLine(i, canvas)
+    ensureAreaHost(canvas)
+    if areaLines[i] then return areaLines[i] end
+    local ln = areaHost:CreateLine(nil, "OVERLAY")
+    ln:SetThickness(2.4)
+    areaLines[i] = ln
+    return ln
+end
+
+-- Mål (objektiv-centroid) for de fokuserede quests på et bestemt kort.
+function Map:FocusPathTargets(mapID)
+    local out = {}
+    local focus = ns.ObjTracker and ns.ObjTracker.FocusList and ns.ObjTracker:FocusList()
+    if not focus then return out end
+    for i, qid in ipairs(focus) do
+        local d = ns.QuestDB and ns.QuestDB[qid]
+        if d and d.o and d.o[1] == mapID then
+            out[#out + 1] = { qid = qid, x = d.o[2], y = d.o[3],
+                              color = AREA_COLORS[i] or AREA_COLORS[1] }
+        end
+    end
+    return out
 end
 
 function Map:UpdateWorldMap()
@@ -342,6 +370,29 @@ function Map:UpdateWorldMap()
         end
     end
     for i = am + 1, #areaMarks do areaMarks[i]:Hide() end
+
+    -- Waypoint-linjer: fra din position til hvert fokuseret mål (samme farve
+    -- som skyen). Kun når du kigger på det kort du står på.
+    local ln = 0
+    if ns.Q.char.ui.mapIcons ~= false and ns.Q.char.ui.spawnAreas ~= false then
+        local pmap = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
+        local ppos = pmap == mapID and C_Map.GetPlayerMapPosition
+            and C_Map.GetPlayerMapPosition(mapID, "player")
+        local px, py = ppos and ppos:GetXY()
+        if px and px ~= 0 then
+            for _, tgt in ipairs(self:FocusPathTargets(mapID)) do
+                ln = ln + 1
+                local line = getAreaLine(ln, canvas)
+                local c = tgt.color
+                line:SetColorTexture(c[1], c[2], c[3], 0.85)
+                line:ClearAllPoints()
+                line:SetStartPoint("TOPLEFT", canvas, (px * w), -(py * h))
+                line:SetEndPoint("TOPLEFT", canvas, (tgt.x / 100) * w, -(tgt.y / 100) * h)
+                line:Show()
+            end
+        end
+    end
+    for i = ln + 1, #areaLines do areaLines[i]:Hide() end
 
     local n = 0
     for _, ic in ipairs(self:ClusterIcons(list)) do
