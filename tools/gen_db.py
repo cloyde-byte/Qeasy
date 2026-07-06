@@ -177,6 +177,12 @@ def main():
                 extra = [n for n in onames if n and n not in title]
                 if extra:
                     parts.append("ou={%s}" % ",".join('"%s"' % esc(n) for n in onames))
+        # oi = item-id'er man skal samle (til quest-info i item-tooltips)
+        objx = q["obj"]
+        if T(objx) == "table" and objx["I"]:
+            iids = sorted({int(i) for i in objx["I"].values()})
+            if iids:
+                parts.append("oi={%s}" % ",".join(str(i) for i in iids))
         if q["min"]:
             parts.append("lvl=%d" % int(q["min"]))
         if race:

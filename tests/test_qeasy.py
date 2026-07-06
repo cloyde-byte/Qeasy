@@ -96,7 +96,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.17.1' end
+function GetAddOnMetadata() return '0.17.2' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -361,6 +361,15 @@ lua.eval("""function() QLOG = { { title='Clefthoof Mastery', questID=9789,
   objectives = { { text='Clefthoof slain: 0/30', done=false } } } } end""")()
 t1 = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Clefthoof").values())
 check("tier-1 'Clefthoof' matcher via tekst (ingen ou)", len(t1) == 1)
+
+# item-tooltips: et loot-item viser hvilken aktiv quest det hører til (oi)
+lua.eval("""function() QLOG = { { title='I Must Have Them!', questID=10109,
+  objectives = { { text='Air Elemental Gas: 0/3', done=false } } } } end""")()
+ih = list(ns.QuestLog.ItemObjectives(ns.QuestLog, 27807, "Air Elemental Gas").values())
+check("quest-item i tooltip matcher via oi",
+      len(ih) == 1 and ih[0].title == "I Must Have Them!" and "Elemental" in ih[0].text)
+noi = list(ns.QuestLog.ItemObjectives(ns.QuestLog, 99999, "Random").values())
+check("urelateret item matcher ikke", len(noi) == 0)
 
 # ---- kort/minimap-ikoner (Outland) ----
 check("Outland quest-DB indlæst (>500 quests)",

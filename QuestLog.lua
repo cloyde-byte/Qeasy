@@ -134,6 +134,30 @@ function QuestLog:MobObjectives(name)
     return res
 end
 
+-- Til item-tooltips: hvilke aktive quests skal bruge item `itemID`?
+-- (fx "Air Elemental Gas" -> "I Must Have Them!"). Bruger DB'ens oi-liste.
+function QuestLog:ItemObjectives(itemID, name)
+    local res = {}
+    itemID = tonumber(itemID)
+    if not itemID then return res end
+    for _, e in ipairs(self:Scan()) do
+        if e.questID and not e.isComplete then
+            local d = ns.QuestDB and ns.QuestDB[e.questID]
+            if d and d.oi then
+                for _, iid in ipairs(d.oi) do
+                    if iid == itemID then
+                        local text = pickObjLine(e, name or "")
+                            or (e.objectives[1] and e.objectives[1].text) or ""
+                        res[#res + 1] = { title = e.title, level = e.level, text = text }
+                        break
+                    end
+                end
+            end
+        end
+    end
+    return res
+end
+
 -- Til tooltips: hvilke aktive (ufærdige) quest-objectives nævner `name`?
 -- Returnerer { {title=, level=, text=}, ... }.
 function QuestLog:ObjectivesForName(name)

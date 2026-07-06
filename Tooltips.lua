@@ -37,6 +37,26 @@ local function onUnit(tooltip)
     addQuestLines(tooltip, name)
 end
 
+-- Item-tooltip: vis hvilke aktive quests der skal bruge dette item.
+local function onItem(tooltip)
+    if tooltip ~= GameTooltip then return end
+    if not ns.Q.char.ui.tooltipsEnabled then return end
+    if not tooltip.GetItem then return end
+    local iname, link = tooltip:GetItem()
+    if not link then return end
+    local id = tonumber(link:match("item:(%d+)"))
+    if not id then return end
+    local hits = ns.QuestLog:ItemObjectives(id, iname)
+    if #hits == 0 then return end
+    tooltip:AddLine(" ")
+    for _, h in ipairs(hits) do
+        local r, g, b = ns.QuestLog:DiffColor(h.level)
+        tooltip:AddLine(string.format("|cff69ccf0Qeasy|r [%d] %s", h.level, h.title), r, g, b)
+        tooltip:AddLine("   " .. h.text, 0.85, 0.85, 0.85)
+    end
+    tooltip:Show()
+end
+
 function Tooltips:Init()
     if self.hooked then return end
     self.hooked = true
@@ -45,6 +65,7 @@ function Tooltips:Init()
     -- Moderne: OnTooltipSetUnit. Ældre klienter: samme script findes i TBC.
     if GameTooltip.HookScript then
         GameTooltip:HookScript("OnTooltipSetUnit", onUnit)
+        GameTooltip:HookScript("OnTooltipSetItem", onItem)
     end
 
     -- Fallback: fang navnet via GameTooltip:SetUnit-hook (nogle klienter).
