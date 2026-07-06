@@ -38,6 +38,11 @@ PVP_NAMES = [
     "Bloody Coins? What Are Those?",
 ]
 
+# Titel-fragmenter der altid er PvP (fx alle "Call to Arms"-BG-quests).
+PVP_CONTAINS = [
+    "Call to Arms",
+]
+
 
 def db_ids(root):
     """Sæt af quest-id'er der allerede er i vores Outland-DB."""
@@ -70,6 +75,12 @@ def main():
         for qid in ids_for(name, valid):
             flags[qid] = "pvp"
             report["pvp"].append((qid, name))
+    # substring-match (fx "Call to Arms: Warsong Gulch")
+    for qid in valid:
+        title = qdb.title(qid) or ""
+        if any(frag in title for frag in PVP_CONTAINS):
+            flags[qid] = "pvp"
+            report["pvp"].append((qid, title))
 
     path = os.path.join(root, "Data", "OutlandQuestFlags.lua")
     with open(path, "w", encoding="utf-8") as fh:
