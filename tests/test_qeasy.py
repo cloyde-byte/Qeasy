@@ -96,7 +96,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.17.2' end
+function GetAddOnMetadata() return '0.18.0' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -111,6 +111,8 @@ function GetTime() return PSTATE.time or 0 end
 function IsInGroup() return PSTATE.inGroup end
 function IsInRaid() return false end
 function Ambiguate(name) return name end
+SAYS = {}
+function SendChatMessage(msg, chan) SAYS[#SAYS+1] = { msg = msg, chan = chan } end
 SENT = {}
 C_ChatInfo = {
     RegisterAddonMessagePrefix = function() end,
@@ -552,8 +554,23 @@ lua.execute("PSTATE.combat = false")
 
 # ---- slash ----
 for cmd in ("list","debug","","config","skip","back","help","tracker",
-            "tooltips","mapicons","minimap","party"):
+            "tooltips","mapicons","minimap","party","xp","announce","poi","areas","items"):
     lua.eval("SlashCmdList['QEASY']")(cmd)
+
+# ---- announce: milepæle til party (opt-in) ---- (sidst: sætter egen QLOG)
+ns.Q.char.ui.announceProgress = True
+lua.execute("PSTATE.inGroup=true")
+lua.eval("""function() QLOG = { { title='Windroc Mastery', questID=9854,
+  objectives={{text='Windroc slain: 29/30', done=false}} } } end""")()
+ns.Announce.Check(ns.Announce)                 # init -> ingen besked
+n0 = len(list(g.SAYS.values()))
+lua.eval("""function() QLOG = { { title='Windroc Mastery', questID=9854,
+  objectives={{text='Windroc slain: 30/30', done=true}} } } end""")()
+ns.Announce.Check(ns.Announce)                 # objektiv færdigt -> annoncér
+says = list(g.SAYS.values())
+check("announce ved objektiv-done (opt-in)",
+      len(says) > n0 and any("Windroc" in s.msg for s in says))
+ns.Q.char.ui.announceProgress = False
 
 print("\n--- chat (uddrag) ---")
 for line in list(g.PRINTED.values())[:5]:

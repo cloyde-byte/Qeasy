@@ -149,6 +149,9 @@ local cbPartyShare = checkbox(L.CFG_PARTYSHARE,
     function() return ns.Q.char.ui.partyShare ~= false end,
     function(v) ns.Q.char.ui.partyShare = v
         if v and ns.Comms then ns.Comms:Broadcast(true) end end)
+local cbAnnounce = checkbox(L.CFG_ANNOUNCE,
+    function() return ns.Q.char.ui.announceProgress == true end,
+    function(v) ns.Q.char.ui.announceProgress = v end)
 local cbItemBar = checkbox(L.CFG_ITEMBAR,
     function() return ns.Q.char.ui.itemBar ~= false end,
     function(v) if ns.ItemBar then ns.ItemBar:SetShown(v) else ns.Q.char.ui.itemBar = v end end)
@@ -215,6 +218,7 @@ function Config:Refresh()
     cbFlight:SetChecked(cbFlight.qGet())
     cbPOI:SetChecked(cbPOI.qGet())
     cbPartyShare:SetChecked(cbPartyShare.qGet())
+    cbAnnounce:SetChecked(cbAnnounce.qGet())
     cbItemBar:SetChecked(cbItemBar.qGet())
     cbHero:SetChecked(cbHero.qGet())
     cbMMButton:SetChecked(cbMMButton.qGet())

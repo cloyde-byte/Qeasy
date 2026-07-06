@@ -131,3 +131,50 @@ function Comms:ProgressFor(questID)
     table.sort(out, function(a, b) return a.name < b.name end)
     return out
 end
+
+-- =========================================================================
+-- Qeasy Announce (valgfrit, default fra): annoncér quest-milepæle til party-
+-- chatten - når et objektiv er færdigt, og når en quest er klar til aflevering.
+-- =========================================================================
+local Announce = {}
+ns.Announce = Announce
+local snap = {}
+local inited = false
+
+local function annChannel()
+    if IsInRaid and IsInRaid() then return "RAID" end
+    if IsInGroup and IsInGroup() then return "PARTY" end
+    return nil
+end
+
+local function say(msg)
+    local ch = annChannel()
+    if ch and SendChatMessage then SendChatMessage("Qeasy: " .. msg, ch) end
+end
+
+function Announce:Check()
+    if not ns.QuestLog then return end
+    local first = not inited
+    inited = true
+    local on = ns.Q.char.ui.announceProgress
+    local seen = {}
+    for _, e in ipairs(ns.QuestLog:Scan()) do
+        if e.questID then
+            seen[e.questID] = true
+            local s = snap[e.questID]
+            if on and not first and s then
+                if e.isComplete and not s.complete then
+                    say(e.title .. " - klar til aflevering!")
+                elseif not e.isComplete then
+                    for i, o in ipairs(e.objectives) do
+                        if o.done and not (s.done and s.done[i]) then say(o.text) end
+                    end
+                end
+            end
+            local done = {}
+            for i, o in ipairs(e.objectives) do done[i] = o.done and true or false end
+            snap[e.questID] = { complete = e.isComplete, done = done }
+        end
+    end
+    for qid in pairs(snap) do if not seen[qid] then snap[qid] = nil end end
+end

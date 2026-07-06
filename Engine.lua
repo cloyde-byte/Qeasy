@@ -67,6 +67,7 @@ function Q:InitDB()
     if c.ui.spawnAreas == nil then c.ui.spawnAreas = true end
     if c.ui.poiIcons == nil then c.ui.poiIcons = true end
     if c.ui.sessionStats == nil then c.ui.sessionStats = true end
+    if c.ui.announceProgress == nil then c.ui.announceProgress = false end
     c.knownFlights = c.knownFlights or {}   -- opdagede flyvemestre (per karakter)
     self.db = QeasyDB
     self.char = c

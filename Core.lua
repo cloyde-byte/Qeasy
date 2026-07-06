@@ -88,6 +88,7 @@ Q:SetScript("OnEvent", function(self, event, arg1, arg2, arg3, arg4)
         self:Refresh()
         if ns.Comms then ns.Comms:Broadcast() end
         if ns.ItemBar then ns.ItemBar:Update() end
+        if ns.Announce then ns.Announce:Check() end
 
     elseif event == "PLAYER_REGEN_ENABLED" then
         -- Kampen er slut: opsæt eventuelle udskudte secure-item-knapper.
@@ -176,6 +177,10 @@ SlashCmdList["QEASY"] = function(msg)
         if ns.ItemBar then ns.ItemBar:SetShown(Q.char.ui.itemBar == false) end
     elseif cmd == "xp" then
         if ns.Session then ns.Session:SetShown(Q.char.ui.sessionStats == false) end
+    elseif cmd == "announce" then
+        Q.char.ui.announceProgress = not Q.char.ui.announceProgress
+        print("|cff69ccf0Qeasy|r: Party-annoncering " ..
+            (Q.char.ui.announceProgress and "til." or "fra."))
     elseif cmd == "hero" then
         if ns.ItemBar then ns.ItemBar:SetHeroShown(Q.char.ui.heroButton == false) end
     elseif cmd == "tooltips" then

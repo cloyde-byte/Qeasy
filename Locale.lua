@@ -49,6 +49,7 @@ ns.L = {
     CFG_POI          = "Vis kroværter og postkasser (Outland)",
     CFG_SESSION      = "Vis session-statistik (XP/time, tid til level)",
     CFG_PARTYSHARE   = "Del quest-fremgang med party (Qeasy-brugere)",
+    CFG_ANNOUNCE     = "Annoncér quest-milepæle i party-chat",
     CFG_ITEMBAR      = "Vis knap for quest-items (fx Living Fire)",
     CFG_HERO         = "Fremhæv quest-item midt på skærmen når du er tæt på",
     CFG_MMBUTTON     = "Vis Qeasy-knap på minimappet",
