@@ -10,5 +10,6 @@ ns.QuestFlags = {
   [10077]="repeat",
   [10419]="repeat",
   [10421]="repeat",
-  [10478]="pvp",
+  [10478]="repeat",
+  [11503]="pvp",
 }

@@ -27,11 +27,12 @@ REPEAT_NAMES = [
     "Firewing Signet",
     "Oshu'gun Crystal Powder",
     "Oshu'gun Crystal Fragment",
+    "More Warbeads!",
 ]
 
 # PvP-relaterede quests (Halaa m.fl.).
 PVP_NAMES = [
-    "More Warbeads!",
+    "Enemies, Old and New",
     "Gladiators of Halaa",
     "Banner Down!",
     "Bloody Coins? What Are Those?",
