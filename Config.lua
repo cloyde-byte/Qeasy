@@ -122,6 +122,9 @@ local cbAuto = checkbox(L.CFG_AUTOROUTE,
 local cbObjTracker = checkbox(L.CFG_OBJTRACKER,
     function() return ns.Q.char.ui.objTrackerShown ~= false end,
     function(v) ns.ObjTracker:SetShown(v) end)
+local cbSession = checkbox(L.CFG_SESSION,
+    function() return ns.Q.char.ui.sessionStats ~= false end,
+    function(v) if ns.Session then ns.Session:SetShown(v) else ns.Q.char.ui.sessionStats = v end end)
 local cbTooltips = checkbox(L.CFG_TOOLTIPS,
     function() return ns.Q.char.ui.tooltipsEnabled ~= false end,
     function(v) ns.Q.char.ui.tooltipsEnabled = v end)
@@ -204,6 +207,7 @@ function Config:Refresh()
     cbArrow:SetChecked(cbArrow.qGet())
     cbAuto:SetChecked(cbAuto.qGet())
     cbObjTracker:SetChecked(cbObjTracker.qGet())
+    cbSession:SetChecked(cbSession.qGet())
     cbTooltips:SetChecked(cbTooltips.qGet())
     cbMapIcons:SetChecked(cbMapIcons.qGet())
     cbSpawnAreas:SetChecked(cbSpawnAreas.qGet())

@@ -36,6 +36,7 @@ Q:RegisterEvent("GROUP_ROSTER_UPDATE")
 Q:RegisterEvent("TAXIMAP_OPENED")
 Q:RegisterEvent("PLAYER_REGEN_ENABLED")
 Q:RegisterEvent("BAG_UPDATE_DELAYED")
+Q:RegisterEvent("PLAYER_XP_UPDATE")
 
 Q:SetScript("OnEvent", function(self, event, arg1, arg2, arg3, arg4)
     if event == "ADDON_LOADED" then
@@ -57,6 +58,7 @@ Q:SetScript("OnEvent", function(self, event, arg1, arg2, arg3, arg4)
         if ns.Comms then ns.Comms:Init() end
         if ns.Links then ns.Links:Init() end
         if ns.ItemBar then ns.ItemBar:RestorePosition(); ns.ItemBar:Update() end
+        if ns.Session then ns.Session:RestorePosition(); ns.Session:Init() end
         if ns.Config and not self.blizzRegistered then
             self.blizzRegistered = true
             ns.Config:RegisterBlizzard()
@@ -96,6 +98,9 @@ Q:SetScript("OnEvent", function(self, event, arg1, arg2, arg3, arg4)
     elseif event == "BAG_UPDATE_DELAYED" then
         if ns.ItemBar then ns.ItemBar:Update() end
 
+    elseif event == "PLAYER_XP_UPDATE" then
+        if ns.Session then ns.Session:OnXP() end
+
     elseif event == "CHAT_MSG_ADDON" then
         if ns.Comms then ns.Comms:OnMessage(arg1, arg2, arg3, arg4) end
 
@@ -109,6 +114,7 @@ Q:SetScript("OnEvent", function(self, event, arg1, arg2, arg3, arg4)
     elseif event == "PLAYER_LEVEL_UP" then
         -- Så ding-steps rykker videre i det sekund du dinger.
         self:Refresh()
+        if ns.Session then ns.Session:OnXP() end
 
     elseif event == "ZONE_CHANGED_NEW_AREA" then
         if IsHorde() and self.char.ui.autoRoute ~= false then self:AutoPickRoute() end
@@ -168,6 +174,8 @@ SlashCmdList["QEASY"] = function(msg)
         ns.ObjTracker:SetShown(not Q.char.ui.objTrackerShown)
     elseif cmd == "items" then
         if ns.ItemBar then ns.ItemBar:SetShown(Q.char.ui.itemBar == false) end
+    elseif cmd == "xp" then
+        if ns.Session then ns.Session:SetShown(Q.char.ui.sessionStats == false) end
     elseif cmd == "hero" then
         if ns.ItemBar then ns.ItemBar:SetHeroShown(Q.char.ui.heroButton == false) end
     elseif cmd == "tooltips" then

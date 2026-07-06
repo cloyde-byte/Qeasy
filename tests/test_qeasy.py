@@ -90,11 +90,13 @@ function GetQuestDifficultyColor(level) return { r = 1, g = 1, b = 0 } end
 C_QuestLog = { IsQuestFlaggedCompleted = function(id) return FLAGGED[id] or false end }
 function UnitFactionGroup() return PSTATE.faction end
 function UnitLevel() return PSTATE.level end
+function UnitXP() return PSTATE.xp or 0 end
+function UnitXPMax() return PSTATE.xpmax or 0 end
 function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.17.0' end
+function GetAddOnMetadata() return '0.17.1' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -151,7 +153,7 @@ for f in ["Locale.lua", "Engine.lua", "Arrow.lua", "Guide.lua",
           "Comms.lua", "Links.lua",
           "Data/OutlandQuests.lua", "Data/OutlandFlightMasters.lua",
           "Data/OutlandPOI.lua",
-          "Map.lua", "ItemButton.lua", "Config.lua",
+          "Map.lua", "ItemButton.lua", "Session.lua", "Config.lua",
           "Routes/HellfirePeninsula.lua", "Routes/Zangarmarsh.lua",
           "Routes/TerokkarForest.lua", "Routes/Nagrand.lua",
           "Routes/BladesEdge.lua", "Routes/Netherstorm.lua",
@@ -431,6 +433,23 @@ ns.ObjTracker.ToggleFocus(ns.ObjTracker, 9789)
 tps = list(ns.Map.FocusPathTargets(ns.Map, 1951).values())
 check("waypoint-mål for 2 fokuserede quests (Nagrand)",
       len(tps) == 2 and all(t.color is not None and t.x for t in tps))
+
+# ---- session-statistik (XP/time) ----
+lua.execute("PSTATE.level=65; PSTATE.xp=1000; PSTATE.xpmax=10000; PSTATE.time=0")
+ns.Session.Init(ns.Session)
+check("session-vindue synligt (ikke max level)", g.QeasySessionFrame.shown == True)
+lua.execute("PSTATE.xp=3000; PSTATE.time=60")     # +2000 XP på 60 sek
+ns.Session.OnXP(ns.Session)
+check("session opdaterer uden fejl efter XP-gevinst", g.QeasySessionFrame.shown == True)
+# level-up: XP nulstilles, men optjent XP tælles korrekt
+lua.execute("PSTATE.level=66; PSTATE.xp=500; PSTATE.xpmax=11000")
+ns.Session.OnXP(ns.Session)
+check("session håndterer level-up uden fejl", True)
+# max level -> skjul
+lua.execute("PSTATE.level=70; PSTATE.xpmax=0")
+ns.Session.Update(ns.Session)
+check("session skjules ved max level", g.QeasySessionFrame.shown == False)
+lua.execute("PSTATE.level=58; PSTATE.xpmax=10000")
 
 # opdaget/uopdaget flyvemester: alle er ukendte til at starte med
 ns.Q.char.knownFlights = lua.eval("{}")
