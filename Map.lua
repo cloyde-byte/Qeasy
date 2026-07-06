@@ -371,29 +371,6 @@ function Map:UpdateWorldMap()
     end
     for i = am + 1, #areaMarks do areaMarks[i]:Hide() end
 
-    -- Waypoint-linjer: fra din position til hvert fokuseret mål (samme farve
-    -- som skyen). Kun når du kigger på det kort du står på.
-    local ln = 0
-    if ns.Q.char.ui.mapIcons ~= false and ns.Q.char.ui.spawnAreas ~= false then
-        local pmap = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
-        local ppos = pmap == mapID and C_Map.GetPlayerMapPosition
-            and C_Map.GetPlayerMapPosition(mapID, "player")
-        local px, py = ppos and ppos:GetXY()
-        if px and px ~= 0 then
-            for _, tgt in ipairs(self:FocusPathTargets(mapID)) do
-                ln = ln + 1
-                local line = getAreaLine(ln, canvas)
-                local c = tgt.color
-                line:SetColorTexture(c[1], c[2], c[3], 0.85)
-                line:ClearAllPoints()
-                line:SetStartPoint("TOPLEFT", canvas, (px * w), -(py * h))
-                line:SetEndPoint("TOPLEFT", canvas, (tgt.x / 100) * w, -(tgt.y / 100) * h)
-                line:Show()
-            end
-        end
-    end
-    for i = ln + 1, #areaLines do areaLines[i]:Hide() end
-
     local n = 0
     for _, ic in ipairs(self:ClusterIcons(list)) do
         n = n + 1
@@ -435,6 +412,42 @@ function Map:UpdateWorldMap()
         p:ClearAllPoints()
         p:SetPoint("CENTER", canvas, "TOPLEFT", (ic.x / 100) * w, -(ic.y / 100) * h)
         p:Show()
+    end
+
+    -- Waypoint-linjer TIL SIDST (og crash-sikret), så en fejl i linje-API'et
+    -- aldrig kan forhindre selve quest-ikonerne i at blive tegnet.
+    self:DrawFocusLines(canvas, mapID, w, h)
+end
+
+-- Farvet linje fra din position til hvert fokuseret mål (samme farve som
+-- skyen). Pakket ind i pcall, da CreateLine/SetStartPoint varierer lidt
+-- mellem klientversioner.
+function Map:DrawFocusLines(canvas, mapID, w, h)
+    local ln = 0
+    local ok = pcall(function()
+        if ns.Q.char.ui.mapIcons == false or ns.Q.char.ui.spawnAreas == false then return end
+        if not (canvas.CreateLine and C_Map and C_Map.GetBestMapForUnit) then return end
+        if C_Map.GetBestMapForUnit("player") ~= mapID then return end
+        local ppos = C_Map.GetPlayerMapPosition and C_Map.GetPlayerMapPosition(mapID, "player")
+        local px, py = ppos and ppos:GetXY()
+        if not px or px == 0 then return end
+        for _, tgt in ipairs(self:FocusPathTargets(mapID)) do
+            ln = ln + 1
+            local line = getAreaLine(ln, canvas)
+            local c = tgt.color
+            line:SetThickness(2.4)
+            -- Solid, farvet linje via hvid tekstur + vertexfarve (mest kompatibelt).
+            line:SetTexture("Interface\\Buttons\\WHITE8X8")
+            line:SetVertexColor(c[1], c[2], c[3], 0.85)
+            line:ClearAllPoints()
+            line:SetStartPoint("TOPLEFT", canvas, px * w, -py * h)
+            line:SetEndPoint("TOPLEFT", canvas, (tgt.x / 100) * w, -(tgt.y / 100) * h)
+            line:Show()
+        end
+    end)
+    if not ok then ln = 0 end   -- ved fejl: skjul alle linjer
+    for i = ln + 1, #areaLines do
+        if areaLines[i] then areaLines[i]:Hide() end
     end
 end
 

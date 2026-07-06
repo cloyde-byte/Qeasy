@@ -45,6 +45,7 @@ function CreateFrame(ftype, name, parent, template)
     function f:SetChecked(v) rawset(f, '_checked', v) end
     function f:CreateFontString() return autostub({ GetStringHeight=function() return 12 end }) end
     function f:CreateTexture() return autostub({}) end
+    function f:CreateLine() return autostub({}) end
     autostub(f)
     if name then _G[name] = f end
     return f
@@ -96,7 +97,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.18.0' end
+function GetAddOnMetadata() return '0.18.1' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -444,6 +445,24 @@ ns.ObjTracker.ToggleFocus(ns.ObjTracker, 9789)
 tps = list(ns.Map.FocusPathTargets(ns.Map, 1951).values())
 check("waypoint-mål for 2 fokuserede quests (Nagrand)",
       len(tps) == 2 and all(t.color is not None and t.x for t in tps))
+
+# verdenskort-render end-to-end: pins SKAL tegnes, også når linje-koden kører
+# (regression: waypoint-linjerne aborterede før ikonerne blev tegnet).
+lua.execute("""
+WorldMapFrame = CreateFrame('Frame', 'WorldMapFrame')
+function WorldMapFrame:IsShown() return true end
+function WorldMapFrame:GetMapID() return 1951 end
+WorldMapFrame.ScrollContainer = CreateFrame('Frame')
+WorldMapFrame.ScrollContainer.Child = CreateFrame('Frame')
+WorldMapFrame.ScrollContainer.Child:SetSize(1000, 700)
+PSTATE.map = 1951; PSTATE.level = 66
+""")
+lua.eval("""function() QLOG = { { title='Clefthoof Mastery', questID=9789,
+  objectives = { { text='Clefthoof slain: 0/30', done=false } } } } end""")()
+ns.Q.char.ui.trackerFocus = lua.eval("{9789}")
+ns.Map.UpdateWorldMap(ns.Map)   # kaster hvis pin-tegningen fejler
+check("verdenskort tegner pins + waypoint-linje uden fejl", True)
+lua.execute("WorldMapFrame = nil")
 
 # ---- session-statistik (XP/time) ----
 lua.execute("PSTATE.level=65; PSTATE.xp=1000; PSTATE.xpmax=10000; PSTATE.time=0")
