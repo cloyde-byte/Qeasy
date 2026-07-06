@@ -89,20 +89,25 @@ def outland_objective(qid):
             return qdb.centroid(pts), "u", pts, sorted(names)
 
     if obj["I"]:
-        pts, from_unit = [], False
+        pts, from_unit, names = [], False, set()
         for iid in obj["I"].values():
             it = qdb.idata[int(iid)]
             if it is not None and T(it) == "table":
                 if it["U"]:
                     from_unit = True
                     for uid in it["U"].keys():
-                        pts += [p for p in qdb.spawns(qdb.udata, int(uid)) if p[0] in OUTLAND]
+                        uid = int(uid)
+                        sp = [p for p in qdb.spawns(qdb.udata, uid) if p[0] in OUTLAND]
+                        if sp:
+                            pts += sp
+                            names.add(qdb.loc_name(qdb.uloc, qdb.uloc_v, uid))
                 if it["O"]:
                     for oid in it["O"].keys():
                         pts += [p for p in qdb.spawns(qdb.odata, int(oid)) if p[0] in OUTLAND]
         if pts:
-            # genstand fra en enhed = reelt et dræb; ellers indsamling
-            return qdb.centroid(pts), ("u" if from_unit else "i"), pts, None
+            # genstand fra en enhed = reelt et dræb (vis kilde-mobs); ellers indsamling
+            return (qdb.centroid(pts), ("u" if from_unit else "i"), pts,
+                    sorted(names) if names else None)
     return None, None, None, None
 
 
@@ -173,10 +178,10 @@ def main():
                 parts.append("oa={%s}" % area)
             # ou = navne på enheder der tæller (kun hvis de tilføjer noget ud
             # over selve titlen - fx kategori-mål). Sparer plads på de trivielle.
+            # ou = navne på enheder der tæller (til mob-tooltips OG til at vise
+            # "Dræb: X" på kort-ikonet). Gemmes altid for rene dræb-mål.
             if onames:
-                extra = [n for n in onames if n and n not in title]
-                if extra:
-                    parts.append("ou={%s}" % ",".join('"%s"' % esc(n) for n in onames))
+                parts.append("ou={%s}" % ",".join('"%s"' % esc(n) for n in onames))
         # oi = item-id'er man skal samle (til quest-info i item-tooltips)
         objx = q["obj"]
         if T(objx) == "table" and objx["I"]:

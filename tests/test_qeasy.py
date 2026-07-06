@@ -97,7 +97,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.18.1' end
+function GetAddOnMetadata() return '0.18.2' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -359,11 +359,21 @@ plain = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Clefthoof").values())
 check("almindelig 'Clefthoof' tæller IKKE til 'Clefthoof Bull'", len(plain) == 0)
 bull = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Clefthoof Bull").values())
 check("'Clefthoof Bull' tæller til Bull-quest", len(bull) == 1)
-# tier-1 (9789, ingen ou) matcher stadig via objektiv-tekst
+# tier-1: plain "Clefthoof" tæller til tier-1 (9789 har ou={"Clefthoof"})
 lua.eval("""function() QLOG = { { title='Clefthoof Mastery', questID=9789,
   objectives = { { text='Clefthoof slain: 0/30', done=false } } } } end""")()
 t1 = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Clefthoof").values())
-check("tier-1 'Clefthoof' matcher via tekst (ingen ou)", len(t1) == 1)
+check("tier-1 'Clefthoof' matcher (ou)", len(t1) == 1)
+
+# collect-fra-mob: kilde-mobben ('Enraged Crusher') er gemt i ou, så kort-
+# ikonet kan vise "Dræb: ..." og mob-tooltip'et matcher når man dræber den
+lua.eval("""function() QLOG = { { title='Eating Damnation', questID=9821,
+  objectives = { { text='Enraged Crusher Core: 0/15', done=false } } } } end""")()
+ec = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Enraged Crusher").values())
+check("collect-fra-mob: kilde-mob matcher quest (Eating Damnation)",
+      len(ec) == 1 and ec[0].title == "Eating Damnation")
+check("DB gemmer kilde-mob-navn (ou) for Eating Damnation",
+      ns.QuestDB[9821].ou is not None)
 
 # item-tooltips: et loot-item viser hvilken aktiv quest det hører til (oi)
 lua.eval("""function() QLOG = { { title='I Must Have Them!', questID=10109,

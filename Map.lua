@@ -117,6 +117,21 @@ local ICON_FLIGHTPOINT = "Interface\\AddOns\\Qeasy\\Media\\flightpoint"  -- grø
 -- Er et objektiv et "dræb"-mål? (otype 'u' fra pfQuest = enheder).
 local function isSlay(otype) return otype == "u" end
 
+-- Under-tekst til et objektiv-ikon: hvilke mobs skal dræbes (fra DB'ens ou).
+local function objectiveSub(qid, otype)
+    local d = ns.QuestDB and ns.QuestDB[qid]
+    local ou = d and d.ou
+    if ou and #ou > 0 then
+        local n = math.min(3, #ou)
+        local names = {}
+        for i = 1, n do names[i] = ou[i] end
+        local s = table.concat(names, ", ")
+        if #ou > n then s = s .. " m.fl." end
+        return "Dræb: " .. s
+    end
+    return isSlay(otype) and "Dræb-mål her" or "Objektiv her"
+end
+
 local function styleIcon(tex, kind, size, otype, known)
     tex:SetSize(size, size)
     tex:SetVertexColor(1, 1, 1)
@@ -404,10 +419,8 @@ function Map:UpdateWorldMap()
             p.sub = "Kroværter (sæt hearthstone)"
         elseif ic.kind == "mailbox" then
             p.sub = "Postkasse"
-        elseif isSlay(ic.otype) then
-            p.sub = "Dræb-mål her"
-        else
-            p.sub = "Objektiv her"
+        else   -- objektiv (dræb/interager): vis mob-navne hvis vi har dem
+            p.sub = objectiveSub(ic.qid, ic.otype)
         end
         p:ClearAllPoints()
         p:SetPoint("CENTER", canvas, "TOPLEFT", (ic.x / 100) * w, -(ic.y / 100) * h)
