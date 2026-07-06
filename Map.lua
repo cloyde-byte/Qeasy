@@ -113,6 +113,11 @@ end
 local ICON_OBJECTIVE   = "Interface\\AddOns\\Qeasy\\Media\\objective"    -- tandhjul (interager)
 local ICON_SLAY        = "Interface\\AddOns\\Qeasy\\Media\\slay"         -- krydsede sværd (dræb)
 local ICON_FLIGHTPOINT = "Interface\\AddOns\\Qeasy\\Media\\flightpoint"  -- grønt "!" (mangler)
+local ICON_BANG_RED    = "Interface\\AddOns\\Qeasy\\Media\\bang_red"     -- rødt "!" (PvP)
+local ICON_BANG_BLUE   = "Interface\\AddOns\\Qeasy\\Media\\bang_blue"    -- blåt "!" (gentagelig)
+
+-- Er en quest PvP ('pvp') eller gentagelig ('repeat')? (kurateret liste)
+local function questFlag(qid) return ns.QuestFlags and ns.QuestFlags[qid] end
 
 -- Er et objektiv et "dræb"-mål? (otype 'u' fra pfQuest = enheder).
 local function isSlay(otype) return otype == "u" end
@@ -132,11 +137,14 @@ local function objectiveSub(qid, otype)
     return isSlay(otype) and "Dræb-mål her" or "Objektiv her"
 end
 
-local function styleIcon(tex, kind, size, otype, known)
+local function styleIcon(tex, kind, size, otype, known, flag)
     tex:SetSize(size, size)
     tex:SetVertexColor(1, 1, 1)
     if kind == "giver" then
-        tex:SetTexture(ICON_GIVER)
+        -- PvP = rødt "!", gentagelig = blåt "!", ellers standard gult "!".
+        tex:SetTexture(flag == "pvp" and ICON_BANG_RED
+            or flag == "repeat" and ICON_BANG_BLUE
+            or ICON_GIVER)
     elseif kind == "turnin" then
         tex:SetTexture(ICON_TURNIN)
     elseif kind == "flightmaster" then
@@ -398,7 +406,8 @@ function Map:UpdateWorldMap()
             or (ic.kind == "objective") and (isSlay(ic.otype) and 13 or 12)
             or (ic.kind == "innkeeper" or ic.kind == "mailbox") and 14
             or 13
-        styleIcon(p.tex, ic.kind, base, ic.otype, ic.known)
+        styleIcon(p.tex, ic.kind, base, ic.otype, ic.known,
+            ic.kind == "giver" and questFlag(ic.qid) or nil)
         p:SetSize(base, base)
         p.base = base
         -- Kun tandhjul (interager/saml) pulserer; sværd står stille og tydeligt.
@@ -411,7 +420,10 @@ function Map:UpdateWorldMap()
         if ic.kind == "turnin" then
             p.sub = "Aflever" .. (ic.npc and (" hos " .. ic.npc) or " her")
         elseif ic.kind == "giver" then
-            p.sub = "Tilgængelig quest" .. (ic.npc and (" · " .. ic.npc) or "")
+            local fl = questFlag(ic.qid)
+            local tag = fl == "pvp" and "PvP-quest" or fl == "repeat" and "Gentagelig quest"
+                or "Tilgængelig quest"
+            p.sub = tag .. (ic.npc and (" · " .. ic.npc) or "")
         elseif ic.kind == "flightmaster" then
             local fac = ic.horde and "Horde" or "neutral"
             p.sub = ic.known and ("Flyvemester (" .. fac .. ")")
@@ -555,7 +567,8 @@ mmFrame:SetScript("OnUpdate", function(_, dt)
                 local base = (ic.kind == "flightmaster") and (ic.known and 10 or 12)
                     or (ic.kind == "objective") and (isSlay(ic.otype) and 12 or 11)
                     or (ic.kind == "innkeeper" or ic.kind == "mailbox") and 13 or 12
-                styleIcon(t, ic.kind, base, ic.otype, ic.known)
+                styleIcon(t, ic.kind, base, ic.otype, ic.known,
+                    ic.kind == "giver" and questFlag(ic.qid) or nil)
                 t.base = base
                 t.pulse = (ic.kind == "objective") and not isSlay(ic.otype)
                 -- nord = op (+y), vest = venstre (-x)

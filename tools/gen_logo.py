@@ -233,15 +233,15 @@ def render_sword(px=32):
     return img.resize((px, px), Image.LANCZOS)
 
 
-def render_bang(px=32):
-    """Simpelt grønt '!' til uopdagede flyvemestre (i stil med quest-ikonet)."""
+def render_bang(px=32, fill=(58, 210, 82), edge=(14, 74, 26), hi=(150, 255, 170)):
+    """Simpelt '!' (i stil med quest-ikonet) i valgfri farve - grøn/rød/blå."""
     S = px * SS
     img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     c = S / 2
-    GREEN = (58, 210, 82, 255)
-    EDGE = (14, 74, 26, 255)
-    HI = (150, 255, 170, 220)
+    GREEN = fill + (255,)
+    EDGE = edge + (255,)
+    HI = hi + (220,)
     w = max(1, int(SS))
     bw = S * 0.15
     top, bot = S * 0.13, S * 0.58
@@ -342,6 +342,10 @@ def main():
     write_tga(render_gear(32), os.path.join(MEDIA, "objective.tga"))
     write_tga(render_sword(32), os.path.join(MEDIA, "slay.tga"))
     write_tga(render_bang(32), os.path.join(MEDIA, "flightpoint.tga"))
+    write_tga(render_bang(32, fill=(232, 62, 55), edge=(92, 12, 10), hi=(255, 150, 140)),
+              os.path.join(MEDIA, "bang_red.tga"))    # PvP-quests
+    write_tga(render_bang(32, fill=(74, 140, 255), edge=(16, 40, 110), hi=(170, 205, 255)),
+              os.path.join(MEDIA, "bang_blue.tga"))   # gentagelige quests
     write_tga(render_glow(64), os.path.join(MEDIA, "glow.tga"))
     write_tga(render_slot(64), os.path.join(MEDIA, "slot.tga"))
     write_tga(render_blob(64), os.path.join(MEDIA, "blob.tga"))

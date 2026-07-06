@@ -97,7 +97,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.18.3' end
+function GetAddOnMetadata() return '0.19.0' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -155,7 +155,7 @@ for f in ["Locale.lua", "Engine.lua", "Arrow.lua", "Guide.lua",
           "QuestLog.lua", "ObjectiveTracker.lua", "Tooltips.lua",
           "Comms.lua", "Links.lua",
           "Data/OutlandQuests.lua", "Data/OutlandFlightMasters.lua",
-          "Data/OutlandPOI.lua",
+          "Data/OutlandPOI.lua", "Data/OutlandQuestFlags.lua",
           "Map.lua", "ItemButton.lua", "Session.lua", "Config.lua",
           "Routes/HellfirePeninsula.lua", "Routes/Zangarmarsh.lua",
           "Routes/TerokkarForest.lua", "Routes/Nagrand.lua",
@@ -424,6 +424,11 @@ kinds_poi = set(p.kind for p in poi)
 check("kroværter + postkasser på kortet (Hellfire)",
       "innkeeper" in kinds_poi and "mailbox" in kinds_poi)
 check("kroværter har navn", all(p.title for p in poi if p.kind == "innkeeper"))
+
+# quest-flags: PvP (rødt !) og gentagelige (blåt !)
+check("quest-flags indlæst (pvp + repeat)",
+      ns.QuestFlags is not None and ns.QuestFlags[10478] == "pvp"
+      and ns.QuestFlags[9766] == "repeat")
 
 # multi-fokus: op til 3 quests kan fokuseres samtidigt
 lua.eval("""function() QLOG = {
