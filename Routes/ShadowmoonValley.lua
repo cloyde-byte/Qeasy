@@ -60,6 +60,26 @@ ns.Q:RegisterRoute({
                   coords = { map = 1948, x = 32.0, y = 30.0 }, note = "Tag Spectrecles på og hjælp de faldne orc-ånder omkring byen." },
                 { kind = "turnin", quest = 10625, title = "Spectrecles",
                   coords = { map = 1948, x = 30.0, y = 27.7 }, note = "Aflever hos Chief Apothecary Hildagard." },
+                { kind = "accept", quest = 10702, title = "A Grunt's Work...",
+                  coords = { map = 1948, x = 28.4, y = 26.5 }, note = "Fra Overlord Or'barokh i Shadowmoon Village." },
+                { kind = "accept", quest = 10760, title = "The Sketh'lon Wreckage",
+                  coords = { map = 1948, x = 31.0, y = 29.8 }, note = "Fra Sergeant Kargrul nær Shadowmoon Village." },
+        }},
+        { label = "Shadowmoon Village", elements = {
+                { kind = "do", quest = 10702, title = "A Grunt's Work...",
+                  coords = { map = 1948, x = 54.0, y = 30.5 }, note = "Fuldfør A Grunt's Work (følg kort-markøren)." },
+        }},
+        { label = "Shadowmoon Village", elements = {
+                { kind = "do", quest = 10760, title = "The Sketh'lon Wreckage",
+                  coords = { map = 1948, x = 37.7, y = 30.6 }, note = "Undersøg Sketh'lon-vraget nord for byen." },
+        }},
+        { label = "Shadowmoon Village", elements = {
+                { kind = "turnin", quest = 10702, title = "A Grunt's Work...",
+                  coords = { map = 1948, x = 28.4, y = 26.5 }, note = "Aflever hos Overlord Or'barokh." },
+        }},
+        { label = "Shadowmoon Village", elements = {
+                { kind = "turnin", quest = 10760, title = "The Sketh'lon Wreckage",
+                  coords = { map = 1948, x = 31.0, y = 29.8 }, note = "Aflever hos Sergeant Kargrul." },
         }},
         { label = "Legion Hold", elements = {
                 { kind = "accept", quest = 10595, title = "Besieged!",

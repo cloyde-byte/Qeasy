@@ -137,6 +137,22 @@ ns.Q:RegisterRoute({
         { label = "Zabra'jin og troldene", elements = {
                 { kind = "turnin", quest = 9823, title = "Us or Them",
                   coords = { map = 1946, x = 30.7, y = 50.9 }, note = "Aflever hos Shadow Hunter Denjai." },
+                { kind = "accept", quest = 9841, title = "Stinging the Stingers",
+                  coords = { map = 1946, x = 31.6, y = 49.2 }, note = "Fra Gambarinka i Zabra'jin." },
+                { kind = "accept", quest = 9814, title = "Burstcap Mushrooms, Mon!",
+                  coords = { map = 1946, x = 32.9, y = 48.9 }, note = "Fra Witch Doctor Tor'gash i Zabra'jin." },
+                { kind = "do", quest = 9814, title = "Burstcap Mushrooms, Mon!",
+                  coords = { map = 1946, x = 30.1, y = 50.9 }, note = "Saml Burstcap Mushrooms i sumpen nær Zabra'jin." },
+        }},
+        { label = "Zabra'jin og troldene", elements = {
+                { kind = "do", quest = 9841, title = "Stinging the Stingers",
+                  coords = { map = 1946, x = 22.2, y = 40.5 }, note = "Dræb Marsh Stingers nord/vest for byen." },
+        }},
+        { label = "Zabra'jin og troldene", elements = {
+                { kind = "turnin", quest = 9814, title = "Burstcap Mushrooms, Mon!",
+                  coords = { map = 1946, x = 32.9, y = 48.9 }, note = "Aflever hos Witch Doctor Tor'gash." },
+                { kind = "turnin", quest = 9841, title = "Stinging the Stingers",
+                  coords = { map = 1946, x = 31.6, y = 49.2 }, note = "Aflever hos Gambarinka." },
         }},
         { label = "Sporeggar", elements = {
                 { kind = "travel", coords = { map = 1946, x = 19.7, y = 52.1 }, radius = 60,

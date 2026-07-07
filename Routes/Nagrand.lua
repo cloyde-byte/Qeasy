@@ -35,10 +35,18 @@ ns.Q:RegisterRoute({
                   coords = { map = 1951, x = 55.8, y = 38.0 }, note = "Dusør fra Garadar Bulletin Board." },
                 { kind = "accept", quest = 9939, title = "Wanted: Zorbo the Advisor",
                   coords = { map = 1951, x = 55.8, y = 38.0 }, note = "Fra Garadar Bulletin Board." },
+                { kind = "accept", quest = 9916, title = "Bleeding Hollow Supply Crates",
+                  coords = { map = 1951, x = 55.6, y = 37.5 }, note = "Fra Elkay'gan the Mystic i Garadar." },
+                { kind = "accept", quest = 9867, title = "Murkblood Leaders...",
+                  coords = { map = 1951, x = 54.5, y = 40.0 }, note = "Fra Farseer Margadesh i Garadar." },
+                { kind = "accept", quest = 9864, title = "The Missing War Party",
+                  coords = { map = 1951, x = 54.8, y = 39.9 }, note = "Fra Farseer Corhuk i Garadar." },
         }},
         { label = "Garadar", elements = {
                 { kind = "do", quest = 9863, title = "Vile Idolatry",
                   coords = { map = 1951, x = 33.0, y = 41.0 }, note = "Dræb Murkblood-Broken ved Sunspring Post (vest) og Laughing Skull." },
+                { kind = "do", quest = 9867, title = "Murkblood Leaders...",
+                  coords = { map = 1951, x = 30.8, y = 42.4 }, note = "Dræb Murkblood-lederne ved Sunspring Post (vest) - samme sted som Vile Idolatry." },
         }},
         { label = "Garadar", elements = {
                 { kind = "do", quest = 9910, title = "Standards and Practices",
@@ -53,14 +61,30 @@ ns.Q:RegisterRoute({
                   coords = { map = 1951, x = 46.0, y = 22.0 }, note = "Dræb Zorbo the Advisor ved Warmaul Hill (nord)." },
         }},
         { label = "Garadar", elements = {
+                { kind = "do", quest = 9916, title = "Bleeding Hollow Supply Crates",
+                  coords = { map = 1951, x = 46.1, y = 43.1 }, note = "Saml Bleeding Hollow Supply Crates i det centrale Nagrand." },
+        }},
+        { label = "Garadar", elements = {
+                { kind = "do", quest = 9864, title = "The Missing War Party",
+                  coords = { map = 1951, x = 32.4, y = 36.0 }, note = "Undersøg den forsvundne krigsgruppe (følg kort-markøren)." },
+        }},
+        { label = "Garadar", elements = {
                 { kind = "turnin", quest = 9863, title = "Vile Idolatry",
                   coords = { map = 1951, x = 54.8, y = 39.4 }, note = "Aflever hos Farseer Kurkush." },
+                { kind = "turnin", quest = 9867, title = "Murkblood Leaders...",
+                  coords = { map = 1951, x = 54.5, y = 40.0 }, note = "Aflever hos Farseer Margadesh i Garadar." },
                 { kind = "turnin", quest = 9910, title = "Standards and Practices",
                   coords = { map = 1951, x = 55.6, y = 37.5 }, note = "Aflever hos Elkay'gan the Mystic." },
                 { kind = "turnin", quest = 9935, title = "Wanted: Giselda the Crone",
                   coords = { map = 1951, x = 55.8, y = 37.9 }, note = "Aflever hos Warden Bullrok." },
                 { kind = "turnin", quest = 9939, title = "Wanted: Zorbo the Advisor",
                   coords = { map = 1951, x = 55.8, y = 37.9 }, note = "Aflever hos Warden Bullrok." },
+                { kind = "turnin", quest = 9916, title = "Bleeding Hollow Supply Crates",
+                  coords = { map = 1951, x = 55.6, y = 37.5 }, note = "Aflever hos Elkay'gan the Mystic." },
+        }},
+        { label = "Garadar", elements = {
+                { kind = "turnin", quest = 9864, title = "The Missing War Party",
+                  coords = { map = 1951, x = 32.4, y = 36.0 }, note = "Aflever hos Farseer Corhuk i Garadar." },
         }},
         { label = "Throne of the Elements", elements = {
                 { kind = "accept", quest = 9870, title = "The Throne of the Elements",
@@ -171,6 +195,10 @@ ns.Q:RegisterRoute({
                   coords = { map = 1951, x = 31.8, y = 56.8 }, note = "Fra Shadrek." },
         }},
         { label = "Consortium: Aeris Landing", elements = {
+                { kind = "accept", quest = 9913, title = "The Consortium Needs You!",
+                  coords = { map = 1951, x = 51.5, y = 52.3 }, note = "Fra Consortium Recruiter ved Aeris Landing." },
+        }},
+        { label = "Consortium: Aeris Landing", elements = {
                 { kind = "do", quest = 9849, title = "Shattering the Veil",
                   coords = { map = 1951, x = 26.0, y = 54.0 }, note = "Ved verdens rand i sydvest (Oshu'gun/Aeris Landing): kast Gordawgs klippe på giftstenene og dræb Minions of Gurok. Du er her alligevel for Consortium-questsene." },
         }},
@@ -183,9 +211,23 @@ ns.Q:RegisterRoute({
                   coords = { map = 1951, x = 40.0, y = 55.0 }, note = "Saml elfenben fra clefthoofs." },
         }},
         { label = "Consortium: Aeris Landing", elements = {
+                { kind = "do", quest = 9913, title = "The Consortium Needs You!",
+                  coords = { map = 1951, x = 31.4, y = 57.8 }, note = "Fuldfør The Consortium Needs You! ved Aeris Landing." },
                 { kind = "turnin", quest = 9882, title = "Stealing from Thieves",
                   coords = { map = 1951, x = 31.4, y = 57.8 }, note = "Aflever hos Gezhe." },
                 { kind = "turnin", quest = 9914, title = "A Head Full of Ivory",
+                  coords = { map = 1951, x = 31.8, y = 56.8 }, note = "Aflever hos Shadrek." },
+                { kind = "turnin", quest = 9913, title = "The Consortium Needs You!",
+                  coords = { map = 1951, x = 31.4, y = 57.8 }, note = "Aflever ved Aeris Landing." },
+                { kind = "accept", quest = 9915, title = "More Heads Full of Ivory",
+                  coords = { map = 1951, x = 31.8, y = 56.8 }, note = "Fra Shadrek (opfølger til A Head Full of Ivory)." },
+        }},
+        { label = "Consortium: Aeris Landing", elements = {
+                { kind = "do", quest = 9915, title = "More Heads Full of Ivory",
+                  coords = { map = 1951, x = 49.2, y = 52.1 }, note = "Saml mere elfenben fra clefthoofs på sletterne." },
+        }},
+        { label = "Consortium: Aeris Landing", elements = {
+                { kind = "turnin", quest = 9915, title = "More Heads Full of Ivory",
                   coords = { map = 1951, x = 31.8, y = 56.8 }, note = "Aflever hos Shadrek." },
         }},
         { label = "Consortium: Aeris Landing", elements = {

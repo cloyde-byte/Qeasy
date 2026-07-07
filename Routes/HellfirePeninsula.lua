@@ -215,12 +215,20 @@ ns.Q:RegisterRoute({
                   coords = { map = 1944, x = 61.1, y = 81.8 }, note = "Fra Apothecary Albreck." },
                 { kind = "accept", quest = 10809, title = "Wanted: Worg Master Kruush",
                   coords = { map = 1944, x = 61.2, y = 80.6 }, note = "Wanted-plakat ved Spinebreaker Post." },
+                { kind = "accept", quest = 10792, title = "Zeth'Gor Must Burn!",
+                  coords = { map = 1944, x = 61.2, y = 81.3 }, note = "Fra Captain Darkhowl ved Spinebreaker Post." },
         }},
         { label = "Spinebreaker Post og Zeth'Gor", elements = {
                 { kind = "do", quest = 10538, title = "Boiling Blood",
                   coords = { map = 1944, x = 66.5, y = 68.0 }, note = "Dræb Bleeding Hollow fel orcs ved Zeth'Gor øst for posten og saml blod." },
         }},
         { label = "Spinebreaker Post og Zeth'Gor", elements = {
+                { kind = "do", quest = 10792, title = "Zeth'Gor Must Burn!",
+                  coords = { map = 1944, x = 68.9, y = 74.0 }, note = "Brænd bygninger / dræb fel orcs i Zeth'Gor (samme sted som Bleeding Hollow-questsene)." },
+        }},
+        { label = "Spinebreaker Post og Zeth'Gor", elements = {
+                { kind = "turnin", quest = 10792, title = "Zeth'Gor Must Burn!",
+                  coords = { map = 1944, x = 61.2, y = 81.3 }, note = "Aflever hos Captain Darkhowl." },
                 { kind = "turnin", quest = 10538, title = "Boiling Blood",
                   coords = { map = 1944, x = 61.1, y = 81.8 }, note = "Aflever hos Apothecary Albreck." },
                 { kind = "accept", quest = 10813, title = "The Eyes of Grillok",
@@ -255,6 +263,24 @@ ns.Q:RegisterRoute({
         { label = "Vestpå: Falcon Watch og Sha'naar", elements = {
                 { kind = "turnin", quest = 9498, title = "Falcon Watch",
                   coords = { map = 1944, x = 28.5, y = 60.2 }, note = "Aflever hos Ranger Captain Venn'ren." },
+                { kind = "accept", quest = 9466, title = "Wanted: Blacktalon the Savage",
+                  coords = { map = 1944, x = 28.0, y = 60.3 }, note = "Dusør-plakat ved Falcon Watch." },
+                { kind = "accept", quest = 9381, title = "Trueflight Arrows",
+                  coords = { map = 1944, x = 27.7, y = 60.3 }, note = "Fra Falconer Drenna Riverwind i Falcon Watch." },
+        }},
+        { label = "Vestpå: Falcon Watch og Sha'naar", elements = {
+                { kind = "do", quest = 9466, title = "Wanted: Blacktalon the Savage",
+                  coords = { map = 1944, x = 33.4, y = 65.1 }, note = "Dræb Blacktalon the Savage i området nær Falcon Watch." },
+        }},
+        { label = "Vestpå: Falcon Watch og Sha'naar", elements = {
+                { kind = "do", quest = 9381, title = "Trueflight Arrows",
+                  coords = { map = 1944, x = 25.8, y = 48.0 }, note = "Fuldfør Trueflight Arrows i området (følg kort-markøren)." },
+        }},
+        { label = "Vestpå: Falcon Watch og Sha'naar", elements = {
+                { kind = "turnin", quest = 9466, title = "Wanted: Blacktalon the Savage",
+                  coords = { map = 1944, x = 28.5, y = 60.2 }, note = "Aflever hos Ranger Captain Venn'ren." },
+                { kind = "turnin", quest = 9381, title = "Trueflight Arrows",
+                  coords = { map = 1944, x = 27.7, y = 60.3 }, note = "Aflever hos Falconer Drenna Riverwind." },
         }},
         { label = "Vestpå: Falcon Watch og Sha'naar", elements = {
                 { kind = "accept", quest = 9361, title = "Helboar, the Other White Meat",
@@ -266,6 +292,16 @@ ns.Q:RegisterRoute({
         }},
         { label = "Vestpå: Falcon Watch og Sha'naar", elements = {
                 { kind = "turnin", quest = 9361, title = "Helboar, the Other White Meat",
+                  coords = { map = 1944, x = 49.2, y = 74.8 }, note = "Aflever hos Legassi." },
+                { kind = "accept", quest = 9356, title = "Smooth as Butter",
+                  coords = { map = 1944, x = 49.2, y = 74.8 }, note = "Fra Legassi (opfølger)." },
+        }},
+        { label = "Vestpå: Falcon Watch og Sha'naar", elements = {
+                { kind = "do", quest = 9356, title = "Smooth as Butter",
+                  coords = { map = 1944, x = 61.6, y = 67.4 }, note = "Fuldfør Smooth as Butter i det sydøstlige marskland." },
+        }},
+        { label = "Vestpå: Falcon Watch og Sha'naar", elements = {
+                { kind = "turnin", quest = 9356, title = "Smooth as Butter",
                   coords = { map = 1944, x = 49.2, y = 74.8 }, note = "Aflever hos Legassi." },
         }},
         { label = "Vestpå: Falcon Watch og Sha'naar", elements = {

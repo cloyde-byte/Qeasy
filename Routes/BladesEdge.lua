@@ -105,6 +105,22 @@ ns.Q:RegisterRoute({
         { label = "Mok'Nathal Village og Rexxar", elements = {
                 { kind = "turnin", quest = 10860, title = "Mok'Nathal Treats",
                   coords = { map = 1949, x = 76.1, y = 60.3 }, note = "Aflever hos Matron Varah." },
+                { kind = "accept", quest = 10618, title = "The Softest Wings",
+                  coords = { map = 1949, x = 75.8, y = 61.5 }, note = "Fra Silmara i Mok'Nathal Village." },
+                { kind = "accept", quest = 10617, title = "Silkwing Cocoons",
+                  coords = { map = 1949, x = 75.9, y = 61.4 }, note = "Fra Taerek i Mok'Nathal Village." },
+        }},
+        { label = "Mok'Nathal Village og Rexxar", elements = {
+                { kind = "do", quest = 10618, title = "The Softest Wings",
+                  coords = { map = 1949, x = 74.1, y = 70.1 }, note = "Saml de blødeste silkwing-vinger syd for landsbyen." },
+                { kind = "do", quest = 10617, title = "Silkwing Cocoons",
+                  coords = { map = 1949, x = 74.3, y = 70.9 }, note = "Saml Silkwing Cocoons syd for landsbyen." },
+        }},
+        { label = "Mok'Nathal Village og Rexxar", elements = {
+                { kind = "turnin", quest = 10618, title = "The Softest Wings",
+                  coords = { map = 1949, x = 75.8, y = 61.5 }, note = "Aflever hos Silmara." },
+                { kind = "turnin", quest = 10617, title = "Silkwing Cocoons",
+                  coords = { map = 1949, x = 75.9, y = 61.4 }, note = "Aflever hos Taerek." },
         }},
         { label = "Evergrove", elements = {
                 { kind = "travel", coords = { map = 1949, x = 62.3, y = 40.1 }, radius = 60,

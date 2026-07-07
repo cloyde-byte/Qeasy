@@ -40,6 +40,14 @@ ns.Q:RegisterRoute({
                 { kind = "turnin", quest = 9968, title = "Strange Energy",
                   coords = { map = 1952, x = 44.3, y = 26.3 }, note = "Aflever hos Earthbinder Tavgren." },
         }},
+        { label = "Cenarion Thicket", elements = {
+                { kind = "accept", quest = 9951, title = "It's Watching You!",
+                  coords = { map = 1952, x = 43.4, y = 22.4 }, note = "Fra Warden Treelos i Cenarion Thicket." },
+                { kind = "do", quest = 9951, title = "It's Watching You!",
+                  coords = { map = 1952, x = 43.5, y = 22.1 }, note = "Fuldfør It's Watching You! i thicket (følg kort-markøren)." },
+                { kind = "turnin", quest = 9951, title = "It's Watching You!",
+                  coords = { map = 1952, x = 43.4, y = 22.4 }, note = "Aflever hos Warden Treelos." },
+        }},
         { label = "Stonebreaker Hold", elements = {
                 { kind = "travel", coords = { map = 1952, x = 49.2, y = 45.7 }, radius = 60,
                   text = "Stonebreaker Hold", note = "Løb syd til Horde-basen Stonebreaker Hold (flight point)." },
@@ -137,6 +145,16 @@ ns.Q:RegisterRoute({
         { label = "Bone Wastes: Refugee Caravan", elements = {
                 { kind = "turnin", quest = 10878, title = "Before Darkness Falls",
                   coords = { map = 1952, x = 37.8, y = 51.8 }, note = "Aflever hos Mekeda." },
+                { kind = "accept", quest = 10896, title = "The Infested Protectors",
+                  coords = { map = 1952, x = 37.9, y = 51.7 }, note = "Fra Lakotae ved flygtninge-karavanen." },
+        }},
+        { label = "Bone Wastes: Refugee Caravan", elements = {
+                { kind = "do", quest = 10896, title = "The Infested Protectors",
+                  coords = { map = 1952, x = 45.4, y = 63.3 }, note = "Ryd de inficerede protectors i Bone Wastes." },
+        }},
+        { label = "Bone Wastes: Refugee Caravan", elements = {
+                { kind = "turnin", quest = 10896, title = "The Infested Protectors",
+                  coords = { map = 1952, x = 37.9, y = 51.7 }, note = "Aflever hos Lakotae." },
         }},
         { label = "Ekstra: Stonebreaker-quests (valgfri - god XP)", elements = {
                 { kind = "note", coords = { map = 1952, x = 49.2, y = 45.7 }, text = "Disse quests er valgfri",

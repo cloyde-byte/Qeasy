@@ -54,6 +54,36 @@ ns.Q:RegisterRoute({
                 { kind = "turnin", quest = 10189, title = "Manaforge B'naar",
                   coords = { map = 1953, x = 32.0, y = 64.1 }, note = "Tilbage til Spymaster Thalodien." },
         }},
+        { label = "Area 52", elements = {
+                { kind = "accept", quest = 10190, title = "Recharging the Batteries",
+                  coords = { map = 1953, x = 31.5, y = 56.6 }, note = "Fra Bot-Specialist Alley i Area 52." },
+                { kind = "accept", quest = 10191, title = "Mark V is Alive!",
+                  coords = { map = 1953, x = 31.6, y = 56.6 }, note = "Fra Maxx A. Million i Area 52." },
+        }},
+        { label = "Area 52", elements = {
+                { kind = "accept", quest = 10342, title = "Securing the Shaleskin Shale",
+                  coords = { map = 1953, x = 32.3, y = 63.9 }, note = "Fra Boots i Area 52." },
+        }},
+        { label = "Area 52", elements = {
+                { kind = "do", quest = 10190, title = "Recharging the Batteries",
+                  coords = { map = 1953, x = 31.5, y = 56.6 }, note = "Genoplad batterierne i Area 52." },
+                { kind = "do", quest = 10191, title = "Mark V is Alive!",
+                  coords = { map = 1953, x = 31.5, y = 56.6 }, note = "Fuldfør Mark V is Alive! i Area 52." },
+        }},
+        { label = "Area 52", elements = {
+                { kind = "do", quest = 10342, title = "Securing the Shaleskin Shale",
+                  coords = { map = 1953, x = 31.7, y = 64.4 }, note = "Saml Shaleskin Shale nær Area 52." },
+        }},
+        { label = "Area 52", elements = {
+                { kind = "turnin", quest = 10190, title = "Recharging the Batteries",
+                  coords = { map = 1953, x = 31.5, y = 56.6 }, note = "Aflever hos Bot-Specialist Alley." },
+                { kind = "turnin", quest = 10191, title = "Mark V is Alive!",
+                  coords = { map = 1953, x = 31.5, y = 56.6 }, note = "Aflever hos Maxx A. Million." },
+        }},
+        { label = "Area 52", elements = {
+                { kind = "turnin", quest = 10342, title = "Securing the Shaleskin Shale",
+                  coords = { map = 1953, x = 32.3, y = 63.9 }, note = "Aflever hos Boots." },
+        }},
         { label = "Manaforge-nedlukningen (Consortium/Aldor)", elements = {
                 { kind = "accept", quest = 10193, title = "High Value Targets",
                   coords = { map = 1953, x = 32.0, y = 64.1 }, note = "Fra Spymaster Thalodien." },
