@@ -97,7 +97,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.19.3' end
+function GetAddOnMetadata() return '0.19.4' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -374,6 +374,18 @@ check("collect-fra-mob: kilde-mob matcher quest (Eating Damnation)",
       len(ec) == 1 and ec[0].title == "Eating Damnation")
 check("DB gemmer kilde-mob-navn (ou) for Eating Damnation",
       ns.QuestDB[9821].ou is not None)
+
+# rigtig objektiv-linje ved flere mål der deler ord: "Murkblood Raider" skal
+# vise Raider-linjen, ikke Scavenger-linjen (Once Were Warriors, ou har begge)
+lua.eval("""function() QLOG = { { title='Once Were Warriors', questID=9865,
+  objectives = { { text='Murkblood Scavenger slain: 9/40', done=false },
+                 { text='Murkblood Raider slain: 4/20', done=false } } } } end""")()
+mr = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Murkblood Raider").values())
+check("Murkblood Raider viser Raider-linjen (ikke Scavenger)",
+      len(mr) == 1 and "Raider" in mr[0].text and "Scavenger" not in mr[0].text)
+ms = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Murkblood Scavenger").values())
+check("Murkblood Scavenger viser Scavenger-linjen",
+      len(ms) == 1 and "Scavenger" in ms[0].text)
 
 # item-tooltips: et loot-item viser hvilken aktiv quest det hører til (oi)
 lua.eval("""function() QLOG = { { title='I Must Have Them!', questID=10109,

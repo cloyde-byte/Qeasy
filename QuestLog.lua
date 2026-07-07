@@ -87,20 +87,22 @@ function QuestLog:TitleForID(questID)
     return nil
 end
 
--- Vælg den mest relevante objektiv-linje for en mob: en ufærdig linje hvis
--- tekst deler et ord med mob-navnet (fx "sorrow" i "Kil'sorrow Agent slain"),
--- ellers den første ufærdige linje.
+-- Vælg den mest relevante objektiv-linje for en mob: den ufærdige linje der
+-- deler FLEST ord med mob-navnet (så "Murkblood Raider" rammer "...Raider..."
+-- og ikke "...Scavenger...", selvom begge deler "Murkblood"). Ellers den
+-- første ufærdige linje.
 local function pickObjLine(e, name)
-    local fallback
+    local best, bestScore = nil, -1
     for _, o in ipairs(e.objectives) do
         if not o.done then
+            local score = 0
             for word in name:gmatch("%a+") do
-                if #word >= 4 and o.text:find(word, 1, true) then return o.text end
+                if #word >= 4 and o.text:find(word, 1, true) then score = score + 1 end
             end
-            fallback = fallback or o.text
+            if score > bestScore then best, bestScore = o.text, score end
         end
     end
-    return fallback
+    return best
 end
 
 -- Hvilke aktive quests tæller mobben `name` til, med objektiv-linje?
