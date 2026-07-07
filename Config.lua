@@ -12,7 +12,7 @@ ns.Config = Config
 
 local backdrop = BackdropTemplateMixin and "BackdropTemplate" or nil
 local frame = CreateFrame("Frame", "QeasyConfigFrame", UIParent, backdrop)
-frame:SetSize(340, 470)
+frame:SetSize(430, 470)
 frame:SetPoint("CENTER")
 frame:SetFrameStrata("HIGH")
 frame:SetMovable(true)
@@ -87,7 +87,7 @@ end
 local function slider(labeltext, minv, maxv, getter, setter)
     local s = CreateFrame("Slider", nil, frame, "OptionsSliderTemplate")
     s:SetPoint("TOPLEFT", frame, "TOPLEFT", 26, y - 14)
-    s:SetWidth(280)
+    s:SetWidth(370)
     s:SetMinMaxValues(minv, maxv)
     s:SetValueStep(0.05)
     if s.SetObeyStepOnDrag then s:SetObeyStepOnDrag(true) end
@@ -177,7 +177,7 @@ local function ensureRouteButtons()
     for _, key in ipairs(ns.Q.routeOrder) do
         local route = ns.Q.routes[key]
         local b = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-        b:SetSize(300, 20)
+        b:SetSize(390, 20)
         b:SetPoint("TOPLEFT", frame, "TOPLEFT", 20, ry)
         b:SetText(string.format("%s  (%s)", route.title, route.levels or ""))
         b.qKey = key
@@ -190,7 +190,7 @@ local function ensureRouteButtons()
     end
     -- Nulstil-knap
     local reset = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-    reset:SetSize(300, 22)
+    reset:SetSize(390, 22)
     reset:SetPoint("TOPLEFT", frame, "TOPLEFT", 20, ry - 4)
     reset:SetText(L.CFG_RESET)
     reset:SetScript("OnClick", function() ns.Q:ResetRoute(); Config:Refresh() end)
