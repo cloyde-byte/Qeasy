@@ -97,7 +97,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.19.4' end
+function GetAddOnMetadata() return '0.19.5' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -386,6 +386,18 @@ check("Murkblood Raider viser Raider-linjen (ikke Scavenger)",
 ms = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Murkblood Scavenger").values())
 check("Murkblood Scavenger viser Scavenger-linjen",
       len(ms) == 1 and "Scavenger" in ms[0].text)
+
+# subset-navne: "Sporebat" må ikke ryge til "Greater Sporebat"-linjen (den
+# mest specifikke vinder, selv når Greater-linjen står først). 9801 har begge i ou.
+lua.eval("""function() QLOG = { { title='Gathering the Reagents', questID=9801,
+  objectives = { { text='Greater Sporebat slain: 0/5', done=false },
+                 { text='Sporebat slain: 0/5', done=false } } } } end""")()
+sp = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Sporebat").values())
+check("plain 'Sporebat' viser Sporebat-linjen (ikke Greater)",
+      len(sp) == 1 and sp[0].text.strip().startswith("Sporebat"))
+gsp = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Greater Sporebat").values())
+check("'Greater Sporebat' viser Greater-linjen",
+      len(gsp) == 1 and "Greater" in gsp[0].text)
 
 # item-tooltips: et loot-item viser hvilken aktiv quest det hører til (oi)
 lua.eval("""function() QLOG = { { title='I Must Have Them!', questID=10109,

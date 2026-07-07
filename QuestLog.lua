@@ -87,19 +87,27 @@ function QuestLog:TitleForID(questID)
     return nil
 end
 
--- Vælg den mest relevante objektiv-linje for en mob: den ufærdige linje der
--- deler FLEST ord med mob-navnet (så "Murkblood Raider" rammer "...Raider..."
--- og ikke "...Scavenger...", selvom begge deler "Murkblood"). Ellers den
--- første ufærdige linje.
+-- Vælg den mest relevante objektiv-linje for en mob. Score = (antal ord fra
+-- mob-navnet i linjen)*100 minus (antal øvrige ord i linjen). Så "Murkblood
+-- Raider" rammer "...Raider..." (ikke "...Scavenger..."), OG "Sporebat" rammer
+-- "Sporebat slain" frem for "Greater Sporebat slain" (mest specifikke vinder).
 local function pickObjLine(e, name)
-    local best, bestScore = nil, -1
+    local mobWords = {}
+    for w in name:gmatch("%a+") do
+        if #w >= 4 then mobWords[w:lower()] = true end
+    end
+    local best, bestScore
     for _, o in ipairs(e.objectives) do
         if not o.done then
-            local score = 0
-            for word in name:gmatch("%a+") do
-                if #word >= 4 and o.text:find(word, 1, true) then score = score + 1 end
+            local matched, extra = 0, 0
+            for w in o.text:gmatch("%a+") do
+                if #w >= 4 then
+                    if mobWords[w:lower()] then matched = matched + 1
+                    else extra = extra + 1 end
+                end
             end
-            if score > bestScore then best, bestScore = o.text, score end
+            local sc = matched * 100 - extra
+            if bestScore == nil or sc > bestScore then best, bestScore = o.text, sc end
         end
     end
     return best
