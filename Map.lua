@@ -119,6 +119,41 @@ local ICON_BANG_BLUE   = "Interface\\AddOns\\Qeasy\\Media\\bang_blue"    -- blå
 -- Er en quest PvP ('pvp') eller gentagelig ('repeat')? (kurateret liste)
 local function questFlag(qid) return ns.QuestFlags and ns.QuestFlags[qid] end
 
+-- Omvendt indeks: quest-giver-navn -> liste af quest-id'er (bygges én gang).
+local giverByName
+local function buildGiverIndex()
+    if giverByName then return end
+    giverByName = {}
+    if not ns.QuestDB then return end
+    for qid, d in pairs(ns.QuestDB) do
+        if d.gn then
+            giverByName[d.gn] = giverByName[d.gn] or {}
+            table.insert(giverByName[d.gn], qid)
+        end
+    end
+end
+
+-- Hvilke TILGÆNGELIGE quests giver NPC'en `name`? (til mob/NPC-tooltips, så
+-- man kan se hvad en questgiver har uden at åbne kortet - a la Questie).
+function Map:AvailableQuestsForGiver(name)
+    buildGiverIndex()
+    local out = {}
+    local list = name and giverByName[name]
+    if not list then return out end
+    local inLog = {}
+    for _, e in ipairs(ns.QuestLog:Scan()) do
+        if e.questID then inLog[e.questID] = true end
+    end
+    for _, qid in ipairs(list) do
+        local d = ns.QuestDB[qid]
+        if not inLog[qid] and giverAvailable(qid, d) then
+            out[#out + 1] = { qid = qid, title = d.t, level = d.lvl or 0, flag = questFlag(qid) }
+        end
+    end
+    table.sort(out, function(a, b) return a.level < b.level end)
+    return out
+end
+
 -- Er et objektiv et "dræb"-mål? (otype 'u' fra pfQuest = enheder).
 local function isSlay(otype) return otype == "u" end
 

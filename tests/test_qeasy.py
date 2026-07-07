@@ -97,7 +97,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.19.5' end
+function GetAddOnMetadata() return '0.20.0' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -455,6 +455,16 @@ check("kroværter har navn", all(p.title for p in poi if p.kind == "innkeeper"))
 check("quest-flags indlæst (pvp + repeat)",
       ns.QuestFlags is not None and ns.QuestFlags[11503] == "pvp"
       and ns.QuestFlags[10478] == "repeat")
+
+# NPC-tooltip: tilgængelige quests fra en questgiver (uden at åbne kortet)
+lua.execute("PSTATE.level=70; QLOG={}; FLAGGED={}")
+aq = list(ns.Map.AvailableQuestsForGiver(ns.Map, "Hemet Nesingwary").values())
+check("tilgængelige quests fra giver (Hemet Nesingwary)",
+      len(aq) >= 1 and any("Clefthoof Mastery" in q.title for q in aq))
+lua.eval("function(id) QLOG = { { title='Clefthoof Mastery', questID=id } } end")(9789)
+aq2 = list(ns.Map.AvailableQuestsForGiver(ns.Map, "Hemet Nesingwary").values())
+check("giver-quest i loggen vises ikke som tilgængelig",
+      not any(int(q.qid) == 9789 for q in aq2))
 
 # multi-fokus: op til 3 quests kan fokuseres samtidigt
 lua.eval("""function() QLOG = {
