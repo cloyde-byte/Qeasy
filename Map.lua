@@ -448,10 +448,12 @@ end
 -- Farvet linje fra din position til hvert fokuseret mål (samme farve som
 -- skyen). Pakket ind i pcall, da CreateLine/SetStartPoint varierer lidt
 -- mellem klientversioner.
-local atan2 = math.atan2 or function(y, x) return math.atan(y, x) end
+-- Prikket sti fra dig til hvert fokuseret mål. Vi bruger en RÆKKE små prikker
+-- i stedet for én roteret tekstur, fordi SetRotation klipper lange, tynde
+-- teksturer til deres akse-rettede kasse (så en skrå linje forsvinder).
 function Map:DrawFocusLines(canvas, mapID, w, h)
-    local ln = 0
-    local ok = pcall(function()
+    local dn = 0
+    pcall(function()
         if ns.Q.char.ui.mapIcons == false or ns.Q.char.ui.spawnAreas == false then return end
         if not (canvas.CreateTexture and C_Map and C_Map.GetBestMapForUnit) then return end
         if C_Map.GetBestMapForUnit("player") ~= mapID then return end
@@ -460,23 +462,28 @@ function Map:DrawFocusLines(canvas, mapID, w, h)
         if not px or px == 0 then return end
         local x1, y1 = px * w, -py * h                       -- kanvas-pixel (TOPLEFT-anker)
         for _, tgt in ipairs(self:FocusPathTargets(mapID)) do
-            ln = ln + 1
             local c = tgt.color
             local x2, y2 = (tgt.x / 100) * w, -(tgt.y / 100) * h
             local dx, dy = x2 - x1, y2 - y1
-            local len = math.max(1, math.sqrt(dx * dx + dy * dy))
-            -- roteret tynd tekstur = linje fra dig til målet
-            local line = getAreaLine(ln, canvas)
-            line:SetVertexColor(c[1], c[2], c[3], 0.8)
-            line:SetSize(len, 2.5)
-            line:ClearAllPoints()
-            line:SetPoint("CENTER", canvas, "TOPLEFT", (x1 + x2) / 2, (y1 + y2) / 2)
-            line:SetRotation(atan2(dy, dx))
-            line:Show()
+            local dist = math.sqrt(dx * dx + dy * dy)
+            local count = math.min(60, math.max(2, math.floor(dist / 16)))  -- prik pr. ~16 px
+            for k = 1, count - 1 do                            -- spring endepunkterne over
+                local t = k / count
+                dn = dn + 1
+                local dot = getAreaLine(dn, canvas)
+                dot:SetVertexColor(c[1], c[2], c[3], 0.9)
+                dot:SetSize(5, 5)
+                dot:ClearAllPoints()
+                dot:SetPoint("CENTER", canvas, "TOPLEFT", x1 + dx * t, y1 + dy * t)
+                dot:Show()
+            end
+        end
+        if dn > 0 and areaHost then    -- løft prikkerne over kortet (under ikonerne)
+            if canvas.GetFrameStrata then areaHost:SetFrameStrata(canvas:GetFrameStrata()) end
+            areaHost:SetFrameLevel((canvas.GetFrameLevel and canvas:GetFrameLevel() or 0) + 2450)
         end
     end)
-    if not ok then ln = 0 end   -- ved fejl: skjul alle linjer
-    for i = ln + 1, #areaLines do
+    for i = dn + 1, #areaLines do
         if areaLines[i] then areaLines[i]:Hide() end
     end
 end

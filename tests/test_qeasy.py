@@ -97,7 +97,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.19.2' end
+function GetAddOnMetadata() return '0.19.3' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -387,6 +387,8 @@ check("urelateret item matcher ikke", len(noi) == 0)
 # ---- kort/minimap-ikoner (Outland) ----
 check("Outland quest-DB indlæst (>500 quests)",
       ns.QuestDB is not None and sum(1 for _ in ns.QuestDB.keys()) > 500)
+check("Midsummer-quests fjernet, men normale beholdt",
+      ns.QuestDB[11807] is None and ns.QuestDB[10233] is not None)
 lua.execute("PSTATE.map=1944; PSTATE.level=70; QLOG={}; FLAGGED={}")
 icons = list(ns.Map.IconsForMap(ns.Map, 1944).values())
 kinds = set(i.kind for i in icons)

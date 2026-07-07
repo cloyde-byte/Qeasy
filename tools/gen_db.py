@@ -20,6 +20,24 @@ OUTLAND = {1944, 1946, 1952, 1951, 1949, 1953, 1948, 1955}
 HORDE_MASK = 2 + 16 + 32 + 128 + 512
 T = qdb.T
 
+# Sæson-/event-quests (Midsummer Fire Festival m.fl.) skal ikke fylde på
+# kortet uden for eventet. Ekskluderes via titel.
+EXCLUDE_TITLES = {
+    "A Thief's Reward",
+}
+EXCLUDE_CONTAINS = [
+    "Honor the Flame",
+    "Desecrate this Fire",
+    "'s Flame",                 # Stealing X's Flame (Midsummer)
+    "Playing with Fire",
+    "Festival Scorchling",
+    "Spinner of Summer Tales",
+]
+
+
+def is_seasonal(title):
+    return title in EXCLUDE_TITLES or any(f in title for f in EXCLUDE_CONTAINS)
+
 
 def outland_endpoint(node):
     """(navn, centroid) for en start/slut-node, begrænset til Outland."""
@@ -154,7 +172,7 @@ def main():
         if not (giver or turnin or obj):
             continue
         title = qdb.title(qid)
-        if not title:
+        if not title or is_seasonal(title):
             continue
         n_total += 1
         pre = sorted(int(p) for p in q["pre"].values()) if q["pre"] else []
