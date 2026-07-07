@@ -16,7 +16,8 @@ lua.execute("pfDB = { quests = {}, units = {}, objects = {}, zones = {}, items =
 for f in ["quests-tbc.lua", "units-tbc.lua", "objects-tbc.lua", "items-tbc.lua",
           "enUS/quests.lua", "enUS/quests-tbc.lua",
           "enUS/units.lua", "enUS/units-tbc.lua",
-          "enUS/objects.lua", "enUS/objects-tbc.lua"]:
+          "enUS/objects.lua", "enUS/objects-tbc.lua",
+          "enUS/items.lua", "enUS/items-tbc.lua"]:
     lua.execute(open(f"{PF}/{f}", encoding="utf-8", errors="replace").read())
 
 pfDB = lua.globals().pfDB
@@ -27,8 +28,17 @@ uloc, uloc_v = pfDB["units"]["enUS-tbc"], pfDB["units"]["enUS"]
 odata = pfDB["objects"]["data-tbc"]
 oloc, oloc_v = pfDB["objects"]["enUS-tbc"], pfDB["objects"]["enUS"]
 idata = pfDB["items"]["data-tbc"]
+iloc, iloc_v = pfDB["items"]["enUS-tbc"], pfDB["items"]["enUS"]
 
 T = lupa.lua_type
+
+
+def item_name(iid):
+    """Engelsk item-navn (til at matche objektiv-linjer som '<navn>: x/y')."""
+    v = iloc[iid] if iloc else None
+    if v is None or (isinstance(v, str) and v == "_"):
+        v = iloc_v[iid] if iloc_v else None
+    return str(v) if v is not None else None
 
 
 def loc_name(loc, loc_v, i):

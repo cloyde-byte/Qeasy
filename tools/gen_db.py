@@ -73,16 +73,21 @@ def _opts(src):
 
 
 def outland_objective(qid):
-    """Returnér (centroid, otype, pts). otype: 'u'=dræb enhed (sværd),
-    'o'=interager/brug item (tandhjul), 'i'=saml genstand (tandhjul).
+    """Returnér (centroid, otype, pts, onames, omap). otype: 'u'=dræb enhed
+    (sværd), 'o'=interager/brug item (tandhjul), 'i'=saml genstand (tandhjul).
     pts = alle Outland-spawnpunkter for målet (til område-markering).
+    onames = navne på tællende enheder (rene dræb-mål).
+    omap = {mob-navn: item-navn} for saml-fra-mob-quests, så mob-tooltips kan
+    matche mobben mod DEN RIGTIGE objektiv-linje ('<item>: x/y') i live-loggen.
+    Det undgår fejl som 'Warmaul Brute' vist under Gurok-questen, når pfQuest
+    slår flere items sammen på samme quest.
 
     Vigtigt: et objektiv med et påkrævet/udleveret item (IR) eller et objekt
     (O) er en INTERACT/brug-quest (tandhjul) - selv hvis der også er enheder
     (fx 'brug banner ved Boulderfist-lejre'). Kun rene enheds-mål = dræb."""
     q = qdb.qdata[qid]
     if T(q) != "table" or not q["obj"]:
-        return None, None, None, None
+        return None, None, None, None, None
     obj = q["obj"]
 
     # Brug-item (IR) eller interager-med-objekt (O) => tandhjul.
@@ -91,7 +96,7 @@ def outland_objective(qid):
         if not pts and obj["U"]:
             pts = _upts(obj["U"])          # fald tilbage på enheder for placering
         if pts:
-            return qdb.centroid(pts), "o", pts, None
+            return qdb.centroid(pts), "o", pts, None, None
 
     # Rent enheds-mål => dræb (sværd). Gem også navnene på de enheder der
     # tæller (til mob-tooltips - fx kategori-mål som "Kil'sorrow Agent").
@@ -104,12 +109,14 @@ def outland_objective(qid):
                 pts += sp
                 names.add(qdb.loc_name(qdb.uloc, qdb.uloc_v, uid))
         if pts:
-            return qdb.centroid(pts), "u", pts, sorted(names)
+            return qdb.centroid(pts), "u", pts, sorted(names), None
 
     if obj["I"]:
-        upts, opts_, unames = [], [], set()
+        upts, opts_, unames, omap = [], [], set(), {}
         for iid in obj["I"].values():
-            it = qdb.idata[int(iid)]
+            iid = int(iid)
+            iname = qdb.item_name(iid)
+            it = qdb.idata[iid]
             if it is not None and T(it) == "table":
                 if it["O"]:
                     for oid in it["O"].keys():
@@ -120,14 +127,19 @@ def outland_objective(qid):
                         sp = [p for p in qdb.spawns(qdb.udata, uid) if p[0] in OUTLAND]
                         if sp:
                             upts += sp
-                            unames.add(qdb.loc_name(qdb.uloc, qdb.uloc_v, uid))
+                            mob = qdb.loc_name(qdb.uloc, qdb.uloc_v, uid)
+                            unames.add(mob)
+                            # Bind mobben til det item den dropper (til tooltips).
+                            if iname:
+                                omap[mob] = iname
         # Genstand fra et OBJEKT (fx kister/knuder) = loot/interager (tandhjul).
         # Kun fra ENHEDER = reelt et dræb (sværd, vis kilde-mobs). Ellers indsamling.
         if opts_:
-            return qdb.centroid(opts_), "o", opts_, None
+            return qdb.centroid(opts_), "o", opts_, None, None
         if upts:
-            return qdb.centroid(upts), "u", upts, sorted(unames) if unames else None
-    return None, None, None, None
+            return (qdb.centroid(upts), "u", upts,
+                    sorted(unames) if unames else None, omap or None)
+    return None, None, None, None, None
 
 
 def build_area(pts, mapid, cap=24):
@@ -167,7 +179,7 @@ def main():
             continue  # ren Alliance
         giver_name, giver = outland_endpoint(q["start"])
         turnin_name, turnin = outland_endpoint(q["end"])
-        obj, otype, opts, onames = outland_objective(qid)
+        obj, otype, opts, onames, omap = outland_objective(qid)
         # medtag kun quests med mindst én Outland-koordinat
         if not (giver or turnin or obj):
             continue
@@ -201,6 +213,12 @@ def main():
             # "Dræb: X" på kort-ikonet). Gemmes altid for rene dræb-mål.
             if onames:
                 parts.append("ou={%s}" % ",".join('"%s"' % esc(n) for n in onames))
+            # om = {mob-navn = item-navn}: binder hver kilde-mob til DET item den
+            # dropper, så mob-tooltips kun matcher den korrekte objektiv-linje.
+            if omap:
+                pairs = ",".join('["%s"]="%s"' % (esc(m), esc(i))
+                                 for m, i in sorted(omap.items()))
+                parts.append("om={%s}" % pairs)
         # oi = item-id'er man skal samle (til quest-info i item-tooltips)
         objx = q["obj"]
         if T(objx) == "table" and objx["I"]:

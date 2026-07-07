@@ -97,7 +97,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.22.1' end
+function GetAddOnMetadata() return '0.22.2' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -387,17 +387,31 @@ ms = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Murkblood Scavenger").values()
 check("Murkblood Scavenger viser Scavenger-linjen",
       len(ms) == 1 and "Scavenger" in ms[0].text)
 
-# subset-navne: "Sporebat" må ikke ryge til "Greater Sporebat"-linjen (den
-# mest specifikke vinder, selv når Greater-linjen står først). 9801 har begge i ou.
+# saml-fra-mob med to items: 'Gathering the Reagents' (9801) samler Sporebat Eye
+# (fra sporebats) og Fen Strider Tentacle (fra striders). Hver mob skal ramme
+# SIT items linje - ikke den anden.
 lua.eval("""function() QLOG = { { title='Gathering the Reagents', questID=9801,
-  objectives = { { text='Greater Sporebat slain: 0/5', done=false },
-                 { text='Sporebat slain: 0/5', done=false } } } } end""")()
+  objectives = { { text='Sporebat Eye: 0/5', done=false },
+                 { text='Fen Strider Tentacle: 0/8', done=false } } } } end""")()
 sp = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Sporebat").values())
-check("plain 'Sporebat' viser Sporebat-linjen (ikke Greater)",
-      len(sp) == 1 and sp[0].text.strip().startswith("Sporebat"))
-gsp = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Greater Sporebat").values())
-check("'Greater Sporebat' viser Greater-linjen",
-      len(gsp) == 1 and "Greater" in gsp[0].text)
+check("Sporebat viser Sporebat Eye-linjen",
+      len(sp) == 1 and "Sporebat Eye" in sp[0].text)
+fs = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Fen Strider").values())
+check("Fen Strider viser Fen Strider Tentacle-linjen (ikke Sporebat Eye)",
+      len(fs) == 1 and "Fen Strider Tentacle" in fs[0].text)
+
+# saml-fra-mob (om): Gurok the Usurper (9853) dropper KUN Gurok's Earthen Head.
+# Warmaul Brute dropper 'Warmaul Skull' (andet item) og må IKKE vises under
+# Gurok-questen, selvom pfQuest lister begge items på quest 9853.
+check("9853 har om-map (mob -> item)", ns.QuestDB[9853].om is not None)
+lua.eval("""function() QLOG = { { title='Gurok the Usurper', questID=9853,
+  objectives = { { text="Gurok's Earthen Head: 0/1", done=false } } } } end""")()
+wb = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Warmaul Brute").values())
+check("Warmaul Brute vises IKKE under Gurok-questen",
+      not any(h.title == "Gurok the Usurper" for h in wb))
+gu = list(ns.QuestLog.MobObjectives(ns.QuestLog, "Gurok the Usurper").values())
+check("Gurok the Usurper viser Gurok's Earthen Head-linjen",
+      len(gu) == 1 and "Gurok's Earthen Head" in gu[0].text)
 
 # item-tooltips: et loot-item viser hvilken aktiv quest det hører til (oi)
 lua.eval("""function() QLOG = { { title='I Must Have Them!', questID=10109,

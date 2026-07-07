@@ -124,7 +124,16 @@ function QuestLog:MobObjectives(name)
         if e.questID and not e.isComplete then
             local d = ns.QuestDB and ns.QuestDB[e.questID]
             local text
-            if d and d.ou then
+            if d and d.om and d.om[name] then
+                -- Saml-fra-mob-quest: mobben tæller KUN hvis live-loggen har en
+                -- ufærdig objektiv-linje for præcis DET item, mobben dropper.
+                -- (Undgår fx at Warmaul Brute vises under Gurok-questen, når
+                -- pfQuest slår flere items sammen på samme quest.)
+                local itemName = d.om[name]
+                for _, o in ipairs(e.objectives) do
+                    if not o.done and o.text:find(itemName, 1, true) then text = o.text; break end
+                end
+            elseif d and d.ou then
                 -- Autoritativ liste: mobben tæller KUN hvis navnet står præcist i
                 -- ou. (Undgår at "Clefthoof" fejlagtigt matcher "Clefthoof Bull".)
                 for _, un in ipairs(d.ou) do
