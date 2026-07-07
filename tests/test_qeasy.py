@@ -97,7 +97,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.20.2' end
+function GetAddOnMetadata() return '0.20.3' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -496,6 +496,20 @@ ns.ObjTracker.ToggleFocus(ns.ObjTracker, 9789)
 tps = list(ns.Map.FocusPathTargets(ns.Map, 1951).values())
 check("waypoint-mål for 2 fokuserede quests (Nagrand)",
       len(tps) == 2 and all(t.color is not None and t.x for t in tps))
+
+# Stien følger OGSÅ pilens aktuelle mål - selv uden fokuserede quests.
+ns.Q.char.ui.trackerFocus = lua.eval("{}")
+lua.eval("function() QLOG = {} end")()
+saved_pick = ns.Arrow.PickTarget
+ns.Arrow.PickTarget = lua.eval(
+    "function() return { coords = { map = 1951, x = 42, y = 55 } } end")
+tp2 = list(ns.Map.PathTargets(ns.Map, 1951).values())
+check("sti følger pilens mål uden fokus",
+      len(tp2) == 1 and abs(tp2[0].x - 42) < 0.01 and abs(tp2[0].y - 55) < 0.01)
+# mål på et ANDET kort giver ingen sti
+tp3 = list(ns.Map.PathTargets(ns.Map, 1944).values())
+check("ingen sti når pilens mål er på et andet kort", len(tp3) == 0)
+ns.Arrow.PickTarget = saved_pick
 
 # verdenskort-render end-to-end: pins SKAL tegnes, også når linje-koden kører
 # (regression: waypoint-linjerne aborterede før ikonerne blev tegnet).

@@ -363,19 +363,47 @@ local function getAreaLine(i, canvas)
     return t
 end
 
--- Mål (objektiv-centroid) for de fokuserede quests på et bestemt kort.
-function Map:FocusPathTargets(mapID)
+-- Lys gylden farve til hoved-stien (mod GPS-pilens mål).
+local TRAIL_COLOR = { 1.0, 0.86, 0.25 }
+
+-- Mål for de prikkede stier på et bestemt kort. To kilder:
+--   1) GPS-pilens AKTUELLE mål (det step du lige nu bliver ledt til) - findes
+--      altid når du følger ruten, uden at du skal fokusere noget. Gylden sti.
+--   2) De fokuserede quests i trackeren (op til 3) - hver i sin blå nuance,
+--      så de matcher spawn-skyerne.
+function Map:PathTargets(mapID)
     local out = {}
+    local seen = {}
+    local function add(x, y, color)
+        if not x then return end
+        local key = math.floor(x * 4) .. ":" .. math.floor(y * 4)
+        if seen[key] then return end
+        seen[key] = true
+        out[#out + 1] = { x = x, y = y, color = color }
+    end
+
+    -- 1) Pilens mål (samme punkt pilen peger på).
+    local pick = ns.Arrow and ns.Arrow.PickTarget and ns.Arrow:PickTarget()
+    if pick and pick.coords and pick.coords.map == mapID then
+        add(pick.coords.x, pick.coords.y, TRAIL_COLOR)
+    end
+
+    -- 2) Fokuserede quests' objektiv-centroider.
     local focus = ns.ObjTracker and ns.ObjTracker.FocusList and ns.ObjTracker:FocusList()
-    if not focus then return out end
-    for i, qid in ipairs(focus) do
-        local d = ns.QuestDB and ns.QuestDB[qid]
-        if d and d.o and d.o[1] == mapID then
-            out[#out + 1] = { qid = qid, x = d.o[2], y = d.o[3],
-                              color = AREA_COLORS[i] or AREA_COLORS[1] }
+    if focus then
+        for i, qid in ipairs(focus) do
+            local d = ns.QuestDB and ns.QuestDB[qid]
+            if d and d.o and d.o[1] == mapID then
+                add(d.o[2], d.o[3], AREA_COLORS[i] or AREA_COLORS[1])
+            end
         end
     end
     return out
+end
+
+-- Bagudkompatibelt alias (bruges af ældre kald/tests).
+function Map:FocusPathTargets(mapID)
+    return self:PathTargets(mapID)
 end
 
 function Map:UpdateWorldMap()
@@ -489,28 +517,32 @@ end
 function Map:DrawFocusLines(canvas, mapID, w, h)
     local dn = 0
     pcall(function()
-        if ns.Q.char.ui.mapIcons == false or ns.Q.char.ui.spawnAreas == false then return end
+        if ns.Q.char.ui.mapIcons == false then return end
         if not (canvas.CreateTexture and C_Map and C_Map.GetBestMapForUnit) then return end
+        -- Stien tegnes kun på kortet for den zone du STÅR i (ikke når du
+        -- kigger på en anden zone) - så prikkerne peger fra din faktiske plads.
         if C_Map.GetBestMapForUnit("player") ~= mapID then return end
         local ppos = C_Map.GetPlayerMapPosition and C_Map.GetPlayerMapPosition(mapID, "player")
         local px, py = ppos and ppos:GetXY()
-        if not px or px == 0 then return end
+        if not px or (px == 0 and py == 0) then return end
         local x1, y1 = px * w, -py * h                       -- kanvas-pixel (TOPLEFT-anker)
-        for _, tgt in ipairs(self:FocusPathTargets(mapID)) do
+        for _, tgt in ipairs(self:PathTargets(mapID)) do
             local c = tgt.color
             local x2, y2 = (tgt.x / 100) * w, -(tgt.y / 100) * h
             local dx, dy = x2 - x1, y2 - y1
             local dist = math.sqrt(dx * dx + dy * dy)
-            local count = math.min(60, math.max(2, math.floor(dist / 16)))  -- prik pr. ~16 px
-            for k = 1, count - 1 do                            -- spring endepunkterne over
-                local t = k / count
-                dn = dn + 1
-                local dot = getAreaLine(dn, canvas)
-                dot:SetVertexColor(c[1], c[2], c[3], 0.9)
-                dot:SetSize(5, 5)
-                dot:ClearAllPoints()
-                dot:SetPoint("CENTER", canvas, "TOPLEFT", x1 + dx * t, y1 + dy * t)
-                dot:Show()
+            if dist > 6 then
+                local count = math.min(80, math.max(2, math.floor(dist / 14)))  -- prik pr. ~14 px
+                for k = 1, count - 1 do                        -- spring endepunkterne over
+                    local t = k / count
+                    dn = dn + 1
+                    local dot = getAreaLine(dn, canvas)
+                    dot:SetVertexColor(c[1], c[2], c[3], 0.95)
+                    dot:SetSize(6, 6)
+                    dot:ClearAllPoints()
+                    dot:SetPoint("CENTER", canvas, "TOPLEFT", x1 + dx * t, y1 + dy * t)
+                    dot:Show()
+                end
             end
         end
         if dn > 0 and areaHost then    -- løft prikkerne over kortet (under ikonerne)
