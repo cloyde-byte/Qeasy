@@ -135,12 +135,14 @@ end
 -- =========================================================================
 -- Qeasy Announce (valgfrit, default fra): annoncér quest-milepæle til party-
 -- chatten - a la Questie. Slå til med "/qeasy announce" (kun i gruppe).
+--   * når et DELMÅL bliver fuldført (fx "Warmaul Brute slain: 15/15") - kun
+--     for quests med flere delmål, så man ser hver del blive klaret
 --   * når en quest er klar til aflevering ("- klar til aflevering!")
 --   * når en quest bliver AFLEVERET/fuldført ("Fuldførte quest: <navn>!")
 -- =========================================================================
 local Announce = {}
 ns.Announce = Announce
-local snap = {}      -- questID -> { complete = bool }
+local snap = {}      -- questID -> { complete = bool, done = { [i] = bool } }
 local titles = {}    -- questID -> titel (cache, så vi kender navnet ved turn-in)
 local inited = false
 
@@ -189,10 +191,25 @@ function Announce:Check()
             seen[e.questID] = true
             titles[e.questID] = e.title
             local s = snap[e.questID]
-            if on and not first and s and e.isComplete and not s.complete then
-                say(e.title .. " - klar til aflevering!")
+            if on and not first and s then
+                -- Delmål: annoncér hvert objektiv der netop blev fuldført, men
+                -- kun når questen har FLERE delmål (ellers dækker "klar til
+                -- aflevering" allerede det ene mål).
+                if #e.objectives > 1 then
+                    for i, o in ipairs(e.objectives) do
+                        if o.done and not (s.done and s.done[i]) then
+                            say(e.title .. ": " .. o.text)
+                        end
+                    end
+                end
+                -- Hele questen klar til aflevering.
+                if e.isComplete and not s.complete then
+                    say(e.title .. " - klar til aflevering!")
+                end
             end
-            snap[e.questID] = { complete = e.isComplete }
+            local done = {}
+            for i, o in ipairs(e.objectives) do done[i] = o.done and true or false end
+            snap[e.questID] = { complete = e.isComplete, done = done }
         end
     end
     for qid in pairs(snap) do if not seen[qid] then snap[qid] = nil end end

@@ -97,7 +97,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.22.0' end
+function GetAddOnMetadata() return '0.22.1' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -660,6 +660,21 @@ ns.Announce.OnTurnIn(ns.Announce, 9854)
 says = list(g.SAYS.values())
 check("announce ved aflevering/turn-in (opt-in)",
       len(says) > n1 and any("Fuldførte quest" in s.msg and "Windroc" in s.msg for s in says))
+# Delmål: quest med FLERE objektiver annoncerer hvert delmål der bliver klaret.
+ns.Q.char.ui.announceProgress = True
+lua.eval("""function() QLOG = { { title='War on the Warmaul', questID=9945, objectives={
+  {text='Warmaul Brute slain: 0/15', done=false},
+  {text='Warmaul Warlock slain: 0/15', done=false} } } } end""")()
+ns.Announce.Check(ns.Announce)                 # init -> ingen besked
+nb = len(list(g.SAYS.values()))
+lua.eval("""function() QLOG = { { title='War on the Warmaul', questID=9945, objectives={
+  {text='Warmaul Brute slain: 15/15', done=true},
+  {text='Warmaul Warlock slain: 7/15', done=false} } } } end""")()
+ns.Announce.Check(ns.Announce)                 # ét delmål klaret -> annoncér DET
+says = list(g.SAYS.values())
+check("announce delmål (15/15 af den ene type)",
+      any("Warmaul Brute slain: 15/15" in s.msg for s in says[nb:])
+      and not any("aflevering" in s.msg for s in says[nb:]))
 # Slået fra -> ingen besked ved turn-in
 ns.Q.char.ui.announceProgress = False
 n2 = len(list(g.SAYS.values()))
