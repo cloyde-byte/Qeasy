@@ -401,14 +401,30 @@ p.X(9857)
 p.N("Mastery-kæderne fortsætter", (NG, 71.5, 40.8),
     "Hver Mastery har tre trin (Clefthoof 9789->9850->9851, Windroc 9854->9855->9856, Talbuk 9857->9858->9859) og munder ud i 'The Ultimate Bloodsport'. Enorm XP - fortsæt sideløbende. Tryk 'Spring over', når du er klar.", optional=True)
 
+# Gordawgs elementer-kæde: objektiverne ligger ude på sletterne (samme steder du
+# jager masteries) og MUNDER UD i sydvest ved Oshu'gun - lige ved Aeris Landing.
+# Derfor batches sidste trin (Shattering the Veil) sammen med Consortium-questsene.
+p.S("Gordawg: Elementernes kæde")
+p.N("Sletternes elementer - fra Gordawg", (NG, 61.3, 24.8),
+    "Gordawg ved Throne of the Elements sender dig ud på sletterne (samme dyr/steder som masteries) og til sidst til Oshu'gun i sydvest. Kæden giver stor XP - tag den mens du alligevel render rundt.")
+p.A(9819, "Fra Gordawg (efter The Underneath).")
+p.D(9819, "Dræb rasende jord-elementaler ude på de sydøstlige sletter.", at=(NG, 64.7, 57.5))
+p.X(9819, "Aflever hos Gordawg.")
+p.A(9821, "Fra Gordawg.")
+p.D(9821, "Saml Enraged Crusher Cores fra elementaler midt på sletterne.", at=(NG, 47.8, 46.2))
+p.X(9821, "Aflever hos Gordawg - du får Gordawgs klippe til næste trin.")
+p.A(9849, "Fra Gordawg - tag Gordawgs klippe med sydvest.")
+
 p.S("Consortium: Aeris Landing")
 p.T("Aeris Landing", (NG, 31.4, 57.8), "Consortium-lejren ved foden af Oshu'gun i sydvest.")
 p.A(9882, "Fra Gezhe.")
 p.A(9914, "Fra Shadrek.")
+p.D(9849, "Ved verdens rand i sydvest (Oshu'gun/Aeris Landing): kast Gordawgs klippe på giftstenene og dræb Minions of Gurok. Du er her alligevel for Consortium-questsene.", at=(NG, 26.0, 54.0))
 p.D(9882, "Saml Obsidian Warbeads/krystaller fra ogrer på Spirit Fields.", at=(NG, 35.0, 55.0))
 p.D(9914, "Saml elfenben fra clefthoofs.", at=(NG, 40.0, 55.0))
 p.X(9882)
 p.X(9914)
+p.X(9849, "Aflever hos Gordawg ved Throne of the Elements (nordøst) - fx på vej mod næste zone.")
 
 p.S("Ekstra: Mastery-opfølgere (valgfri - stor XP)")
 p.N("Gør Nesingwary-kæderne færdige", (NG, 71.5, 40.8),

@@ -132,6 +132,34 @@ ns.Q:RegisterRoute({
                 { kind = "note", coords = { map = 1951, x = 71.5, y = 40.8 }, text = "Mastery-kæderne fortsætter",
                   note = "Hver Mastery har tre trin (Clefthoof 9789->9850->9851, Windroc 9854->9855->9856, Talbuk 9857->9858->9859) og munder ud i 'The Ultimate Bloodsport'. Enorm XP - fortsæt sideløbende. Tryk 'Spring over', når du er klar." },
         }},
+        { label = "Gordawg: Elementernes kæde", elements = {
+                { kind = "note", coords = { map = 1951, x = 61.3, y = 24.8 }, text = "Sletternes elementer - fra Gordawg",
+                  note = "Gordawg ved Throne of the Elements sender dig ud på sletterne (samme dyr/steder som masteries) og til sidst til Oshu'gun i sydvest. Kæden giver stor XP - tag den mens du alligevel render rundt." },
+        }},
+        { label = "Gordawg: Elementernes kæde", elements = {
+                { kind = "accept", quest = 9819, title = "The Tortured Earth",
+                  coords = { map = 1951, x = 61.3, y = 24.8 }, note = "Fra Gordawg (efter The Underneath)." },
+        }},
+        { label = "Gordawg: Elementernes kæde", elements = {
+                { kind = "do", quest = 9819, title = "The Tortured Earth",
+                  coords = { map = 1951, x = 64.7, y = 57.5 }, note = "Dræb rasende jord-elementaler ude på de sydøstlige sletter." },
+        }},
+        { label = "Gordawg: Elementernes kæde", elements = {
+                { kind = "turnin", quest = 9819, title = "The Tortured Earth",
+                  coords = { map = 1951, x = 61.3, y = 24.8 }, note = "Aflever hos Gordawg." },
+                { kind = "accept", quest = 9821, title = "Eating Damnation",
+                  coords = { map = 1951, x = 61.3, y = 24.8 }, note = "Fra Gordawg." },
+        }},
+        { label = "Gordawg: Elementernes kæde", elements = {
+                { kind = "do", quest = 9821, title = "Eating Damnation",
+                  coords = { map = 1951, x = 47.8, y = 46.2 }, note = "Saml Enraged Crusher Cores fra elementaler midt på sletterne." },
+        }},
+        { label = "Gordawg: Elementernes kæde", elements = {
+                { kind = "turnin", quest = 9821, title = "Eating Damnation",
+                  coords = { map = 1951, x = 61.3, y = 24.8 }, note = "Aflever hos Gordawg - du får Gordawgs klippe til næste trin." },
+                { kind = "accept", quest = 9849, title = "Shattering the Veil",
+                  coords = { map = 1951, x = 61.3, y = 24.8 }, note = "Fra Gordawg - tag Gordawgs klippe med sydvest." },
+        }},
         { label = "Consortium: Aeris Landing", elements = {
                 { kind = "travel", coords = { map = 1951, x = 31.4, y = 57.8 }, radius = 60,
                   text = "Aeris Landing", note = "Consortium-lejren ved foden af Oshu'gun i sydvest." },
@@ -141,6 +169,10 @@ ns.Q:RegisterRoute({
                   coords = { map = 1951, x = 31.4, y = 57.8 }, note = "Fra Gezhe." },
                 { kind = "accept", quest = 9914, title = "A Head Full of Ivory",
                   coords = { map = 1951, x = 31.8, y = 56.8 }, note = "Fra Shadrek." },
+        }},
+        { label = "Consortium: Aeris Landing", elements = {
+                { kind = "do", quest = 9849, title = "Shattering the Veil",
+                  coords = { map = 1951, x = 26.0, y = 54.0 }, note = "Ved verdens rand i sydvest (Oshu'gun/Aeris Landing): kast Gordawgs klippe på giftstenene og dræb Minions of Gurok. Du er her alligevel for Consortium-questsene." },
         }},
         { label = "Consortium: Aeris Landing", elements = {
                 { kind = "do", quest = 9882, title = "Stealing from Thieves",
@@ -155,6 +187,10 @@ ns.Q:RegisterRoute({
                   coords = { map = 1951, x = 31.4, y = 57.8 }, note = "Aflever hos Gezhe." },
                 { kind = "turnin", quest = 9914, title = "A Head Full of Ivory",
                   coords = { map = 1951, x = 31.8, y = 56.8 }, note = "Aflever hos Shadrek." },
+        }},
+        { label = "Consortium: Aeris Landing", elements = {
+                { kind = "turnin", quest = 9849, title = "Shattering the Veil",
+                  coords = { map = 1951, x = 61.3, y = 24.8 }, note = "Aflever hos Gordawg ved Throne of the Elements (nordøst) - fx på vej mod næste zone." },
         }},
         { label = "Ekstra: Mastery-opfølgere (valgfri - stor XP)", elements = {
                 { kind = "note", coords = { map = 1951, x = 71.5, y = 40.8 }, text = "Gør Nesingwary-kæderne færdige",
