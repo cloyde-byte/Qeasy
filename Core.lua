@@ -80,6 +80,7 @@ Q:SetScript("OnEvent", function(self, event, arg1, arg2, arg3, arg4)
 
     elseif event == "QUEST_TURNED_IN" then
         self:OnQuestTurnedIn(arg1)
+        if ns.Announce then ns.Announce:OnTurnIn(arg1) end
         if ns.Comms then ns.Comms:Broadcast(true) end
 
     elseif event == "QUEST_LOG_UPDATE" or event == "UNIT_QUEST_LOG_CHANGED" then

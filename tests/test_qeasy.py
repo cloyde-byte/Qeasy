@@ -97,7 +97,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.20.0' end
+function GetAddOnMetadata() return '0.20.1' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -636,11 +636,21 @@ ns.Announce.Check(ns.Announce)                 # init -> ingen besked
 n0 = len(list(g.SAYS.values()))
 lua.eval("""function() QLOG = { { title='Windroc Mastery', questID=9854,
   objectives={{text='Windroc slain: 30/30', done=true}} } } end""")()
-ns.Announce.Check(ns.Announce)                 # objektiv færdigt -> annoncér
+ns.Announce.Check(ns.Announce)                 # quest komplet -> "klar til aflevering"
 says = list(g.SAYS.values())
-check("announce ved objektiv-done (opt-in)",
-      len(says) > n0 and any("Windroc" in s.msg for s in says))
+check("announce 'klar til aflevering' (opt-in)",
+      len(says) > n0 and any("Windroc" in s.msg and "aflevering" in s.msg for s in says))
+# Aflever questen -> OnTurnIn annoncerer "Fuldførte quest: <navn>!"
+n1 = len(list(g.SAYS.values()))
+ns.Announce.OnTurnIn(ns.Announce, 9854)
+says = list(g.SAYS.values())
+check("announce ved aflevering/turn-in (opt-in)",
+      len(says) > n1 and any("Fuldførte quest" in s.msg and "Windroc" in s.msg for s in says))
+# Slået fra -> ingen besked ved turn-in
 ns.Q.char.ui.announceProgress = False
+n2 = len(list(g.SAYS.values()))
+ns.Announce.OnTurnIn(ns.Announce, 9854)
+check("ingen announce når slået fra", len(list(g.SAYS.values())) == n2)
 
 print("\n--- chat (uddrag) ---")
 for line in list(g.PRINTED.values())[:5]:

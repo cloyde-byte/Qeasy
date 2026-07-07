@@ -134,11 +134,14 @@ end
 
 -- =========================================================================
 -- Qeasy Announce (valgfrit, default fra): annoncér quest-milepæle til party-
--- chatten - når et objektiv er færdigt, og når en quest er klar til aflevering.
+-- chatten - a la Questie. Slå til med "/qeasy announce" (kun i gruppe).
+--   * når en quest er klar til aflevering ("- klar til aflevering!")
+--   * når en quest bliver AFLEVERET/fuldført ("Fuldførte quest: <navn>!")
 -- =========================================================================
 local Announce = {}
 ns.Announce = Announce
-local snap = {}
+local snap = {}      -- questID -> { complete = bool }
+local titles = {}    -- questID -> titel (cache, så vi kender navnet ved turn-in)
 local inited = false
 
 local function annChannel()
@@ -152,6 +155,29 @@ local function say(msg)
     if ch and SendChatMessage then SendChatMessage("Qeasy: " .. msg, ch) end
 end
 
+-- Slå navnet på et quest-id op: helst det vi lige har set i loggen, ellers
+-- databasens titel. Faldback til et generisk "en quest".
+local function titleFor(questID)
+    if titles[questID] then return titles[questID] end
+    local d = ns.QuestDB and ns.QuestDB[questID]
+    if d and d.t then return d.t end
+    return nil
+end
+
+-- Kaldes fra QUEST_TURNED_IN. Annoncér at questen er afleveret/fuldført.
+function Announce:OnTurnIn(questID)
+    questID = tonumber(questID)
+    if not ns.Q.char.ui.announceProgress then return end
+    local t = questID and titleFor(questID)
+    if t then say("Fuldførte quest: " .. t .. "!") end
+    if questID then
+        snap[questID] = nil
+        titles[questID] = nil
+    end
+end
+
+-- Kaldes fra QUEST_LOG_UPDATE. Opdaterer cache og annoncér "klar til aflevering"
+-- første gang en quest bliver komplet (selve afleveringen håndteres i OnTurnIn).
 function Announce:Check()
     if not ns.QuestLog then return end
     local first = not inited
@@ -161,19 +187,12 @@ function Announce:Check()
     for _, e in ipairs(ns.QuestLog:Scan()) do
         if e.questID then
             seen[e.questID] = true
+            titles[e.questID] = e.title
             local s = snap[e.questID]
-            if on and not first and s then
-                if e.isComplete and not s.complete then
-                    say(e.title .. " - klar til aflevering!")
-                elseif not e.isComplete then
-                    for i, o in ipairs(e.objectives) do
-                        if o.done and not (s.done and s.done[i]) then say(o.text) end
-                    end
-                end
+            if on and not first and s and e.isComplete and not s.complete then
+                say(e.title .. " - klar til aflevering!")
             end
-            local done = {}
-            for i, o in ipairs(e.objectives) do done[i] = o.done and true or false end
-            snap[e.questID] = { complete = e.isComplete, done = done }
+            snap[e.questID] = { complete = e.isComplete }
         end
     end
     for qid in pairs(snap) do if not seen[qid] then snap[qid] = nil end end
