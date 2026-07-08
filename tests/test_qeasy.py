@@ -97,7 +97,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.23.1' end
+function GetAddOnMetadata() return '0.24.0' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -145,6 +145,12 @@ ChatFrame1 = CreateFrame('Frame', 'ChatFrame1')
 Minimap = CreateFrame('Frame', 'Minimap')
 function Minimap:GetZoom() return 3 end
 GetCVar = function() return '0' end
+-- Dato-stub til sæson-events (styr med PDATE).
+PDATE = { month = 7, day = 1 }
+function date(fmt)
+    if fmt == '*t' then return { month = PDATE.month, day = PDATE.day } end
+    return ''
+end
 -- WorldMapFrame udeladt (nil) -> kort-pin-koden skal degradere pænt.
 """
 lua.execute(STUBS)
@@ -156,6 +162,7 @@ for f in ["Locale.lua", "Engine.lua", "Arrow.lua", "Guide.lua",
           "Comms.lua", "Links.lua",
           "Data/OutlandQuests.lua", "Data/OutlandFlightMasters.lua",
           "Data/OutlandPOI.lua", "Data/OutlandQuestFlags.lua",
+          "Seasonal.lua",
           "Map.lua", "ItemButton.lua", "Session.lua", "Config.lua",
           "Routes/HellfirePeninsula.lua", "Routes/Zangarmarsh.lua",
           "Routes/TerokkarForest.lua", "Routes/Nagrand.lua",
@@ -437,8 +444,9 @@ check("urelateret item matcher ikke", len(noi) == 0)
 # ---- kort/minimap-ikoner (Outland) ----
 check("Outland quest-DB indlæst (>500 quests)",
       ns.QuestDB is not None and sum(1 for _ in ns.QuestDB.keys()) > 500)
-check("Midsummer-quests fjernet, men normale beholdt",
-      ns.QuestDB[11807] is None and ns.QuestDB[10233] is not None)
+check("Midsummer-quest tagget med event (ikke fjernet), normal quest utagget",
+      ns.QuestDB[11807] is not None and ns.QuestDB[11807].ev == "midsummer"
+      and ns.QuestDB[10233] is not None and ns.QuestDB[10233].ev is None)
 lua.execute("PSTATE.map=1944; PSTATE.level=70; QLOG={}; FLAGGED={}")
 icons = list(ns.Map.IconsForMap(ns.Map, 1944).values())
 kinds = set(i.kind for i in icons)
@@ -666,6 +674,27 @@ lua.execute("PSTATE.combat = false")
 for cmd in ("list","debug","","config","skip","back","help","tracker",
             "tooltips","mapicons","minimap","party","xp","announce","poi","areas","items"):
     lua.eval("SlashCmdList['QEASY']")(cmd)
+
+# ---- sæson-events: dato-styret synlighed på kortet ----
+check("Candy Bucket (12388) er tagget hallowsend", ns.QuestDB[12388].ev == "hallowsend")
+lua.execute("PDATE.month=7; PDATE.day=1")     # Fire Festival aktiv, Hallow's End ikke
+check("midsummer aktiv 1. juli", ns.Seasonal.IsActive(ns.Seasonal, "midsummer") == True)
+check("hallowsend IKKE aktiv 1. juli", ns.Seasonal.IsActive(ns.Seasonal, "hallowsend") == False)
+check("Candy Bucket skjult uden for Hallow's End",
+      ns.Seasonal.QuestVisible(ns.Seasonal, 12388) == False)
+lua.execute("PDATE.month=10; PDATE.day=20")   # Hallow's End aktiv
+check("hallowsend aktiv 20. oktober", ns.Seasonal.IsActive(ns.Seasonal, "hallowsend") == True)
+check("Candy Bucket synlig under Hallow's End",
+      ns.Seasonal.QuestVisible(ns.Seasonal, 12388) == True)
+# vindue der krydser årsskiftet (Winter Veil)
+lua.execute("PDATE.month=12; PDATE.day=20")
+check("winterveil aktiv 20. december", ns.Seasonal.IsActive(ns.Seasonal, "winterveil") == True)
+lua.execute("PDATE.month=1; PDATE.day=1")
+check("winterveil aktiv 1. januar", ns.Seasonal.IsActive(ns.Seasonal, "winterveil") == True)
+lua.execute("PDATE.month=1; PDATE.day=10")
+check("winterveil IKKE aktiv 10. januar", ns.Seasonal.IsActive(ns.Seasonal, "winterveil") == False)
+# ikke-sæson-quest vises altid
+check("almindelig quest altid synlig", ns.Seasonal.QuestVisible(ns.Seasonal, 9863) == True)
 
 # ---- announce: milepæle til party (opt-in) ---- (sidst: sætter egen QLOG)
 ns.Q.char.ui.announceProgress = True

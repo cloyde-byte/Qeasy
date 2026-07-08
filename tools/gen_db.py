@@ -20,23 +20,40 @@ OUTLAND = {1944, 1946, 1952, 1951, 1949, 1953, 1948, 1955}
 HORDE_MASK = 2 + 16 + 32 + 128 + 512
 T = qdb.T
 
-# Sæson-/event-quests (Midsummer Fire Festival m.fl.) skal ikke fylde på
-# kortet uden for eventet. Ekskluderes via titel.
-EXCLUDE_TITLES = {
-    "A Thief's Reward",
+# Sæson-/event-quests: de MEDTAGES nu i DB'en, men mærkes med et event-tag
+# (`ev`), så de kun vises på kortet mens eventet er aktivt (dato-styret i
+# Seasonal.lua). Fx Fire Festival kun i juni-juli, Candy Bucket kun til
+# Hallow's End. Kurateret pr. titel (pfQuest har ingen event-data).
+SEASON_EXACT = {
+    "A Thief's Reward": "midsummer",
+    "Candy Bucket": "hallowsend",
+    "Accepting All Eggs": "noblegarden",
+    "Of Thistleheads and Eggs...": "noblegarden",
+    "Children's Week": "childrensweek",
 }
-EXCLUDE_CONTAINS = [
-    "Honor the Flame",
-    "Desecrate this Fire",
-    "'s Flame",                 # Stealing X's Flame (Midsummer)
-    "Playing with Fire",
-    "Festival Scorchling",
-    "Spinner of Summer Tales",
+SEASON_CONTAINS = [
+    ("Honor the Flame", "midsummer"),
+    ("Desecrate this Fire", "midsummer"),
+    ("'s Flame", "midsummer"),              # Stealing X's Flame
+    ("Playing with Fire", "midsummer"),
+    ("Festival Scorchling", "midsummer"),
+    ("Spinner of Summer Tales", "midsummer"),
+    ("Torch Catching", "midsummer"),
+    ("Torch Tossing", "midsummer"),
+    ("Wickerman", "hallowsend"),
+    ("Pumpkin", "hallowsend"),
+    ("Hallow's End", "hallowsend"),
 ]
 
 
-def is_seasonal(title):
-    return title in EXCLUDE_TITLES or any(f in title for f in EXCLUDE_CONTAINS)
+def season_of(title):
+    """Event-nøgle for en sæson-quest, ellers None."""
+    if title in SEASON_EXACT:
+        return SEASON_EXACT[title]
+    for frag, ev in SEASON_CONTAINS:
+        if frag in title:
+            return ev
+    return None
 
 
 def outland_endpoint(node):
@@ -184,8 +201,9 @@ def main():
         if not (giver or turnin or obj):
             continue
         title = qdb.title(qid)
-        if not title or is_seasonal(title):
+        if not title:
             continue
+        season = season_of(title)
         n_total += 1
         pre = sorted(int(p) for p in q["pre"].values()) if q["pre"] else []
 
@@ -231,6 +249,8 @@ def main():
             parts.append("race=%d" % race)
         if pre:
             parts.append("pre={%s}" % ",".join(str(p) for p in pre))
+        if season:
+            parts.append('ev="%s"' % season)
         rows.append((qid, "  [%d]={%s}," % (qid, ", ".join(parts))))
 
     rows.sort()

@@ -57,6 +57,8 @@ end
 
 local function giverAvailable(qid, d)
     if flagged(qid) then return false end             -- allerede klaret
+    -- Sæson-event: skjul quest-giveren uden for eventets datovindue.
+    if d.ev and ns.Seasonal and not ns.Seasonal:IsActive(d.ev) then return false end
     if d.lvl and playerLevel() < d.lvl then return false end
     if d.pre then
         for _, p in ipairs(d.pre) do
