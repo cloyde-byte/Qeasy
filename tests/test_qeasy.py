@@ -97,7 +97,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.22.3' end
+function GetAddOnMetadata() return '0.23.0' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -306,14 +306,26 @@ Q.char.ui.trackerFocus = None
 ns.ObjTracker.Update(ns.ObjTracker)  # må ikke fejle med fremhævet aktiv quest
 
 # ---- quest-links i chat (Questie-agtigt) ----
+# Serveren stripper |Hquest|h, så vi sender ren "[Titel]" og laver den om til et
+# klikbart |Hqeasy|h-link LOKALT hos hver Qeasy-bruger via et chat-filter.
 link = ns.Links.QuestLink(ns.Links, 10043, "Kill the Shadow Council!", 65)
-check("quest-link har korrekt format",
-      "Hquest:10043:65" in link and "[Kill the Shadow Council!]" in link)
+check("quest-link bruger qeasy-hyperlink",
+      "Hqeasy:10043:65" in link and "[Kill the Shadow Council!]" in link)
 ns.Links.Init(ns.Links)
 check("Links:Init hooker ChatFrame1", ns.Links.hooked[g.ChatFrame1] == True)
 g.EDITBOX._text = ""
-ns.Links.Insert(ns.Links, 10043, "Kill the Shadow Council!", 65)
-check("Links:Insert lægger link i editbox", "Hquest:10043:65" in g.EDITBOX._text)
+ns.Links.Insert(ns.Links, 9945, "War on the Warmaul", 65)
+check("Links:Insert sender ren [Titel] (overlever serveren)",
+      g.EDITBOX._text == "[War on the Warmaul]")
+# Rewrite: kendt quest-navn i [...] bliver klikbart; ukendt og eksisterende
+# hyperlinks røres ikke.
+rw = ns.Links.Rewrite(ns.Links, "Kom med til [War on the Warmaul] tak")
+check("Rewrite linker kendt quest-navn", "Hqeasy:9945" in rw)
+rw2 = ns.Links.Rewrite(ns.Links, "bare [noget rart] her")
+check("Rewrite rører ikke ukendte [ord]", rw2 == "bare [noget rart] her")
+rw3 = ns.Links.Rewrite(ns.Links, "wts |cffffffff|Hitem:1:2|h[War on the Warmaul]|h|r nu")
+check("Rewrite ødelægger ikke eksisterende hyperlinks",
+      "|Hitem:1:2|h[War on the Warmaul]|h|r" in rw3 and "Hqeasy" not in rw3)
 
 # ---- party quest-sync ('snakke med Questie') ----
 lua.execute("PSTATE.unitName='Me'; PSTATE.inGroup=true")

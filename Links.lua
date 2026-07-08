@@ -2,34 +2,87 @@ local _, ns = ...
 
 -- =========================================================================
 -- Qeasy Links: link quest-navne fra questloggen i chatten (a la Questie).
--- Bruger native WoW `quest:`-hyperlinks, så andre spillere kan klikke dem.
--- Ved hover viser vi et tooltip med objectives + party-fremgang (via Comms).
+--
+-- TBC-serveren fjerner |Hquest:...|h-hyperlinks fra chat (de bliver til ren
+-- tekst hos modtageren). Derfor gør vi som Questie: vi sender KUN ren tekst
+-- "[Quest-navn]" (som overlever serveren), og hver Qeasy-klient laver den om
+-- til et klikbart link LOKALT via et chat-filter. Alle med Qeasy ser dermed
+-- klikbare quest-links; andre ser bare "[Quest-navn]".
 -- =========================================================================
 
 local Links = {}
 ns.Links = Links
 
--- Byg et klikbart quest-hyperlink. Formatet er WoW's eget `quest:`-link, så
--- det virker for alle spillere (også dem uden Qeasy).
+-- Byg et klikbart Qeasy-quest-link (egen |Hqeasy:...|h-type, så klienten ikke
+-- afviser det - vi håndterer selv hover-tooltip og klik).
 function Links:QuestLink(questID, title, level)
     questID = tonumber(questID) or 0
     level = tonumber(level) or 0
-    return string.format("|cffffff00|Hquest:%d:%d|h[%s]|h|r", questID, level, tostring(title))
+    return string.format("|cffffff00|Hqeasy:%d:%d|h[%s]|h|r", questID, level, tostring(title))
 end
 
--- Indsæt et quest-link i chat-editboxen (åbner den hvis nødvendigt).
+-- Indsæt et quest-link i chat-editboxen. Vi indsætter REN tekst "[Titel]", så
+-- serveren ikke stripper noget - modtagernes Qeasy laver det om til et link.
 function Links:Insert(questID, title, level)
-    local link = self:QuestLink(questID, title, level)
+    local text = "[" .. tostring(title) .. "]"
     local eb = ChatEdit_ChooseBoxForSend and ChatEdit_ChooseBoxForSend()
     if eb then
         if not eb:IsShown() then
             if ChatEdit_ActivateChat then ChatEdit_ActivateChat(eb) else eb:Show() end
         end
-        eb:Insert(link)
+        eb:Insert(text)
         eb:SetFocus()
     elseif DEFAULT_CHAT_FRAME then
-        DEFAULT_CHAT_FRAME:AddMessage(link)
+        DEFAULT_CHAT_FRAME:AddMessage(text)
     end
+end
+
+-- -------------------------------------------------------------------------
+-- Titel-opslag: navn (små bogstaver) -> { id, level }. Bygges fra quest-DB'en,
+-- så vi kan genkende ethvert kendt quest-navn i "[...]" i chatten.
+-- -------------------------------------------------------------------------
+local index
+local function buildIndex()
+    if index then return index end
+    index = {}
+    if ns.QuestDB then
+        for id, d in pairs(ns.QuestDB) do
+            if d.t then index[d.t:lower()] = { id = id, level = d.lvl or 0 } end
+        end
+    end
+    return index
+end
+
+-- Slå et navn op og returnér et klikbart link (eller nil hvis ukendt).
+local function linkify(title)
+    local e = buildIndex()[title:lower()]
+    if not e then return nil end
+    return Links:QuestLink(e.id, title, e.level)
+end
+
+-- Erstat "[Kendt quest]" med et link i et stykke REN tekst (uden hyperlinks).
+local function scanPlain(s)
+    return (s:gsub("%[([^%[%]]+)%]", function(inner)
+        return linkify(inner) or ("[" .. inner .. "]")
+    end))
+end
+
+-- Lav "[Quest-navn]" om til klikbare links i en besked. Eksisterende hyperlinks
+-- (item/enchant/andre) bevares urørt, så vi ikke ødelægger dem.
+function Links:Rewrite(msg)
+    if not msg or not msg:find("[", 1, true) then return msg end
+    local out, pos = {}, 1
+    while true do
+        local s, e = msg:find("|H.-|h.-|h", pos)
+        if not s then
+            out[#out + 1] = scanPlain(msg:sub(pos))
+            break
+        end
+        out[#out + 1] = scanPlain(msg:sub(pos, s - 1))
+        out[#out + 1] = msg:sub(s, e)          -- behold eksisterende link
+        pos = e + 1
+    end
+    return table.concat(out)
 end
 
 -- Vis et tooltip for et quest-hyperlink: titel, objectives (hvis i egen log)
@@ -48,8 +101,7 @@ local function showQuestTooltip(questID, title, level)
         if objs and #objs > 0 then
             GameTooltip:AddLine(" ")
             for _, o in ipairs(objs) do
-                local done = o.done
-                GameTooltip:AddLine((done and "|cff20ff20" or "|cffd9d9d9") .. o.text .. "|r")
+                GameTooltip:AddLine((o.done and "|cff20ff20" or "|cffd9d9d9") .. o.text .. "|r")
             end
         end
     end
@@ -68,6 +120,13 @@ local function showQuestTooltip(questID, title, level)
     GameTooltip:Show()
 end
 
+local CHAT_EVENTS = {
+    "CHAT_MSG_SAY", "CHAT_MSG_YELL", "CHAT_MSG_PARTY", "CHAT_MSG_PARTY_LEADER",
+    "CHAT_MSG_RAID", "CHAT_MSG_RAID_LEADER", "CHAT_MSG_GUILD", "CHAT_MSG_OFFICER",
+    "CHAT_MSG_WHISPER", "CHAT_MSG_WHISPER_INFORM", "CHAT_MSG_CHANNEL",
+    "CHAT_MSG_INSTANCE_CHAT", "CHAT_MSG_INSTANCE_CHAT_LEADER",
+}
+
 function Links:Init()
     if self._inited then return end
     self._inited = true
@@ -75,7 +134,7 @@ function Links:Init()
     local function onEnter(_, link)
         if not link then return end
         local kind, a, b = strsplit(":", link)
-        if kind == "quest" then
+        if kind == "qeasy" or kind == "quest" then
             local qid = tonumber(a) or 0
             local level = tonumber(b) or 0
             local title
@@ -98,6 +157,18 @@ function Links:Init()
             self.hooked[cf] = true
             cf:HookScript("OnHyperlinkEnter", onEnter)
             cf:HookScript("OnHyperlinkLeave", onLeave)
+        end
+    end
+
+    -- Chat-filter: lav "[Quest-navn]" om til klikbare links hos ALLE Qeasy-
+    -- brugere (også afsenderen selv, når beskeden ekkoer tilbage).
+    if ChatFrame_AddMessageEventFilter and not self._filtered then
+        self._filtered = true
+        local filter = function(_, _, msg, ...)
+            return false, Links:Rewrite(msg), ...
+        end
+        for _, ev in ipairs(CHAT_EVENTS) do
+            ChatFrame_AddMessageEventFilter(ev, filter)
         end
     end
 end
