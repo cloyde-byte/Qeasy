@@ -39,7 +39,7 @@ du selv. Det holder addonet trygt inden for Blizzards regler.
    (mappen skal hedde `Qeasy` og indeholde `Qeasy.toc`).
 3. Genstart spillet eller kør `/reload`.
 
-> **Interface-version:** `Qeasy.toc` er sat til `20505` (TBC 2.5.5). Hvis
+> **Interface-version:** `Qeasy.toc` er sat til `20506` (TBC 2.5.6). Hvis
 > klienten er nyere, kan du enten opdatere tallet i `.toc`-filen eller slå
 > "Load out of date AddOns" til i addon-listen.
 
