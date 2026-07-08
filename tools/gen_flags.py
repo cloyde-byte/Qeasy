@@ -36,6 +36,7 @@ PVP_NAMES = [
     "Gladiators of Halaa",
     "Banner Down!",
     "Bloody Coins? What Are Those?",
+    "Spirits of Auchindoun",   # Auchindoun-spirit-tower: kontestet med Alliance
 ]
 
 # Titel-fragmenter der altid er PvP (fx alle "Call to Arms"-BG-quests).
