@@ -97,7 +97,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.24.0' end
+function GetAddOnMetadata() return '0.24.1' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -452,6 +452,18 @@ icons = list(ns.Map.IconsForMap(ns.Map, 1944).values())
 kinds = set(i.kind for i in icons)
 check(f"kort-ikoner for Hellfire (1944): {len(icons)} stk", len(icons) > 20)
 check("indeholder giver-ikoner (!)", "giver" in kinds)
+
+# Alliance-byer (Telredor/Orebor Harborage): ingen tilgængelige quests for Horde.
+lua.execute("PSTATE.map=1946; PSTATE.level=70; QLOG={}; FLAGGED={}")
+tel = list(ns.Map.AvailableQuestsForGiver(ns.Map, "Anchorite Ahuurn").values())  # Telredor
+check("Telredor-giver viser ingen tilgængelige quests", len(tel) == 0)
+ore = list(ns.Map.AvailableQuestsForGiver(ns.Map, "Puluu").values())            # Orebor Harborage
+check("Orebor Harborage-giver viser ingen tilgængelige quests", len(ore) == 0)
+zab = list(ns.Map.AvailableQuestsForGiver(ns.Map, "Gambarinka").values())        # Zabra'jin (Horde)
+check("Horde-by (Zabra'jin) viser stadig quests", len(zab) > 0)
+zicons = list(ns.Map.IconsForMap(ns.Map, 1946).values())
+telredor_giver = any(i.kind == "giver" and 66 <= i.x <= 70 and 47 <= i.y <= 52 for i in zicons)
+check("ingen giver-ikoner ved Telredor på kortet", not telredor_giver)
 
 # en available giver-quest må ikke længere vises som giver når den er i loggen
 some = int(next(i.qid for i in icons if i.kind == "giver"))

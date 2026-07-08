@@ -47,6 +47,25 @@ end
 -- ---------------------------------------------------------------------
 local function playerLevel() return UnitLevel and UnitLevel("player") or 0 end
 
+-- Alliance-/draenei-hubs, hvor en Horde-spiller ikke skal se tilgængelige
+-- quests (deres givere er draenei/Broken). Geo-fence: giver-koordinat inden
+-- for radius (zone-%) af hub-centrum. {map, x, y, r}.
+local ALLIANCE_HUBS = {
+    { 1946, 68.2, 49.8, 4.0 },   -- Telredor (Zangarmarsh)
+    { 1946, 41.9, 28.8, 4.0 },   -- Orebor Harborage (Zangarmarsh)
+}
+local function atAllianceHub(d)
+    local g = d.g
+    if not g then return false end
+    for _, h in ipairs(ALLIANCE_HUBS) do
+        if g[1] == h[1] then
+            local dx, dy = g[2] - h[2], g[3] - h[3]
+            if dx * dx + dy * dy <= h[4] * h[4] then return true end
+        end
+    end
+    return false
+end
+
 local function flagged(qid)
     if C_QuestLog and C_QuestLog.IsQuestFlaggedCompleted then
         return C_QuestLog.IsQuestFlaggedCompleted(qid)
@@ -57,6 +76,7 @@ end
 
 local function giverAvailable(qid, d)
     if flagged(qid) then return false end             -- allerede klaret
+    if atAllianceHub(d) then return false end         -- Alliance-by (Telredor/Orebor)
     -- Sæson-event: skjul quest-giveren uden for eventets datovindue.
     if d.ev and ns.Seasonal and not ns.Seasonal:IsActive(d.ev) then return false end
     if d.lvl and playerLevel() < d.lvl then return false end
