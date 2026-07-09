@@ -490,13 +490,16 @@ function Map:UpdateWorldMap()
         local base = (ic.kind == "flightmaster") and (ic.known and 12 or 14)
             or (ic.kind == "objective") and (isSlay(ic.otype) and 13 or 12)
             or (ic.kind == "innkeeper" or ic.kind == "mailbox") and 14
+            or (ic.kind == "turnin") and 16   -- afleverings-"?" større: let at finde
             or 13
         styleIcon(p.tex, ic.kind, base, ic.otype, ic.known,
             ic.kind == "giver" and questFlag(ic.qid) or nil)
         p:SetSize(base, base)
         p.base = base
-        -- Kun tandhjul (interager/saml) pulserer; sværd står stille og tydeligt.
-        p.pulse = (ic.kind == "objective") and not isSlay(ic.otype)
+        -- Tandhjul (interager/saml) OG afleverings-"?" pulserer, så de skiller sig
+        -- ud i en tæt by; sværd/"!" står stille.
+        p.pulse = ic.kind == "turnin"
+            or ((ic.kind == "objective") and not isSlay(ic.otype))
         p.title = ic.title
         p.qid = ic.qid
         p.kind = ic.kind

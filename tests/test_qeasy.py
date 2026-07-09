@@ -97,7 +97,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.24.2' end
+function GetAddOnMetadata() return '0.24.3' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -461,6 +461,15 @@ ore = list(ns.Map.AvailableQuestsForGiver(ns.Map, "Puluu").values())            
 check("Orebor Harborage-giver viser ingen tilgængelige quests", len(ore) == 0)
 zab = list(ns.Map.AvailableQuestsForGiver(ns.Map, "Gambarinka").values())        # Zabra'jin (Horde)
 check("Horde-by (Zabra'jin) viser stadig quests", len(zab) > 0)
+
+# Fuldført quest -> afleverings-"?" på afleverings-NPC'ens kort (fx A Cure for
+# Zahlia hos Sha'nir i Shattrath, uiMap 1955).
+lua.eval("""function() QLOG = { { title='A Cure for Zahlia', questID=10020, complete=true,
+  objectives={ { text="Stonegazer's Blood: 1/1", done=true } } } } end""")()
+sh = list(ns.Map.IconsForMap(ns.Map, 1955).values())
+turnins = [i for i in sh if i.kind == "turnin" and int(i.qid) == 10020]
+check("fuldført quest viser afleverings-ikon på kortet",
+      len(turnins) == 1)
 zicons = list(ns.Map.IconsForMap(ns.Map, 1946).values())
 telredor_giver = any(i.kind == "giver" and 66 <= i.x <= 70 and 47 <= i.y <= 52 for i in zicons)
 check("ingen giver-ikoner ved Telredor på kortet", not telredor_giver)
