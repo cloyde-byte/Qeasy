@@ -97,7 +97,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.24.1' end
+function GetAddOnMetadata() return '0.24.2' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -742,6 +742,26 @@ says = list(g.SAYS.values())
 check("announce delmål (15/15 af den ene type)",
       any("Warmaul Brute slain: 15/15" in s.msg for s in says[nb:])
       and not any("aflevering" in s.msg for s in says[nb:]))
+# Zone-skift må IKKE spamme allerede-færdige quests. Simulér quietvindue +
+# transiente data (færdige mål læses som ufærdige og genopstår).
+ns.Q.char.ui.announceProgress = True
+lua.eval("""function() QLOG = { { title='Terokks Legacy', questID=10098, objectives={
+  {text='Terokks Mask: 1/1', done=true},
+  {text='Terokks Quill: 1/1', done=true} } } } end""")()
+ns.Announce.Check(ns.Announce)                 # seed: allerede færdig
+nz = len(list(g.SAYS.values()))
+lua.execute("PSTATE.time=100")
+ns.Announce.Quiet(ns.Announce, 5)              # quietUntil = 105
+lua.eval("""function() QLOG = { { title='Terokks Legacy', questID=10098, objectives={
+  {text='Terokks Mask: 0/1', done=false},
+  {text='Terokks Quill: 0/1', done=false} } } } end""")()
+ns.Announce.Check(ns.Announce)                 # transient (undertrykt)
+lua.eval("""function() QLOG = { { title='Terokks Legacy', questID=10098, objectives={
+  {text='Terokks Mask: 1/1', done=true},
+  {text='Terokks Quill: 1/1', done=true} } } } end""")()
+ns.Announce.Check(ns.Announce)                 # "genopstår" - stadig i quietvindue
+check("zone-skift spammer ikke færdige quests", len(list(g.SAYS.values())) == nz)
+lua.execute("PSTATE.time=0")
 # Slået fra -> ingen besked ved turn-in
 ns.Q.char.ui.announceProgress = False
 n2 = len(list(g.SAYS.values()))

@@ -46,6 +46,9 @@ Q:SetScript("OnEvent", function(self, event, arg1, arg2, arg3, arg4)
         end
 
     elseif event == "PLAYER_ENTERING_WORLD" then
+        -- Zone-/instans-skift roder i quest-loggen et øjeblik; hold announce
+        -- stille imens, så vi ikke spammer allerede-færdige quests.
+        if ns.Announce then ns.Announce:Quiet() end
         if not loadedPrinted then
             loadedPrinted = true
             print(string.format(L.ADDON_LOADED, GetVersion()))
@@ -119,6 +122,7 @@ Q:SetScript("OnEvent", function(self, event, arg1, arg2, arg3, arg4)
         if ns.Session then ns.Session:OnXP() end
 
     elseif event == "ZONE_CHANGED_NEW_AREA" then
+        if ns.Announce then ns.Announce:Quiet() end
         if IsHorde() and self.char.ui.autoRoute ~= false then self:AutoPickRoute() end
         self:Refresh()
     end

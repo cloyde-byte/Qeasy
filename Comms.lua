@@ -142,9 +142,17 @@ end
 -- =========================================================================
 local Announce = {}
 ns.Announce = Announce
-local snap = {}      -- questID -> { complete = bool, done = { [i] = bool } }
+local snap = {}      -- questID -> { complete = bool, done = { [i] = bool }, n = antal }
 local titles = {}    -- questID -> titel (cache, så vi kender navnet ved turn-in)
 local inited = false
+local quietUntil = 0 -- undertryk announce indtil dette tidspunkt (zone-skift)
+
+-- Kaldes ved zone-/instans-skift: quest-loggen giver et øjeblik forkerte tal
+-- (færdige mål læses som ufærdige og "genopstår"), hvilket ellers ville spamme
+-- chatten. Vi opdaterer snapshottet stille i et par sekunder uden at annoncere.
+function Announce:Quiet(sec)
+    if GetTime then quietUntil = GetTime() + (sec or 5) end
+end
 
 local function annChannel()
     if IsInRaid and IsInRaid() then return "RAID" end
@@ -184,6 +192,8 @@ function Announce:Check()
     if not ns.QuestLog then return end
     local first = not inited
     inited = true
+    -- Undertryk annoncering ved opstart OG i et vindue efter zone-skift.
+    local suppress = first or (GetTime and GetTime() < quietUntil)
     local on = ns.Q.char.ui.announceProgress
     local seen = {}
     for _, e in ipairs(ns.QuestLog:Scan()) do
@@ -191,7 +201,11 @@ function Announce:Check()
             seen[e.questID] = true
             titles[e.questID] = e.title
             local s = snap[e.questID]
-            if on and not first and s then
+            -- Kun annoncér når snapshottet havde SAMME antal delmål (stabile
+            -- data) - så et zone-skift, hvor mål forsvinder/genopstår, ikke
+            -- fejltolkes som friske fuldførelser.
+            local stable = s and s.n == #e.objectives
+            if on and not suppress and stable then
                 -- Delmål: annoncér hvert objektiv der netop blev fuldført, men
                 -- kun når questen har FLERE delmål (ellers dækker "klar til
                 -- aflevering" allerede det ene mål).
@@ -209,7 +223,7 @@ function Announce:Check()
             end
             local done = {}
             for i, o in ipairs(e.objectives) do done[i] = o.done and true or false end
-            snap[e.questID] = { complete = e.isComplete, done = done }
+            snap[e.questID] = { complete = e.isComplete, done = done, n = #e.objectives }
         end
     end
     for qid in pairs(snap) do if not seen[qid] then snap[qid] = nil end end
