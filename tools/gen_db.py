@@ -159,6 +159,43 @@ def outland_objective(qid):
     return None, None, None, None, None
 
 
+def outland_item_points(qid):
+    """Per-item saml-punkter for quests der samler FLERE forskellige items fra
+    hvert sit sted (fx 'Thunderlord Clan Artifacts': tromme/pil/tavle). Returnér
+    [(item-navn, map, x, y), ...] så kortet kan vise én markør pr. item og
+    fjerne dem én ad gangen. None hvis ikke relevant (ét item, ukendt navn,
+    eller alle items ligger samme sted)."""
+    q = qdb.qdata[qid]
+    if T(q) != "table" or not q["obj"] or not q["obj"]["I"]:
+        return None
+    per = []
+    for iid in q["obj"]["I"].values():
+        iid = int(iid)
+        iname = qdb.item_name(iid)
+        if not iname:
+            return None                      # uden navn kan vi ikke matche loggen
+        it = qdb.idata[iid]
+        pts = []
+        if it is not None and T(it) == "table":
+            if it["O"]:
+                for oid in it["O"].keys():
+                    pts += [p for p in qdb.spawns(qdb.odata, int(oid)) if p[0] in OUTLAND]
+            if it["U"]:
+                for uid in it["U"].keys():
+                    pts += [p for p in qdb.spawns(qdb.udata, int(uid)) if p[0] in OUTLAND]
+        c = qdb.centroid(pts) if pts else None
+        if not c:
+            return None                      # ufuldstændige data -> drop hele op
+        per.append((iname, c))
+    if len(per) < 2:
+        return None
+    xs = [c[1] for _, c in per]
+    ys = [c[2] for _, c in per]
+    if (max(xs) - min(xs)) ** 2 + (max(ys) - min(ys)) ** 2 < 9:
+        return None                          # < ~3% spredning: reelt ét sted
+    return [(n, c[0], round(c[1], 1), round(c[2], 1)) for n, c in per]
+
+
 def build_area(pts, mapid, cap=24):
     """Nedsampl spawnpunkter (på målets kort) til en lille sky, der viser
     området. Grid-dedup så vi ikke gemmer hundredvis af punkter."""
@@ -251,6 +288,11 @@ def main():
             parts.append("pre={%s}" % ",".join(str(p) for p in pre))
         if season:
             parts.append('ev="%s"' % season)
+        # op = per-item saml-markører (flere items fra hvert sit sted).
+        op = outland_item_points(qid)
+        if op:
+            parts.append("op={%s}" % ",".join(
+                '{"%s",%d,%.1f,%.1f}' % (esc(n), m, x, y) for n, m, x, y in op))
         rows.append((qid, "  [%d]={%s}," % (qid, ", ".join(parts))))
 
     rows.sort()

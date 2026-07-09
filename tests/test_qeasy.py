@@ -97,7 +97,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.24.3' end
+function GetAddOnMetadata() return '0.25.0' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -470,6 +470,19 @@ sh = list(ns.Map.IconsForMap(ns.Map, 1955).values())
 turnins = [i for i in sh if i.kind == "turnin" and int(i.qid) == 10020]
 check("fuldført quest viser afleverings-ikon på kortet",
       len(turnins) == 1)
+
+# Per-item saml-markører: multi-item quest (Thunderlord Clan Artifacts) viser
+# én markør pr. item, og en HENTET del fjernes fra kortet.
+check("10524 har per-item punkter (op)", ns.QuestDB[10524].op is not None)
+lua.eval("""function() QLOG = { { title='Thunderlord Clan Artifacts', questID=10524, complete=false,
+  objectives={ {text='Thunderlord Clan Arrow: 1/1', done=true},
+               {text='Thunderlord Clan Drum: 0/1', done=false},
+               {text='Thunderlord Clan Tablet: 0/1', done=false} } } } end""")()
+arts = [i for i in ns.Map.IconsForMap(ns.Map, 1949).values()
+        if i.kind == "objective" and int(i.qid) == 10524]
+items = sorted(i.item for i in arts)
+check("hentet item fjernes fra kortet, resten vises",
+      items == ["Thunderlord Clan Drum", "Thunderlord Clan Tablet"])
 zicons = list(ns.Map.IconsForMap(ns.Map, 1946).values())
 telredor_giver = any(i.kind == "giver" and 66 <= i.x <= 70 and 47 <= i.y <= 52 for i in zicons)
 check("ingen giver-ikoner ved Telredor på kortet", not telredor_giver)

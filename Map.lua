@@ -29,16 +29,26 @@ local function buildIndex()
     byMap = {}
     if not ns.QuestDB then return end
     for qid, d in pairs(ns.QuestDB) do
-        local function add(coord, kind)
+        local function add(coord, kind, item)
             if coord then
                 local m = coord[1]
                 byMap[m] = byMap[m] or {}
-                table.insert(byMap[m], { qid = qid, kind = kind, x = coord[2], y = coord[3] })
+                table.insert(byMap[m], { qid = qid, kind = kind,
+                    x = coord[2], y = coord[3], item = item })
             end
         end
         add(d.g, "giver")
         add(d.e, "turnin")
-        add(d.o, "objective")
+        -- Saml-quests med FLERE items fra hvert sit sted: én markør pr. item
+        -- (op = { {item-navn, map, x, y}, ... }), så man ser alle delene og de
+        -- forsvinder én ad gangen når de hentes. Ellers ét samlet objektiv-mål.
+        if d.op then
+            for _, it in ipairs(d.op) do
+                add({ it[2], it[3], it[4] }, "objective", it[1])
+            end
+        else
+            add(d.o, "objective")
+        end
     end
 end
 
@@ -91,21 +101,37 @@ end
 -- Byg quest-log-tilstand fra QuestLog (samme robuste "complete"-logik som
 -- trackeren: en quest er complete når ALLE objectives er det, også når
 -- klientens isComplete-flag mangler - fx redningsquests).
---   st[qid] = "complete" | "active" (i loggen); nil = ikke i loggen
+--   st[qid]   = "complete" | "active" (i loggen); nil = ikke i loggen
+--   done[qid] = sammensat tekst af de FÆRDIGE objektiv-linjer (til at afgøre
+--               om et bestemt saml-item allerede er i tasken).
 local function buildState()
-    local st = {}
+    local st, done = {}, {}
     for _, e in ipairs(ns.QuestLog:Scan()) do
         if e.questID then
             st[e.questID] = e.isComplete and "complete" or "active"
+            local parts
+            for _, o in ipairs(e.objectives) do
+                if o.done then parts = (parts and parts .. "\n" or "") .. o.text end
+            end
+            done[e.questID] = parts
         end
     end
-    return st
+    return st, done
+end
+
+-- Er saml-item'et `itemName` for en quest allerede hentet? (dvs. står som en
+-- FÆRDIG objektiv-linje "<item>: x/y" i loggen). Matcher linjestart + ":" så
+-- fx "Teromoth Sample" ikke fejlagtigt rammer "Vicious Teromoth Sample".
+local function itemCollected(done, qid, itemName)
+    local d = done and done[qid]
+    if not d or not itemName then return false end
+    return ("\n" .. d):find("\n" .. itemName .. ":", 1, true) and true or false
 end
 
 -- Hvilke ikoner skal vises på et bestemt map lige nu?
 function Map:IconsForMap(mapID)
     buildIndex()
-    local st = buildState()
+    local st, done = buildState()
     local list = {}
     for _, e in ipairs(byMap[mapID] or {}) do
         local d = ns.QuestDB[e.qid]
@@ -119,11 +145,15 @@ function Map:IconsForMap(mapID)
             npc = d.en
         elseif e.kind == "objective" then
             show = (state == "active")                          -- i gang
+            -- Per-item-markør: skjul den, når netop DET item er hentet i tasken.
+            if show and e.item and itemCollected(done, e.qid, e.item) then
+                show = false
+            end
         end
         if show then
             list[#list + 1] = { qid = e.qid, kind = e.kind, x = e.x, y = e.y,
-                                title = d.t, npc = npc, otype = d.ot,
-                                oa = (e.kind == "objective") and d.oa or nil }
+                                title = d.t, npc = npc, otype = d.ot, item = e.item,
+                                oa = (e.kind == "objective" and not e.item) and d.oa or nil }
         end
     end
     return list
@@ -265,13 +295,13 @@ end
 function Map:ClusterIcons(list)
     local clusters, index = {}, {}
     for _, ic in ipairs(list) do
-        local key = string.format("%s:%d:%d", visualClass(ic),
+        local key = string.format("%s:%s:%d:%d", visualClass(ic), ic.item or "",
             math.floor(ic.x / 1.5 + 0.5), math.floor(ic.y / 1.5 + 0.5))
         local c = index[key]
         if not c then
             c = { kind = ic.kind, x = ic.x, y = ic.y, otype = ic.otype,
                   known = ic.known, horde = ic.horde, qid = ic.qid,
-                  title = ic.title, npc = ic.npc, entries = {} }
+                  title = ic.title, npc = ic.npc, item = ic.item, entries = {} }
             index[key] = c
             clusters[#clusters + 1] = c
         end
@@ -520,6 +550,8 @@ function Map:UpdateWorldMap()
             p.sub = "Kroværter (sæt hearthstone)"
         elseif ic.kind == "mailbox" then
             p.sub = "Postkasse"
+        elseif ic.item then   -- per-item saml-markør: vis hvilket item her
+            p.sub = "Saml: " .. ic.item
         else   -- objektiv (dræb/interager): vis mob-navne hvis vi har dem
             p.sub = objectiveSub(ic.qid, ic.otype)
         end
