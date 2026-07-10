@@ -99,7 +99,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.26.0' end
+function GetAddOnMetadata() return '0.26.1' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -335,6 +335,10 @@ check("Rewrite rører ikke ukendte [ord]", rw2 == "bare [noget rart] her")
 rw3 = ns.Links.Rewrite(ns.Links, "wts |cffffffff|Hitem:1:2|h[War on the Warmaul]|h|r nu")
 check("Rewrite ødelægger ikke eksisterende hyperlinks",
       "|Hitem:1:2|h[War on the Warmaul]|h|r" in rw3 and "Hqeasy" not in rw3)
+# Questie-brugeres links: serveren stripper deres |Hquestie|h til ren tekst med
+# et level-suffiks - Qeasy skal stadig genkende og linke quest-navnet.
+rwq = ns.Links.Rewrite(ns.Links, "LFG [War on the Warmaul (Level 67)] pls")
+check("Rewrite læser Questie-link med (Level XX)", "Hqeasy:9945" in rwq)
 
 # ---- party quest-sync ('snakke med Questie') ----
 lua.execute("PSTATE.unitName='Me'; PSTATE.inGroup=true")

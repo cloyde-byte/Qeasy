@@ -54,10 +54,17 @@ local function buildIndex()
 end
 
 -- Slå et navn op og returnér et klikbart link (eller nil hvis ukendt).
-local function linkify(title)
-    local e = buildIndex()[title:lower()]
+-- Tolererer Questie-varianter med en efterstillet parentes, fx
+-- "Quest-navn (Level 65)" -> matcher "Quest-navn".
+local function linkify(inner)
+    local idx = buildIndex()
+    local e = idx[inner:lower()]
+    if not e then
+        local base = inner:match("^(.-)%s*%b()%s*$")   -- fjern " (...)" til sidst
+        if base and base ~= "" then e = idx[base:lower()] end
+    end
     if not e then return nil end
-    return Links:QuestLink(e.id, title, e.level)
+    return Links:QuestLink(e.id, inner, e.level)        -- behold synlig tekst
 end
 
 -- Erstat "[Kendt quest]" med et link i et stykke REN tekst (uden hyperlinks).
@@ -134,8 +141,10 @@ function Links:Init()
     local function onEnter(_, link)
         if not link then return end
         local kind, a, b = strsplit(":", link)
-        if kind == "qeasy" or kind == "quest" then
-            local qid = tonumber(a) or 0
+        -- "qeasy"/"quest" = vores egne. "questie" = Questie-brugeres links (hvis
+        -- de nogensinde når frem urørt) - vis Qeasys tooltip for samme quest-id.
+        if kind == "qeasy" or kind == "quest" or kind == "questie" then
+            local qid = tonumber(a) or tonumber(link:match(":(%d+)")) or 0
             local level = tonumber(b) or 0
             local title
             if ns.QuestDB and ns.QuestDB[qid] then title = ns.QuestDB[qid].t end
