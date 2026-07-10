@@ -159,6 +159,44 @@ def outland_objective(qid):
     return None, None, None, None, None
 
 
+def outland_patrol(qid):
+    """Ordnet 'patrulje'-/søge-rute for objektiver der er ÉN enkelt NPC-type
+    spredt over en rute/et lille område (patruljerende eller få spredte spawns).
+    Returnér (map, [(x,y), ...]) nærmeste-nabo-ordnet, så kortet kan tegne en
+    streg 'her kan NPC'en findes'. None for enlige spawns og zone-brede
+    bestande (fx clefthoofs), hvor en streg ikke giver mening."""
+    q = qdb.qdata[qid]
+    if T(q) != "table" or not q["obj"] or not q["obj"]["U"]:
+        return None
+    uids = [int(v) for v in q["obj"]["U"].values()]
+    if len(uids) != 1:                       # kun ét enkelt (unikt) mål
+        return None
+    sp = [p for p in qdb.spawns(qdb.udata, uids[0]) if p[0] in OUTLAND]
+    seen, g = set(), []
+    for m, x, y in sp:                       # grid-dedup (samme som kortets sky)
+        k = (round(x / 1.5), round(y / 1.5))
+        if k in seen:
+            continue
+        seen.add(k)
+        g.append((m, x, y))
+    if not (2 <= len(g) <= 12):              # rute, ikke enlig spawn el. bestand
+        return None
+    mp = g[0][0]
+    pts = [(x, y) for m, x, y in g if m == mp]
+    xs = [x for x, y in pts]
+    ys = [y for x, y in pts]
+    span = ((max(xs) - min(xs)) ** 2 + (max(ys) - min(ys)) ** 2) ** 0.5
+    if not (5 <= span <= 40):
+        return None
+    order = [pts.pop(0)]                      # nærmeste-nabo -> pæn rute
+    while pts:
+        lx, ly = order[-1]
+        j = min(range(len(pts)),
+                key=lambda i: (pts[i][0] - lx) ** 2 + (pts[i][1] - ly) ** 2)
+        order.append(pts.pop(j))
+    return mp, [(round(x, 1), round(y, 1)) for x, y in order]
+
+
 def outland_item_points(qid):
     """Per-item saml-punkter for quests der samler FLERE forskellige items fra
     hvert sit sted (fx 'Thunderlord Clan Artifacts': tromme/pil/tavle). Returnér
@@ -293,6 +331,11 @@ def main():
         if op:
             parts.append("op={%s}" % ",".join(
                 '{"%s",%d,%.1f,%.1f}' % (esc(n), m, x, y) for n, m, x, y in op))
+        # opat = søge-/patrulje-rute (streg på kort) for ét spredt NPC-mål.
+        pat = outland_patrol(qid)
+        if pat:
+            parts.append("opat={%s}" % ",".join(
+                "{%.1f,%.1f}" % (x, y) for x, y in pat[1]))
         rows.append((qid, "  [%d]={%s}," % (qid, ", ".join(parts))))
 
     rows.sort()

@@ -77,6 +77,8 @@ function GetNumQuestLogEntries() return #QLOG end
 function GetQuestLogTitle(i)
     local q = QLOG[i]; if not q then return nil end
     if q.header then return q.title, 0, nil, true, false, nil, nil, nil end
+    -- q.findnpc: "opsøg NPC"-quest (ingen objektiv, isComplete = nil = i gang).
+    if q.findnpc then return q.title, q.level or 60, nil, false, false, nil, nil, q.questID end
     return q.title, q.level or 60, nil, false, false, q.complete and 1 or 0, nil, q.questID
 end
 function GetNumQuestLeaderBoards(i)
@@ -97,7 +99,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.25.0' end
+function GetAddOnMetadata() return '0.26.0' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -483,6 +485,17 @@ arts = [i for i in ns.Map.IconsForMap(ns.Map, 1949).values()
 items = sorted(i.item for i in arts)
 check("hentet item fjernes fra kortet, resten vises",
       items == ["Thunderlord Clan Drum", "Thunderlord Clan Tablet"])
+
+# "Opsøg NPC"-quest uden objektiv (Whispers on the Wind -> Leoroxx): mens den er
+# I GANG vises afleverings-NPC'en som mål (ellers stod der intet på kortet).
+lua.eval("""function() QLOG = { { title='Whispers on the Wind', questID=10614,
+  findnpc=true, objectives={} } } end""")()
+wic = [i for i in ns.Map.IconsForMap(ns.Map, 1949).values()
+       if int(i.qid) == 10614 and i.kind == "turnin"]
+check("opsøg-NPC-quest viser mål på kort mens aktiv", len(wic) == 1)
+
+# Patrulje-/søge-rute (opat): ét spredt NPC-mål får en streg på kortet.
+check("opat findes for patrulje-quest (Spectrecles)", ns.QuestDB[10625].opat is not None)
 zicons = list(ns.Map.IconsForMap(ns.Map, 1946).values())
 telredor_giver = any(i.kind == "giver" and 66 <= i.x <= 70 and 47 <= i.y <= 52 for i in zicons)
 check("ingen giver-ikoner ved Telredor på kortet", not telredor_giver)
@@ -595,6 +608,12 @@ lua.eval("""function() QLOG = { { title='Clefthoof Mastery', questID=9789,
 ns.Q.char.ui.trackerFocus = lua.eval("{9789}")
 ns.Map.UpdateWorldMap(ns.Map)   # kaster hvis pin-tegningen fejler
 check("verdenskort tegner pins + waypoint-linje uden fejl", True)
+# aktiv patrulje-quest (opat) på det viste kort -> tegner søge-streg uden fejl
+lua.execute("function WorldMapFrame:GetMapID() return 1948 end; PSTATE.map=1948")
+lua.eval("""function() QLOG = { { title='Spectrecles', questID=10625,
+  objectives = { { text='Zealots freed: 0/6', done=false } } } } end""")()
+ns.Map.UpdateWorldMap(ns.Map)
+check("kort tegner patrulje-rute (opat) uden fejl", True)
 lua.execute("WorldMapFrame = nil")
 
 # ---- session-statistik (XP/time) ----

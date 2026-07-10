@@ -141,7 +141,11 @@ function Map:IconsForMap(mapID)
             show = (state == nil) and giverAvailable(e.qid, d)  -- ikke i loggen
             npc = d.gn
         elseif e.kind == "turnin" then
-            show = (state == "complete")                        -- færdig, aflever
+            -- Aflever når færdig. MEN "find NPC"-quests (ingen objektiv - fx
+            -- "Whispers on the Wind": opsøg Leoroxx) har afleverings-NPC'en som
+            -- selve målet, så vis den også mens questen er i gang.
+            show = (state == "complete")
+                or (state == "active" and not d.o and not d.op)
             npc = d.en
         elseif e.kind == "objective" then
             show = (state == "active")                          -- i gang
@@ -571,42 +575,66 @@ end
 -- Prikket sti fra dig til hvert fokuseret mål. Vi bruger en RÆKKE små prikker
 -- i stedet for én roteret tekstur, fordi SetRotation klipper lange, tynde
 -- teksturer til deres akse-rettede kasse (så en skrå linje forsvinder).
+local PATROL_COLOR = { 1.0, 0.55, 0.15 }     -- orange søge-/patrulje-rute
+
+-- Tegn en prikket streg mellem to kanvas-punkter (fortsætter dot-tælleren dn).
+local function dottedSeg(canvas, x1, y1, x2, y2, col, alpha, size, step, dn)
+    local dx, dy = x2 - x1, y2 - y1
+    local dist = math.sqrt(dx * dx + dy * dy)
+    if dist <= 3 then return dn end
+    local count = math.min(80, math.max(1, math.floor(dist / step)))
+    for k = 0, count do
+        local t = k / count
+        dn = dn + 1
+        local dot = getAreaLine(dn, canvas)
+        dot:SetVertexColor(col[1], col[2], col[3], alpha)
+        dot:SetSize(size, size)
+        dot:ClearAllPoints()
+        dot:SetPoint("CENTER", canvas, "TOPLEFT", x1 + dx * t, y1 + dy * t)
+        dot:Show()
+    end
+    return dn
+end
+
 function Map:DrawFocusLines(canvas, mapID, w, h)
     local dn = 0
+    -- 1) Patrulje-/søge-ruter: forbind spawn-punkterne for ét spredt NPC-mål
+    -- (opat) med en orange streg, så man ser hvor den patruljerende NPC kan
+    -- være. Tegnes for AKTIVE quests uanset hvilken zone man selv står i.
+    pcall(function()
+        if ns.Q.char.ui.mapIcons == false or not canvas.CreateTexture then return end
+        local st = buildState()
+        for qid, d in pairs(ns.QuestDB) do
+            if d.opat and d.o and d.o[1] == mapID and st[qid] == "active" then
+                local pts = d.opat
+                for i = 1, #pts - 1 do
+                    dn = dottedSeg(canvas,
+                        (pts[i][1] / 100) * w, -(pts[i][2] / 100) * h,
+                        (pts[i + 1][1] / 100) * w, -(pts[i + 1][2] / 100) * h,
+                        PATROL_COLOR, 0.85, 5, 12, dn)
+                end
+            end
+        end
+    end)
+    -- 2) Gylden sti fra DIN position til hvert fokuseret mål (kun på det kort du
+    -- står på, så prikkerne peger fra din faktiske plads).
     pcall(function()
         if ns.Q.char.ui.mapIcons == false then return end
         if not (canvas.CreateTexture and C_Map and C_Map.GetBestMapForUnit) then return end
-        -- Stien tegnes kun på kortet for den zone du STÅR i (ikke når du
-        -- kigger på en anden zone) - så prikkerne peger fra din faktiske plads.
         if C_Map.GetBestMapForUnit("player") ~= mapID then return end
         local ppos = C_Map.GetPlayerMapPosition and C_Map.GetPlayerMapPosition(mapID, "player")
         local px, py = ppos and ppos:GetXY()
         if not px or (px == 0 and py == 0) then return end
-        local x1, y1 = px * w, -py * h                       -- kanvas-pixel (TOPLEFT-anker)
+        local x1, y1 = px * w, -py * h
         for _, tgt in ipairs(self:PathTargets(mapID)) do
-            local c = tgt.color
-            local x2, y2 = (tgt.x / 100) * w, -(tgt.y / 100) * h
-            local dx, dy = x2 - x1, y2 - y1
-            local dist = math.sqrt(dx * dx + dy * dy)
-            if dist > 6 then
-                local count = math.min(80, math.max(2, math.floor(dist / 14)))  -- prik pr. ~14 px
-                for k = 1, count - 1 do                        -- spring endepunkterne over
-                    local t = k / count
-                    dn = dn + 1
-                    local dot = getAreaLine(dn, canvas)
-                    dot:SetVertexColor(c[1], c[2], c[3], 0.95)
-                    dot:SetSize(6, 6)
-                    dot:ClearAllPoints()
-                    dot:SetPoint("CENTER", canvas, "TOPLEFT", x1 + dx * t, y1 + dy * t)
-                    dot:Show()
-                end
-            end
-        end
-        if dn > 0 and areaHost then    -- løft prikkerne over kortet (under ikonerne)
-            if canvas.GetFrameStrata then areaHost:SetFrameStrata(canvas:GetFrameStrata()) end
-            areaHost:SetFrameLevel((canvas.GetFrameLevel and canvas:GetFrameLevel() or 0) + 2450)
+            dn = dottedSeg(canvas, x1, y1, (tgt.x / 100) * w, -(tgt.y / 100) * h,
+                tgt.color, 0.95, 6, 14, dn)
         end
     end)
+    if dn > 0 and areaHost then        -- løft prikkerne over kortet (under ikonerne)
+        if canvas.GetFrameStrata then areaHost:SetFrameStrata(canvas:GetFrameStrata()) end
+        areaHost:SetFrameLevel((canvas.GetFrameLevel and canvas:GetFrameLevel() or 0) + 2450)
+    end
     for i = dn + 1, #areaLines do
         if areaLines[i] then areaLines[i]:Hide() end
     end
