@@ -100,8 +100,41 @@ ns.QuestTips = {
     [10614] = {  -- Whispers on the Wind
         "Ren leverings-quest: der er intet at dræbe. Løb østpå til Leoroxx i Mok'Nathal Village og aflever. Derfor vises den ikke med mål-ikoner på kortet.",
     },
+    -- T'chali-kæden (Thunderlord-outpost, sydvest): 10542 -> 10545 -> 10543 -> 10544.
+    [10543] = {  -- Grimnok and Korgaah, I Am For You!
+        "To navngivne Bladespire-ogrer på HVER sit sted i Bladespire Hold (Grimnok mod syd, Korgaah mod nord) - dræb begge. De står ikke sammen.",
+    },
+    [10544] = {  -- A Curse Upon Both of Your Clans!
+        "Brug 'Wicked Strong Fetish' ved de markerede bygninger inde i Bladespire Hold (Qeasy viser stederne på kortet).",
+    },
+    [10505] = {  -- The Bloodmaul Ogres
+        "Alle Bloodmaul-mobs tæller (brute, shaman, geomancer m.fl.) - de holder til i Bloodmaul-lejren i sydøst. Ryd bare igennem.",
+    },
+    -- Legion-infiltration (Toshley's/Wildlord Antelarion): forklædnings-kæde.
+    [10819] = {  -- Felsworn Gas Mask
+        "Tag 'Felsworn Gas Mask' PÅ, gå ind i Forge Camp: Anger (øst) og brug 'Legion Communicator'. Masken holder 1 time - mister du den, får du en ny hos Wildlord Antelarion.",
+    },
+    [10820] = {  -- Deceive thy Enemy
+        "Bær stadig masken: dræb 4 Doomforge Attendants og 4 Doomforge Engineers i Forge Camp: Anger. Selve questen tager du ved at højreklikke 'Legion Communicator' med masken på.",
+    },
     [11010] = {  -- Bombing Run
-        "Flyve-bombe-quest: tag flyvemaskinen fra questgiveren i Evergrove og kast bomber på målene undervejs - ingen mobs at dræbe manuelt.",
+        "Flyve-bombe-quest fra Sky Sergeant Vanderlip ved Skyguard-outposten (kræver flyvemount). Tag flyvemaskinen og kast bomber på målene undervejs - ingen mobs at dræbe manuelt.",
+    },
+    -- ----- Ogri'la / Skyguard (level 70, kræver flyvemount) -----
+    [11009] = {  -- Ogre Heaven
+        "Låser Ogri'la-hubben op oppe på plateauet (du skal have et flyvemount for at komme derop). Snak med Chu'a'lor.",
+    },
+    [11025] = {  -- The Crystals
+        "Apexis-relikvierne er et 'Simon siger'-spil: læg en apexis-shard i, og gentag farve-sekvensen relikvien viser. Den bliver sværere for hvert trin.",
+    },
+    [11065] = {  -- Wrangle Some Aether Rays!
+        "Skad en Aether Ray ned til ~20% liv og VENT på emote'en om at den er klar - brug så 'Wrangling Rope' til at fange den. De flyver omkring Vortex Pinnacle.",
+    },
+    [11078] = {  -- To Rule The Skies
+        "Gruppe-quest (3-5 spillere): knæk et drage-æg med 35 apexis-shards for at kalde én af de fire drager (Rivendark, Obsidia, Furywing, Insidion) ned. De er Onyxia-kloner - tag en gruppe og et flyvemount med.",
+    },
+    [10995] = {  -- Grulloc Has Two Skulls
+        "Gruppe-quest (level 70): Grulloc er en gronn der rammer meget hårdt - tag en fuld gruppe med. Kraniet kan lootes af alle, også dem der ikke deltog i drabet.",
     },
 
     -- ===================== Netherstorm =====================
