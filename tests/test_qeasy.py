@@ -99,7 +99,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.28.0' end
+function GetAddOnMetadata() return '0.28.1' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -534,6 +534,18 @@ gk = [i for i in ns.Map.IconsForMap(ns.Map, 1949).values()
       if i.kind == "objective" and int(i.qid) == 10543]
 check("dræbt mål fjernes, kun resten vises som sværd",
       len(gk) == 1 and gk[0].item == "Korgaah" and gk[0].otype == "u")
+
+# Manuel per-sted-override (op) for interager-quest på 2 steder: A Curse Upon
+# Both of Your Clans! (10544) - Bladespire Hold + Bloodmaul Outpost.
+check("10544 har manuelle per-sted-markører", ns.QuestDB[10544].op is not None)
+lua.eval("""function() QLOG = { { title='A Curse', questID=10544, complete=false,
+  objectives={ {text='Bladespire Hold building cursed: 5/5', done=true},
+               {text='Bloodmaul Outpost building cursed: 0/2', done=false} } } } end""")()
+lua.execute("PSTATE.level=70; FLAGGED={}")
+cu = [i for i in ns.Map.IconsForMap(ns.Map, 1949).values()
+      if i.kind == "objective" and int(i.qid) == 10544]
+check("færdigt sted fjernes, kun resterende bygnings-sted vises",
+      len(cu) == 1 and cu[0].item == "Bloodmaul Outpost building")
 zicons = list(ns.Map.IconsForMap(ns.Map, 1946).values())
 telredor_giver = any(i.kind == "giver" and 66 <= i.x <= 70 and 47 <= i.y <= 52 for i in zicons)
 check("ingen giver-ikoner ved Telredor på kortet", not telredor_giver)

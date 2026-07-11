@@ -56,6 +56,19 @@ OBJ_OVERRIDE = {
     10545: (1949, 42.0, 52.5, "o"),
 }
 
+# Manuelle PER-STED-markører (op) for quests med FLERE mål på hvert sit sted,
+# hvor pfQuest ikke kan udlede stederne (trigger-enheder uden spawns).
+# { questID: (otype, [(navn, map, x, y), ...]) }. `navn` skal matche STARTEN af
+# objektiv-linjen i loggen, så markøren forsvinder når det delmål er klaret.
+OP_OVERRIDE = {
+    # A Curse Upon Both of Your Clans!: forband bygninger to steder med Wicked
+    # Strong Fetish - Bladespire Hold (NV) og Bloodmaul Outpost (syd).
+    10544: ("o", [
+        ("Bladespire Hold building", 1949, 42.4, 52.6),
+        ("Bloodmaul Outpost building", 1949, 45.1, 77.0),
+    ]),
+}
+
 
 def season_of(title):
     """Event-nøgle for en sæson-quest, ellers None."""
@@ -310,6 +323,15 @@ def main():
         if obj is None and qid in OBJ_OVERRIDE:      # manuelt sted (pfQuest mangler)
             m, ox, oy, ot = OBJ_OVERRIDE[qid]
             obj, otype = (m, ox, oy), ot
+        op_manual = None
+        if qid in OP_OVERRIDE:                        # manuelle per-sted-markører
+            ot_ov, pts_ov = OP_OVERRIDE[qid]
+            op_manual = [(n, m, x, y) for n, m, x, y in pts_ov]
+            otype = ot_ov
+            if obj is None:                          # sæt centroid som pil-mål
+                mx = round(sum(p[2] for p in pts_ov) / len(pts_ov), 1)
+                my = round(sum(p[3] for p in pts_ov) / len(pts_ov), 1)
+                obj = (pts_ov[0][1], mx, my)
         # medtag kun quests med mindst én Outland-koordinat
         if not (giver or turnin or obj):
             continue
@@ -373,7 +395,7 @@ def main():
         if season:
             parts.append('ev="%s"' % season)
         # op = per-item saml-markører (flere items fra hvert sit sted).
-        op = outland_split_points(qid)
+        op = outland_split_points(qid) or op_manual
         if op:
             parts.append("op={%s}" % ",".join(
                 '{"%s",%d,%.1f,%.1f}' % (esc(n), m, x, y) for n, m, x, y in op))
