@@ -72,6 +72,38 @@ local ICON_LABEL = {
 
 local target = nil
 
+-- Peg på den PRIMÆRE fokus-quest (fokus-centreret design). Er quest'en klar til
+-- aflevering, peges der på afleverings-NPC'en (d.e); ellers på objektiv-området
+-- (d.o). Returnerer nil hvis intet er manuelt fokuseret -> pilen falder tilbage
+-- til ruten.
+function Arrow:FocusTarget()
+    if not (ns.ObjTracker and ns.QuestDB and ns.QuestLog) then return nil end
+    local qid = ns.ObjTracker:PrimaryFocusID()
+    if not qid then return nil end
+    local d = ns.QuestDB[qid]
+    if not d then return nil end
+
+    local complete = false
+    for _, e in ipairs(ns.QuestLog:Scan()) do
+        if e.questID == qid then complete = e.isComplete break end
+    end
+
+    local coords, kind
+    local function turnin() if d.e then coords, kind = { map = d.e[1], x = d.e[2], y = d.e[3] }, "turnin" end end
+    local function objective() if d.o then coords, kind = { map = d.o[1], x = d.o[2], y = d.o[3] }, "do" end end
+    if complete then turnin(); if not coords then objective() end
+    else objective(); if not coords then turnin() end end
+    if not coords then return nil end
+
+    local c, wx, wy = WorldPos(coords.map, coords.x, coords.y)
+    if not c then return nil end
+    return { c = c, wx = wx, wy = wy, kind = kind, name = d.t or "?", coords = coords }
+end
+
+-- Koordinater (kort-lokale) som pilen aktuelt peger på - så kortets gyldne sti
+-- kan følge fokus-målet i stedet for rutens element.
+Arrow.activeCoords = nil
+
 function Arrow:PickTarget()
     local Q = ns.Q
     local route = Q:GetActiveRoute()
@@ -104,15 +136,40 @@ end
 
 function Arrow:UpdateTarget()
     local Q = ns.Q
-    local step = Q:GetCurrentStep()
-    if not step or not Q.char.ui.arrowShown then
+    if not Q.char.ui.arrowShown then
         target = nil
+        self.activeCoords = nil
+        frame:Hide()
+        return
+    end
+
+    -- 1) Primær fokus vinder (fokus-centreret design). Ingen auto-ankomst, da
+    --    målet forsvinder af sig selv når objektivet/afleveringen er fuldført.
+    local f = self:FocusTarget()
+    if f then
+        target = {
+            continent = f.c, wx = f.wx, wy = f.wy,
+            label = (ICON_LABEL[f.kind] or "") .. ": " .. f.name,
+            radius = 12,
+        }
+        self.activeCoords = f.coords
+        label:SetText(target.label)
+        frame:Show()
+        return
+    end
+
+    -- 2) Fallback: rutens nærmeste ufærdige element.
+    local step = Q:GetCurrentStep()
+    if not step then
+        target = nil
+        self.activeCoords = nil
         frame:Hide()
         return
     end
     local pick = self:PickTarget()
     if not pick then
         target = nil
+        self.activeCoords = nil
         frame:Hide()
         return
     end
@@ -126,6 +183,7 @@ function Arrow:UpdateTarget()
         autoArrive = (el.kind == "travel" or el.kind == "fly" or el.kind == "hearth"
                       or el.kind == "train" or el.kind == "vendor" or el.kind == "repair"),
     }
+    self.activeCoords = pick.coords
     label:SetText(target.label)
     frame:Show()
 end

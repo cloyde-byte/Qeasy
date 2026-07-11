@@ -141,6 +141,18 @@ for i = 1, UPCOMING do
     upcoming[i] = fs
 end
 
+-- Tips-tekst (fokus-tilstand): én ombrudt blok med titler, mål og tips for de
+-- fokuserede quests. Deler plads med rute-widgetsene ovenfor (kun én vises ad
+-- gangen).
+local tipsBody = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+tipsBody:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -8)
+tipsBody:SetPoint("RIGHT", frame, "RIGHT", -10, 0)
+tipsBody:SetJustifyH("LEFT")
+tipsBody:SetJustifyV("TOP")
+tipsBody:SetWordWrap(true)
+tipsBody:SetSpacing(3)
+tipsBody:Hide()
+
 -- Knapper
 local backBtn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 backBtn:SetSize(95, 20)
@@ -172,10 +184,80 @@ local function ElementText(el)
     return el.text or el.label or ""
 end
 
+-- Byg en linje pr. quest i fokus: titel, mål/status og håndskrevne tips.
+local function tipLinesFor(qid, primary, live)
+    local out = {}
+    local d = ns.QuestDB and ns.QuestDB[qid]
+    local e = live[qid]
+    local title = (d and d.t) or (e and e.title) or ("Quest " .. tostring(qid))
+    local head = primary and "\226\150\182 " or "\226\150\183 "        -- ▶ / ▷
+    out[#out + 1] = "|cffffd200" .. head .. title .. "|r"
+
+    if e and e.isComplete then
+        out[#out + 1] = "   |cff20ff20" .. L.TIPS_TURNIN .. "|r"
+    elseif e and e.objectives and #e.objectives > 0 then
+        for _, o in ipairs(e.objectives) do
+            out[#out + 1] = "   |cff" .. (o.done and "20ff20" or "d9d9d9") .. o.text .. "|r"
+        end
+    end
+
+    local tips = ns.QuestTips and ns.QuestTips[qid]
+    if tips and #tips > 0 then
+        for _, t in ipairs(tips) do
+            out[#out + 1] = "   |cffe8cf94\226\128\162 " .. t .. "|r"   -- • gyldent tip
+        end
+    else
+        out[#out + 1] = "   |cff808080" .. L.TIPS_NONE .. "|r"
+    end
+    return out
+end
+
+-- Fokus-tilstand: vis kuraterede tips for de fokuserede quests (primær først).
+function Guide:ShowTips(focus, primary)
+    tipsBody:Hide()   -- nulstilles, vises igen nedenfor
+    stepLabel:Hide(); helpText:Hide()
+    for i = 1, MAX_ROWS do rows[i]:Hide() end
+    for i = 1, UPCOMING do upcoming[i]:SetText(""); upcoming[i]:Hide() end
+    backBtn:Hide(); skipBtn:Hide()
+    counter:SetText("")
+    header:SetText("|cff69ccf0Qeasy|r " .. L.TIPS_HEADER)
+
+    local live = {}
+    if ns.QuestLog then
+        for _, en in ipairs(ns.QuestLog:Scan()) do
+            if en.questID then live[en.questID] = en end
+        end
+    end
+
+    local order = { primary }
+    for _, qid in ipairs(focus) do if qid ~= primary then order[#order + 1] = qid end end
+
+    local parts = {}
+    for _, qid in ipairs(order) do
+        for _, ln in ipairs(tipLinesFor(qid, qid == primary, live)) do parts[#parts + 1] = ln end
+        parts[#parts + 1] = " "   -- luft mellem quests
+    end
+
+    tipsBody:SetText(table.concat(parts, "\n"))
+    tipsBody:Show()
+    frame:SetHeight(math.max(70, 8 + 14 + 8 + tipsBody:GetStringHeight() + 12))
+end
+
 function Guide:Update()
     local Q = ns.Q
     if not Q.char.ui.guideShown then frame:Hide() return end
     frame:Show()
+
+    -- Fokus vinder: har spilleren manuelt fokuseret en quest, viser guiden tips
+    -- for den/dem i stedet for rute-steppet (ruten er fallback).
+    local primary = ns.ObjTracker and ns.ObjTracker.PrimaryFocusID and ns.ObjTracker:PrimaryFocusID()
+    if primary then
+        self:ShowTips(ns.ObjTracker:FocusList(), primary)
+        return
+    end
+
+    tipsBody:Hide()
+    stepLabel:Show(); helpText:Show(); backBtn:Show(); skipBtn:Show()
 
     local route = Q:GetActiveRoute()
     for i = 1, MAX_ROWS do rows[i]:Hide() end

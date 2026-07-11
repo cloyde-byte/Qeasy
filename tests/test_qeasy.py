@@ -99,7 +99,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.28.1' end
+function GetAddOnMetadata() return '0.29.0' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -164,6 +164,7 @@ for f in ["Locale.lua", "Engine.lua", "Arrow.lua", "Guide.lua",
           "Comms.lua", "Links.lua",
           "Data/OutlandQuests.lua", "Data/OutlandFlightMasters.lua",
           "Data/OutlandPOI.lua", "Data/OutlandQuestFlags.lua",
+          "Data/QuestTips.lua",
           "Seasonal.lua",
           "Map.lua", "ItemButton.lua", "Session.lua", "Config.lua",
           "Routes/HellfirePeninsula.lua", "Routes/Zangarmarsh.lua",
@@ -615,6 +616,61 @@ check("max 3 fokus (ældste falder ud)", fl2 == [9789, 9854, 9891])
 ns.ObjTracker.ToggleFocus(ns.ObjTracker, 9789)   # slå fra igen
 fl3 = sorted(int(x) for x in list(ns.ObjTracker.FocusList(ns.ObjTracker).values()))
 check("fokus kan slås fra", fl3 == [9854, 9891])
+
+# ---- primær fokus + fokus-styret pil (re-work) ----
+lua.eval("""function() QLOG = {
+  { title='Talbuk Mastery', questID=9857, complete=false,
+    objectives={{text='Talbuk slain: 3/30', done=false}} },
+  { title='Windroc Mastery', questID=9854, complete=false,
+    objectives={{text='Windroc slain: 0/30', done=false}} },
+} end""")()
+ns.Q.char.ui.trackerFocus = lua.eval("{}")
+ns.Q.char.ui.primaryFocus = None
+ns.ObjTracker.SetFocusPrimary(ns.ObjTracker, 9857)
+check("klik sætter primær fokus (9857)",
+      int(ns.ObjTracker.PrimaryFocusID(ns.ObjTracker)) == 9857)
+ns.ObjTracker.SetFocusPrimary(ns.ObjTracker, 9854)   # klik på en anden -> ny primær
+check("klik på anden quest gør den primær (9854)",
+      int(ns.ObjTracker.PrimaryFocusID(ns.ObjTracker)) == 9854)
+fl = sorted(int(x) for x in list(ns.ObjTracker.FocusList(ns.ObjTracker).values()))
+check("begge quests er i fokus", fl == [9854, 9857])
+ns.ObjTracker.SetFocusPrimary(ns.ObjTracker, 9854)   # klik igen på primær -> fjern
+check("klik på primær igen fjerner den fra fokus",
+      int(ns.ObjTracker.PrimaryFocusID(ns.ObjTracker)) == 9857)
+
+# pilen følger den primære fokus-quests objektiv (ikke ruten)
+ft = ns.Arrow.FocusTarget(ns.Arrow)
+check("Arrow:FocusTarget peger på primær fokus' objektiv", ft is not None and ft.kind == "do")
+
+# klar til aflevering -> pilen peger på afleverings-NPC
+lua.eval("""function() QLOG = {
+  { title='Talbuk Mastery', questID=9857, complete=true, objectives={} },
+} end""")()
+ns.Q.char.ui.trackerFocus = lua.eval("{9857}")
+ns.Q.char.ui.primaryFocus = 9857
+ft2 = ns.Arrow.FocusTarget(ns.Arrow)
+check("fuldført fokus-quest -> pil peger på aflevering", ft2 is not None and ft2.kind == "turnin")
+
+# uden manuelt fokus -> intet fokus-mål (pilen falder tilbage til ruten)
+ns.Q.char.ui.trackerFocus = lua.eval("{}")
+ns.Q.char.ui.primaryFocus = None
+check("intet fokus -> FocusTarget nil (ruten er fallback)",
+      ns.Arrow.FocusTarget(ns.Arrow) is None)
+
+# guide viser tips for den fokuserede quest (9788 = Nagrand Cherry)
+lua.eval("""function() QLOG = {
+  { title='A Damp, Dark Place', questID=9788, complete=false,
+    objectives={{text='Item: 0/1', done=false}} },
+} end""")()
+ns.Q.char.ui.trackerFocus = lua.eval("{9788}")
+ns.Q.char.ui.primaryFocus = 9788
+ns.Guide.Update(ns.Guide)
+check("guide skifter til tips-tilstand ved fokus", g.QeasyGuideFrame.shown == True)
+check("Nagrand Cherry-tip findes for quest 9788",
+      ns.QuestTips[9788] is not None
+      and "Nagrand Cherry" in list(ns.QuestTips[9788].values())[0])
+ns.Q.char.ui.trackerFocus = lua.eval("{}")
+ns.Q.char.ui.primaryFocus = None
 
 # waypoint-linjer: mål (objektiv) for de fokuserede quests på kortet
 ns.Q.char.ui.trackerFocus = lua.eval("{}")

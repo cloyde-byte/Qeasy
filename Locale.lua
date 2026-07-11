@@ -30,15 +30,21 @@ ns.L = {
     -- Quest-tracker & tooltips
     QUEST_COMPLETE   = "Quest Complete!",
     TRACKER_NOQUESTS = "Ingen aktive quests i loggen.",
-    TRACKER_ACTIVE   = "▶ I gang med",
-    TRACKER_ROWHINT  = "Klik: fokusér · Shift-klik: link i chat · Ctrl-klik: fold",
+    TRACKER_ACTIVE   = "▶ I fokus",
+    TRACKER_ROWHINT  = "Klik: primær fokus (pilen følger) · Klik igen: fjern · Shift: link · Ctrl: fold",
+    -- Guide-vindue (tips til fokuserede quests)
+    TIPS_HEADER      = "Tips",
+    TIPS_NONE        = "Ingen tips for denne quest endnu.",
+    TIPS_NOFOCUS     = "Fokusér en quest i trackeren for at se tips.",
+    TIPS_OBJECTIVES  = "Mål:",
+    TIPS_TURNIN      = "Klar til aflevering!",
     PARTY_HEADER     = "|cff69ccf0Qeasy|r gruppe-fremgang:",
     PARTY_NONE       = "|cff69ccf0Qeasy|r: Ingen party-medlemmer med Qeasy (eller du er ikke i en gruppe).",
 
     -- Config-vindue
     CFG_TITLE        = "Qeasy - Indstillinger",
     CFG_DISPLAY      = "Visning",
-    CFG_GUIDE        = "Vis guide-vindue",
+    CFG_GUIDE        = "Vis guide/tips-vindue",
     CFG_ARROW        = "Vis GPS-pil",
     CFG_OBJTRACKER   = "Vis quest-tracker (aktive quests)",
     CFG_TOOLTIPS     = "Vis quest-info i mob-tooltips",

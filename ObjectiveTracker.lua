@@ -146,17 +146,68 @@ function Tracker:ToggleFocus(qid)
     while #f > MAX_FOCUS do table.remove(f, 1) end
 end
 
+-- Den PRIMÆRE fokus-quest: den GPS-pilen følger. Kun MANUELT fokuserede quests
+-- (inkl. dem der er klar til aflevering, så pilen kan lede til afleverings-NPC'en)
+-- tæller - er intet manuelt fokuseret, returneres nil, og pilen falder tilbage
+-- til ruten. Peger char.ui.primaryFocus på en gyldig fokus-quest bruges den;
+-- ellers vælges den første i fokus-listen.
+function Tracker:PrimaryFocusID()
+    local live = {}
+    for _, e in ipairs(ns.QuestLog:Scan()) do
+        if e.questID then live[e.questID] = e end
+    end
+    local manual = {}
+    for _, qid in ipairs(focusRaw()) do
+        if live[qid] then manual[#manual + 1] = qid end
+    end
+    if #manual == 0 then return nil end
+    local p = ns.Q.char.ui.primaryFocus
+    for _, qid in ipairs(manual) do
+        if qid == p then return p end
+    end
+    return manual[1]
+end
+
+-- Klik på en quest i trackeren: gør den til PRIMÆR fokus (pilen følger den).
+-- Er den allerede primær, fjernes den fra fokus igen. Er den ny, tilføjes den
+-- til fokus (max 3, ældste ryger ud) og bliver primær.
+function Tracker:SetFocusPrimary(qid)
+    local f = focusRaw()
+    local idx
+    for i, q in ipairs(f) do if q == qid then idx = i break end end
+    if not idx then
+        f[#f + 1] = qid                       -- ny: tilføj sidst (bliver aldrig fjernet nedenfor)
+        while #f > MAX_FOCUS do table.remove(f, 1) end
+        ns.Q.char.ui.primaryFocus = qid
+    elseif ns.Q.char.ui.primaryFocus == qid then
+        table.remove(f, idx)                  -- allerede primær: slå fra
+        ns.Q.char.ui.primaryFocus = f[#f]     -- ny primær = seneste tilbage (eller nil)
+    else
+        ns.Q.char.ui.primaryFocus = qid       -- allerede i fokus: gør blot primær
+    end
+end
+
 -- Tilføj én quest (titel + objectives) til linjelisten.
-local function questBlock(lines, e, active)
+--   focused = en af de fokuserede quests (guld tekst)
+--   primary = den quest GPS-pilen følger (▶ + baggrunds-highlight)
+local function questBlock(lines, e, focused, primary)
     local collapsed = Tracker:Collapsed()
-    local isCol = collapsed[e.questID] and not active
+    local isCol = collapsed[e.questID] and not focused
     local r, g, b = ns.QuestLog:DiffColor(e.level)
-    if active then r, g, b = 1, 0.9, 0.35 end   -- fremhævet guld
-    local mark = active and "\226\150\182 " or (isCol and "+ " or "- ")  -- ▶ / + / -
+    local mark
+    if primary then
+        r, g, b = 1, 0.9, 0.35                 -- fremhævet guld
+        mark = "\226\150\182 "                  -- ▶ pilen følger denne
+    elseif focused then
+        r, g, b = 0.95, 0.82, 0.4              -- dæmpet guld
+        mark = "\226\150\183 "                  -- ▷ i fokus, men ikke primær
+    else
+        mark = isCol and "+ " or "- "
+    end
     lines[#lines + 1] = {
         text = string.format("%s[%d] %s", mark, e.level, e.title),
         r = r, g = g, b = b, qid = e.questID, qtitle = e.title, qlevel = e.level,
-        active = active,
+        primary = primary,
     }
     if not isCol then
         if e.isComplete then
@@ -176,15 +227,17 @@ local function buildLines()
     local lines = {}
     local scan = ns.QuestLog:Scan()
     local focus = Tracker:FocusList()
+    local primary = Tracker:PrimaryFocusID()
     local focusSet, byID = {}, {}
     for _, qid in ipairs(focus) do focusSet[qid] = true end
     for _, e in ipairs(scan) do if e.questID then byID[e.questID] = e end end
 
-    -- Fokuserede quests øverst (i fokus-rækkefølge), fremhævet.
+    -- Fokuserede quests øverst (i fokus-rækkefølge), fremhævet. Den primære
+    -- (som pilen følger) markeres med ▶ + highlight; de øvrige med ▷.
     if #focus > 0 then
         lines[#lines + 1] = { text = L.TRACKER_ACTIVE, r = 0.42, g = 0.80, b = 0.94 }
         for _, qid in ipairs(focus) do
-            if byID[qid] then questBlock(lines, byID[qid], true) end
+            if byID[qid] then questBlock(lines, byID[qid], true, qid == primary) end
         end
     end
 
@@ -236,7 +289,7 @@ function Tracker:Update()
         local row = getRow(shown)
         row.text:SetText(ln.text)
         row.text:SetTextColor(ln.r, ln.g, ln.b)
-        if ln.active then row.bg:Show() else row.bg:Hide() end
+        if ln.primary then row.bg:Show() else row.bg:Hide() end
         if ln.qid then
             local qid, qtitle, qlevel = ln.qid, ln.qtitle, ln.qlevel
             row:EnableMouse(true)
@@ -249,8 +302,10 @@ function Tracker:Update()
                     c[qid] = (not c[qid]) or nil                  -- fold sammen
                     Tracker:Update()
                 else
-                    Tracker:ToggleFocus(qid)                       -- fokusér (op til 3)
+                    Tracker:SetFocusPrimary(qid)                   -- gør primær (pilen følger)
                     Tracker:Update()
+                    if ns.Arrow then ns.Arrow:UpdateTarget() end    -- pil peger straks på den
+                    if ns.Guide then ns.Guide:Update() end          -- tips for den valgte
                     if ns.Map then ns.Map:UpdateWorldMap() end      -- opdatér blå områder
                 end
             end)
