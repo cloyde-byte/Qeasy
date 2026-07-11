@@ -669,6 +669,10 @@ check("guide skifter til tips-tilstand ved fokus", g.QeasyGuideFrame.shown == Tr
 check("håndskrevet tip findes for quest 9788",
       ns.QuestTips[9788] is not None
       and "hule" in list(ns.QuestTips[9788].values())[0].lower())
+# Nagrand Cherry-tippet hører til dykker-questen 'Agitated Spirits of Skysong' (9804)
+check("Nagrand Cherry-tip sidder på dykker-questen (9804)",
+      ns.QuestTips[9804] is not None
+      and any("Nagrand Cherry" in t for t in list(ns.QuestTips[9804].values())))
 ns.Q.char.ui.trackerFocus = lua.eval("{}")
 ns.Q.char.ui.primaryFocus = None
 

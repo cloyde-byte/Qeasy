@@ -21,11 +21,18 @@ ns.QuestTips = {
     [10809] = {  -- Wanted: Worg Master Kruush
         "Kruush er inde i Zeth'Gor (sydøst) - tag den samtidig med 'Zeth'Gor Must Burn!'. Kun han dropper 'Worg Master's Head'.",
     },
+    [10392] = {  -- Doorway to the Abyss
+        "Dræb FØRST Warbringer Arix'Amal ved Invasion Point: Annihilator (nord for Thrallmar) for at få 'Burning Legion Gate Key'.",
+        "Brug så nøglen på 'Rune of Spite' ved portalen - det er selve mål-objektet pilen fører dig til.",
+    },
 
     -- ===================== Zangarmarsh =====================
     [9785] = {  -- Blessings of the Ancients
         "Der er TO ancients ved Cenarion Refuge: Ashyen og Keleth. Snak med begge.",
         "Hver ancient giver dig valget mellem to buffs - vælg efter behov (en er nyttig til Sporeggar/Cenarion-rep-grind).",
+    },
+    [9738] = {  -- Lost in Action
+        "Dungeon-quest: de fire savnede (Rayge, Bite, Greenthumb, Claw) findes INDE i Slave Pens og Underbog (Coilfang-instanserne) - ikke ude i det fri. Tag den med, når du kører de dungeons.",
     },
 
     [9788] = {  -- A Damp, Dark Place
@@ -46,6 +53,10 @@ ns.QuestTips = {
     [11506] = {  -- Spirits of Auchindoun
         "PvP-quest: du kæmper om kontrollen over de fire spirit towers ved Auchindoun - forvent fjendtlige spillere. Nemmest med et par allierede.",
     },
+    [10922] = {  -- Digging Through Bones
+        "Forsvars-quest: beskyt Chief Archaeologist Letoll og hans grave-hold mod en bone worm, mens de graver lidt nord for Sha'tari-lejren.",
+        "Ingen af holdet må dø - hold dig tæt på dem. Aflever hos Dwarfowitz, når udgravningen er færdig.",
+    },
 
     -- ===================== Nagrand =====================
     -- Nesingwary-jagtquests: de tre 'Mastery'-kæder deler jagtmarker.
@@ -57,6 +68,13 @@ ns.QuestTips = {
     },
     [9815] = {  -- Muck Diving
         "Trods navnet skal du ikke dykke dybt: dræb Muck Spawns ved vandkanten (følg pilen). De dukker op omkring vandet.",
+    },
+    [9800] = {  -- A Rare Bean
+        "Belønningen er en 'Nagrand Cherry' (5 min. vejrtrækning under vand). GEM den - du skal bruge den til follow-up'en 'Agitated Spirits of Skysong', hvor du skal dykke.",
+    },
+    [9804] = {  -- Agitated Spirits of Skysong
+        "Spis en 'Nagrand Cherry' (fra 'A Rare Bean') FØR du dykker, så du kan ånde under vand.",
+        "Lake Spirits står på bunden af Skysong Lake (nær Throne of Elements i nordøst) - dyk ned og dræb dem der.",
     },
     [9962] = {  -- The Ring of Blood (kæden starter her)
         "Ring of Blood er en arena-serie: én elite-modstander ad gangen, i fast rækkefølge fra Gurgthock.",
