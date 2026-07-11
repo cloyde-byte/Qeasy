@@ -324,6 +324,14 @@ def main():
             parts.append("race=%d" % race)
         if pre:
             parts.append("pre={%s}" % ",".join(str(p) for p in pre))
+        # cl = "close"-gruppe (WoW ExclusiveGroup): gensidigt udelukkende quests
+        # / breadcrumbs. Har du fuldført ÉN af dem, tilbydes de andre ikke mere,
+        # så vi kan skjule det falske "!" (fx Old Oroks Area 52-breadcrumb).
+        close = q["close"] if "close" in q.keys() else None
+        if close and T(close) == "table":
+            sibs = sorted({int(v) for v in close.values()} - {qid})
+            if sibs:
+                parts.append("cl={%s}" % ",".join(str(s) for s in sibs))
         if season:
             parts.append('ev="%s"' % season)
         # op = per-item saml-markører (flere items fra hvert sit sted).

@@ -84,7 +84,7 @@ local function flagged(qid)
     return false
 end
 
-local function giverAvailable(qid, d)
+local function giverAvailable(qid, d, inLog)
     if flagged(qid) then return false end             -- allerede klaret
     if atAllianceHub(d) then return false end         -- Alliance-by (Telredor/Orebor)
     -- Sæson-event: skjul quest-giveren uden for eventets datovindue.
@@ -93,6 +93,13 @@ local function giverAvailable(qid, d)
     if d.pre then
         for _, p in ipairs(d.pre) do
             if not flagged(p) then return false end
+        end
+    end
+    -- "close"-gruppe: har du fuldført (eller er i gang med) en gensidigt
+    -- udelukkende søskende-quest, tilbydes denne ikke længere (fx breadcrumbs).
+    if d.cl then
+        for _, s in ipairs(d.cl) do
+            if flagged(s) or (inLog and inLog[s]) then return false end
         end
     end
     return true
@@ -138,7 +145,7 @@ function Map:IconsForMap(mapID)
         local state = st[e.qid]
         local show, npc = false, nil
         if e.kind == "giver" then
-            show = (state == nil) and giverAvailable(e.qid, d)  -- ikke i loggen
+            show = (state == nil) and giverAvailable(e.qid, d, st)  -- ikke i loggen
             npc = d.gn
         elseif e.kind == "turnin" then
             -- Aflever når færdig. MEN "find NPC"-quests (ingen objektiv - fx
@@ -202,7 +209,7 @@ function Map:AvailableQuestsForGiver(name)
     end
     for _, qid in ipairs(list) do
         local d = ns.QuestDB[qid]
-        if not inLog[qid] and giverAvailable(qid, d) then
+        if not inLog[qid] and giverAvailable(qid, d, inLog) then
             out[#out + 1] = { qid = qid, title = d.t, level = d.lvl or 0, flag = questFlag(qid) }
         end
     end

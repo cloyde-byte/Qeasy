@@ -99,7 +99,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.26.1' end
+function GetAddOnMetadata() return '0.27.0' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -500,6 +500,17 @@ check("opsøg-NPC-quest viser mål på kort mens aktiv", len(wic) == 1)
 
 # Patrulje-/søge-rute (opat): ét spredt NPC-mål får en streg på kortet.
 check("opat findes for patrulje-quest (Spectrecles)", ns.QuestDB[10625].opat is not None)
+
+# "close"-gruppe: en breadcrumb (Old Oroks 'Out of This World Produce!', 11036)
+# skjules når en gensidigt udelukkende søskende er fuldført (fx 10183 'Off To
+# Area 52'). Ellers falsk "!" hos en NPC uden quest.
+lua.execute("PSTATE.level=70; QLOG={}; FLAGGED={}")
+before = [int(q.qid) for q in ns.Map.AvailableQuestsForGiver(ns.Map, "Old Orok").values()]
+check("breadcrumb vises før søskende er klaret", 11036 in before)
+lua.execute("FLAGGED={[10183]=true}")
+after = [int(q.qid) for q in ns.Map.AvailableQuestsForGiver(ns.Map, "Old Orok").values()]
+check("breadcrumb skjult når close-søskende er klaret", 11036 not in after)
+lua.execute("FLAGGED={}")
 zicons = list(ns.Map.IconsForMap(ns.Map, 1946).values())
 telredor_giver = any(i.kind == "giver" and 66 <= i.x <= 70 and 47 <= i.y <= 52 for i in zicons)
 check("ingen giver-ikoner ved Telredor på kortet", not telredor_giver)
