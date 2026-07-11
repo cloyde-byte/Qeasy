@@ -12,10 +12,10 @@ local _, ns = ...
 -- =========================================================================
 
 ns.QuestTips = {
-    -- Nagrand: dyk under vand efter objektivet.
+    -- Nordøst-Nagrand: Ikeyens ejendele ligger inde i en hule.
     [9788] = {
-        "Objektivet ligger under vand - spis en 'Nagrand Cherry' før du dykker, så du kan ånde under vand.",
-        "Nagrand Cherries samles fra kirsebærtræerne rundt om i Nagrand (bl.a. nær Aeris Landing).",
+        "Ikeyen's Belongings ligger i en HULE i det nordøstlige Nagrand, nær grænsen til Zangarmarsh (Umbrafen-området) - ikke ude i det fri.",
+        "Følg pilen helt hen til hulen og gå indenfor for at samle ejendelene.",
     },
 
     -- Nesingwary-jagtquests: de tre 'Mastery'-kæder deler jagtmarker.

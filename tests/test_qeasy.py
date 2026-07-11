@@ -666,9 +666,9 @@ ns.Q.char.ui.trackerFocus = lua.eval("{9788}")
 ns.Q.char.ui.primaryFocus = 9788
 ns.Guide.Update(ns.Guide)
 check("guide skifter til tips-tilstand ved fokus", g.QeasyGuideFrame.shown == True)
-check("Nagrand Cherry-tip findes for quest 9788",
+check("håndskrevet tip findes for quest 9788",
       ns.QuestTips[9788] is not None
-      and "Nagrand Cherry" in list(ns.QuestTips[9788].values())[0])
+      and "hule" in list(ns.QuestTips[9788].values())[0].lower())
 ns.Q.char.ui.trackerFocus = lua.eval("{}")
 ns.Q.char.ui.primaryFocus = None
 
