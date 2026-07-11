@@ -99,7 +99,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.27.0' end
+function GetAddOnMetadata() return '0.27.1' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -511,6 +511,17 @@ lua.execute("FLAGGED={[10183]=true}")
 after = [int(q.qid) for q in ns.Map.AvailableQuestsForGiver(ns.Map, "Old Orok").values()]
 check("breadcrumb skjult når close-søskende er klaret", 11036 not in after)
 lua.execute("FLAGGED={}")
+
+# Manuelt objektiv-sted (pfQuest-trigger uden spawns): Bladespire Kegger (10545)
+# skal have en tandhjul-markør ved Bladespire Hold.
+check("Bladespire Kegger har manuelt objektiv-sted", ns.QuestDB[10545].o is not None)
+lua.eval("""function() QLOG = { { title='Bladespire Kegger', questID=10545, complete=false,
+  objectives={ {text='Bladespire Ogres drunk: 0/5', done=false} } } } end""")()
+lua.execute("PSTATE.level=70; FLAGGED={}")
+bk = [i for i in ns.Map.IconsForMap(ns.Map, 1949).values()
+      if i.kind == "objective" and int(i.qid) == 10545]
+check("Bladespire Kegger viser objektiv-ikon (tandhjul) på kortet",
+      len(bk) == 1 and bk[0].otype == "o")
 zicons = list(ns.Map.IconsForMap(ns.Map, 1946).values())
 telredor_giver = any(i.kind == "giver" and 66 <= i.x <= 70 and 47 <= i.y <= 52 for i in zicons)
 check("ingen giver-ikoner ved Telredor på kortet", not telredor_giver)

@@ -46,6 +46,17 @@ SEASON_CONTAINS = [
 ]
 
 
+# Manuelle objektiv-koordinater for quests, hvor pfQuest ikke kan udlede stedet
+# (fx "brug item"-quests hvis objektiv-enhed er en usynlig trigger uden spawns).
+# { questID: (map, x, y, otype) }. otype: 'o'=interager/brug (tandhjul),
+# 'u'=dræb (sværd). Udvid efter behov.
+OBJ_OVERRIDE = {
+    # Bladespire Kegger: gør Bladespire-ogrerne fulde ved Bladespire Hold.
+    # Objektiv-enheden er en trigger uden spawns; ogrerne står ~(42,52).
+    10545: (1949, 42.0, 52.5, "o"),
+}
+
+
 def season_of(title):
     """Event-nøgle for en sæson-quest, ellers None."""
     if title in SEASON_EXACT:
@@ -237,6 +248,8 @@ def outland_item_points(qid):
 def build_area(pts, mapid, cap=24):
     """Nedsampl spawnpunkter (på målets kort) til en lille sky, der viser
     området. Grid-dedup så vi ikke gemmer hundredvis af punkter."""
+    if not pts:
+        return None
     same = [(round(p[1], 1), round(p[2], 1)) for p in pts if p[0] == mapid]
     if len(same) < 2:
         return None
@@ -272,6 +285,9 @@ def main():
         giver_name, giver = outland_endpoint(q["start"])
         turnin_name, turnin = outland_endpoint(q["end"])
         obj, otype, opts, onames, omap = outland_objective(qid)
+        if obj is None and qid in OBJ_OVERRIDE:      # manuelt sted (pfQuest mangler)
+            m, ox, oy, ot = OBJ_OVERRIDE[qid]
+            obj, otype = (m, ox, oy), ot
         # medtag kun quests med mindst én Outland-koordinat
         if not (giver or turnin or obj):
             continue
