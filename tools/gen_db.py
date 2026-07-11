@@ -208,40 +208,62 @@ def outland_patrol(qid):
     return mp, [(round(x, 1), round(y, 1)) for x, y in order]
 
 
-def outland_item_points(qid):
-    """Per-item saml-punkter for quests der samler FLERE forskellige items fra
-    hvert sit sted (fx 'Thunderlord Clan Artifacts': tromme/pil/tavle). Returnér
-    [(item-navn, map, x, y), ...] så kortet kan vise én markør pr. item og
-    fjerne dem én ad gangen. None hvis ikke relevant (ét item, ukendt navn,
-    eller alle items ligger samme sted)."""
+def outland_split_points(qid):
+    """Per-mål-punkter for quests med FLERE mål på hvert sit sted: enten flere
+    saml-items (fx 'Thunderlord Clan Artifacts': tromme/pil/tavle) ELLER flere
+    navngivne dræb-mål langt fra hinanden (fx Grimnok + Korgaah). Returnér
+    [(navn, map, x, y), ...] så kortet kan vise én markør pr. mål og fjerne dem
+    én ad gangen. None hvis ikke relevant (ét mål, ukendt navn, eller alle mål
+    ligger samme sted)."""
     q = qdb.qdata[qid]
-    if T(q) != "table" or not q["obj"] or not q["obj"]["I"]:
+    if T(q) != "table" or not q["obj"]:
         return None
+    obj = q["obj"]
     per = []
-    for iid in q["obj"]["I"].values():
-        iid = int(iid)
-        iname = qdb.item_name(iid)
-        if not iname:
-            return None                      # uden navn kan vi ikke matche loggen
-        it = qdb.idata[iid]
-        pts = []
-        if it is not None and T(it) == "table":
-            if it["O"]:
-                for oid in it["O"].keys():
-                    pts += [p for p in qdb.spawns(qdb.odata, int(oid)) if p[0] in OUTLAND]
-            if it["U"]:
-                for uid in it["U"].keys():
-                    pts += [p for p in qdb.spawns(qdb.udata, int(uid)) if p[0] in OUTLAND]
-        c = qdb.centroid(pts) if pts else None
-        if not c:
-            return None                      # ufuldstændige data -> drop hele op
-        per.append((iname, c))
+    if obj["I"]:
+        # Saml FLERE items fra hvert sit sted (fx tromme/pil/tavle).
+        for iid in obj["I"].values():
+            iid = int(iid)
+            iname = qdb.item_name(iid)
+            if not iname:
+                return None                  # uden navn kan vi ikke matche loggen
+            it = qdb.idata[iid]
+            pts = []
+            if it is not None and T(it) == "table":
+                if it["O"]:
+                    for oid in it["O"].keys():
+                        pts += [p for p in qdb.spawns(qdb.odata, int(oid)) if p[0] in OUTLAND]
+                if it["U"]:
+                    for uid in it["U"].keys():
+                        pts += [p for p in qdb.spawns(qdb.udata, int(uid)) if p[0] in OUTLAND]
+            c = qdb.centroid(pts) if pts else None
+            if not c:
+                return None                  # ufuldstændige data -> drop hele op
+            per.append((iname, c))
+        min_span2 = 9                        # items: >~3% spredning
+    elif obj["U"]:
+        # Dræb FLERE navngivne mål på hvert sit sted (fx Grimnok + Korgaah) -
+        # kun når det er få mål der ligger LANGT fra hinanden (ellers ville en
+        # kategori-flok, fx Kil'sorrow-orcs samme sted, blive splittet unødigt).
+        uids = [int(v) for v in obj["U"].values()]
+        if not (2 <= len(uids) <= 4):
+            return None
+        for uid in uids:
+            sp = [p for p in qdb.spawns(qdb.udata, uid) if p[0] in OUTLAND]
+            # Kun UNIKKE mål (få spawns) - ikke kategori-bestande (fx Umbrafen-
+            # ogrer), som hellere skal vises som ét område/sky.
+            if not sp or len(sp) > 6:
+                return None
+            per.append((qdb.loc_name(qdb.uloc, qdb.uloc_v, uid), qdb.centroid(sp)))
+        min_span2 = 100                      # units: >~10% spredning
+    else:
+        return None
     if len(per) < 2:
         return None
     xs = [c[1] for _, c in per]
     ys = [c[2] for _, c in per]
-    if (max(xs) - min(xs)) ** 2 + (max(ys) - min(ys)) ** 2 < 9:
-        return None                          # < ~3% spredning: reelt ét sted
+    if (max(xs) - min(xs)) ** 2 + (max(ys) - min(ys)) ** 2 < min_span2:
+        return None                          # reelt ét sted -> ingen split
     return [(n, c[0], round(c[1], 1), round(c[2], 1)) for n, c in per]
 
 
@@ -292,7 +314,7 @@ def main():
         if not (giver or turnin or obj):
             continue
         title = qdb.title(qid)
-        if not title:
+        if not title or title.startswith("BETA "):   # BETA = test-quests, ikke live
             continue
         season = season_of(title)
         n_total += 1
@@ -351,7 +373,7 @@ def main():
         if season:
             parts.append('ev="%s"' % season)
         # op = per-item saml-markører (flere items fra hvert sit sted).
-        op = outland_item_points(qid)
+        op = outland_split_points(qid)
         if op:
             parts.append("op={%s}" % ",".join(
                 '{"%s",%d,%.1f,%.1f}' % (esc(n), m, x, y) for n, m, x, y in op))

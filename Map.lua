@@ -126,13 +126,21 @@ local function buildState()
     return st, done
 end
 
--- Er saml-item'et `itemName` for en quest allerede hentet? (dvs. står som en
--- FÆRDIG objektiv-linje "<item>: x/y" i loggen). Matcher linjestart + ":" så
--- fx "Teromoth Sample" ikke fejlagtigt rammer "Vicious Teromoth Sample".
-local function itemCollected(done, qid, itemName)
+-- Er delmålet `name` for en quest allerede klaret? Objektiv-linjer starter med
+-- målets navn ("<item>: x/y" for saml, "<mob> slain: x/y" for dræb), så vi
+-- matcher navnet i STARTEN af en FÆRDIG linje + en ord-grænse - dermed rammer
+-- fx "Teromoth Sample" ikke "Vicious Teromoth Sample".
+local function targetDone(done, qid, name)
     local d = done and done[qid]
-    if not d or not itemName then return false end
-    return ("\n" .. d):find("\n" .. itemName .. ":", 1, true) and true or false
+    if not d or not name then return false end
+    local nl = #name
+    for line in ("\n" .. d):gmatch("\n([^\n]+)") do
+        if line:sub(1, nl) == name then
+            local nxt = line:sub(nl + 1, nl + 1)
+            if nxt == "" or nxt == ":" or nxt == " " then return true end
+        end
+    end
+    return false
 end
 
 -- Hvilke ikoner skal vises på et bestemt map lige nu?
@@ -157,7 +165,7 @@ function Map:IconsForMap(mapID)
         elseif e.kind == "objective" then
             show = (state == "active")                          -- i gang
             -- Per-item-markør: skjul den, når netop DET item er hentet i tasken.
-            if show and e.item and itemCollected(done, e.qid, e.item) then
+            if show and e.item and targetDone(done, e.qid, e.item) then
                 show = false
             end
         end
@@ -561,8 +569,8 @@ function Map:UpdateWorldMap()
             p.sub = "Kroværter (sæt hearthstone)"
         elseif ic.kind == "mailbox" then
             p.sub = "Postkasse"
-        elseif ic.item then   -- per-item saml-markør: vis hvilket item her
-            p.sub = "Saml: " .. ic.item
+        elseif ic.item then   -- per-mål-markør: dræb-mål (sværd) eller saml-item
+            p.sub = (isSlay(ic.otype) and "Dræb: " or "Saml: ") .. ic.item
         else   -- objektiv (dræb/interager): vis mob-navne hvis vi har dem
             p.sub = objectiveSub(ic.qid, ic.otype)
         end

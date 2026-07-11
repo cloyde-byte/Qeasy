@@ -99,7 +99,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.27.1' end
+function GetAddOnMetadata() return '0.28.0' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -522,6 +522,18 @@ bk = [i for i in ns.Map.IconsForMap(ns.Map, 1949).values()
       if i.kind == "objective" and int(i.qid) == 10545]
 check("Bladespire Kegger viser objektiv-ikon (tandhjul) på kortet",
       len(bk) == 1 and bk[0].otype == "o")
+
+# Flere dræb-mål på hvert sit sted: Grimnok + Korgaah (10543) skal vise ét sværd
+# pr. mål (ikke ét i midten), og et dræbt mål fjernes fra kortet.
+check("10543 splittet i per-mål (op)", ns.QuestDB[10543].op is not None)
+lua.eval("""function() QLOG = { { title='Grimnok and Korgaah', questID=10543, complete=false,
+  objectives={ {text='Grimnok Battleborn slain: 1/1', done=true},
+               {text='Korgaah slain: 0/1', done=false} } } } end""")()
+lua.execute("PSTATE.level=70; FLAGGED={}")
+gk = [i for i in ns.Map.IconsForMap(ns.Map, 1949).values()
+      if i.kind == "objective" and int(i.qid) == 10543]
+check("dræbt mål fjernes, kun resten vises som sværd",
+      len(gk) == 1 and gk[0].item == "Korgaah" and gk[0].otype == "u")
 zicons = list(ns.Map.IconsForMap(ns.Map, 1946).values())
 telredor_giver = any(i.kind == "giver" and 66 <= i.x <= 70 and 47 <= i.y <= 52 for i in zicons)
 check("ingen giver-ikoner ved Telredor på kortet", not telredor_giver)
