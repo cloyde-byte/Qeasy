@@ -54,6 +54,10 @@ OBJ_OVERRIDE = {
     # Bladespire Kegger: gør Bladespire-ogrerne fulde ved Bladespire Hold.
     # Objektiv-enheden er en trigger uden spawns; ogrerne står ~(42,52).
     10545: (1949, 42.0, 52.5, "o"),
+    # On Spirit's Wings: aflyt Bloodmaul-ogrerne. Objektiv-enheden er en usynlig
+    # "[DND]Bloodmaul Chatter Credit"-trigger uden spawns; det par man skal aflytte
+    # (Bloodmaul Taskmaster + Soothsayer) står i den østlige kløft ~(58,31).
+    10714: (1949, 57.8, 31.1, "o"),
 }
 
 # Manuelle PER-STED-markører (op) for quests med FLERE mål på hvert sit sted,

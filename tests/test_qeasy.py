@@ -677,6 +677,11 @@ check("Nagrand Cherry-tip sidder på dykker-questen (9804)",
 check("manaforge-nedlukning deler Access Crystal-tip (10321)",
       ns.QuestTips[10321] is not None
       and any("Access Crystal" in t for t in list(ns.QuestTips[10321].values())))
+# 'On Spirit's Wings' (10714): aflytnings-mål uden killable unit -> OBJ_OVERRIDE
+# giver den en objektiv-koordinat, så kortet/pilen viser eavesdrop-stedet i
+# stedet for at behandle questen som klar-til-aflevering.
+check("On Spirit's Wings har objektiv-koordinat (ikke kun aflevering)",
+      ns.QuestDB[10714] is not None and ns.QuestDB[10714].o is not None)
 ns.Q.char.ui.trackerFocus = lua.eval("{}")
 ns.Q.char.ui.primaryFocus = None
 

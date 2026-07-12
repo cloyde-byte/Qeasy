@@ -138,6 +138,9 @@ ns.QuestTips = {
     [10614] = {  -- Whispers on the Wind
         "Ren leverings-quest: der er intet at dræbe. Løb østpå til Leoroxx i Mok'Nathal Village og aflever. Derfor vises den ikke med mål-ikoner på kortet.",
     },
+    [10714] = {  -- On Spirit's Wings
+        "Aflytnings-quest: find et par Bloodmaul-ogrer (Taskmaster + Soothsayer) i den østlige kløft nord for Circle of Blood (~58,31), og brug 'Rexxar's Whistle' for at sende Spirit ud og lytte. Der er ikke noget at dræbe.",
+    },
     -- T'chali-kæden (Thunderlord-outpost, sydvest): 10542 -> 10545 -> 10543 -> 10544.
     [10543] = {  -- Grimnok and Korgaah, I Am For You!
         "To navngivne Bladespire-ogrer på HVER sit sted i Bladespire Hold (Grimnok mod syd, Korgaah mod nord) - dræb begge. De står ikke sammen.",
