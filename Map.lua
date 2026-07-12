@@ -390,33 +390,68 @@ local function raisePin(p, canvas)
     p:SetFrameLevel(lvl)
 end
 
+-- Fælles tooltip for et pin (kort ELLER minimap). `clickable` tilføjer en
+-- fokus-hint-linje (kun verdenskortet er klikbart; minimappet er kun hover).
+local function showPinTooltip(self, clickable)
+    if not self.title then return end
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+    if self.count and self.count > 1 then
+        -- Flere quests/mål på samme sted: list dem alle.
+        GameTooltip:AddLine(clusterHeader(self.kind), 1, 0.85, 0.30)
+        for _, e in ipairs(self.entries) do
+            local line = "• " .. (e.title or "")
+            if e.npc then line = line .. "  |cff9fb8cc(" .. e.npc .. ")|r" end
+            GameTooltip:AddLine(line, 0.9, 0.9, 0.9)
+        end
+    else
+        GameTooltip:AddLine(self.title, 1, 0.85, 0.30)   -- questnavn, fremhævet
+        if self.sub then GameTooltip:AddLine(self.sub, 0.75, 0.82, 0.95) end
+    end
+    if clickable and self.qid and (self.kind == "giver" or self.kind == "objective"
+                                   or self.kind == "turnin") then
+        GameTooltip:AddLine("Klik: fokusér (pilen følger)", 0.45, 0.75, 0.5)
+    end
+    GameTooltip:Show()
+end
+
+-- Sæt fælles tooltip-/udseende-metadata på et pin fra en ikon-tabel.
+local function applyPinMeta(p, ic)
+    p.title = ic.title
+    p.qid = ic.qid
+    p.kind = ic.kind
+    p.entries = ic.entries
+    p.count = ic.entries and #ic.entries or 1
+    -- Tandhjul (interager/saml) OG afleverings-"?" pulserer; sværd/"!" står stille.
+    p.pulse = ic.kind == "turnin" or ((ic.kind == "objective") and not isSlay(ic.otype))
+    if ic.kind == "turnin" then
+        p.sub = "Aflever" .. (ic.npc and (" hos " .. ic.npc) or " her")
+    elseif ic.kind == "giver" then
+        local fl = questFlag(ic.qid)
+        local tag = fl == "pvp" and "PvP-quest" or fl == "repeat" and "Gentagelig quest"
+            or "Tilgængelig quest"
+        p.sub = tag .. (ic.npc and (" · " .. ic.npc) or "")
+    elseif ic.kind == "flightmaster" then
+        local fac = ic.horde and "Horde" or "neutral"
+        p.sub = ic.known and ("Flyvemester (" .. fac .. ")")
+            or ("Ny flyvemester her (" .. fac .. ") · mangler")
+    elseif ic.kind == "innkeeper" then
+        p.sub = "Kroværter (sæt hearthstone)"
+    elseif ic.kind == "mailbox" then
+        p.sub = "Postkasse"
+    elseif ic.item then   -- per-mål-markør: dræb-mål (sværd) eller saml-item
+        p.sub = (isSlay(ic.otype) and "Dræb: " or "Saml: ") .. ic.item
+    else                  -- objektiv (dræb/interager): vis mob-navne hvis vi har dem
+        p.sub = objectiveSub(ic.qid, ic.otype)
+    end
+end
+
 local function getWorldPin(i, canvas)
     if worldPins[i] then return worldPins[i] end
     local p = CreateFrame("Button", nil, canvas)
     p.tex = p:CreateTexture(nil, "OVERLAY")
     p.tex:SetDrawLayer("OVERLAY", 7)
     p.tex:SetAllPoints(p)
-    p:SetScript("OnEnter", function(self)
-        if not self.title then return end
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        if self.count and self.count > 1 then
-            -- Flere quests/mål på samme sted: list dem alle.
-            GameTooltip:AddLine(clusterHeader(self.kind), 1, 0.85, 0.30)
-            for _, e in ipairs(self.entries) do
-                local line = "• " .. (e.title or "")
-                if e.npc then line = line .. "  |cff9fb8cc(" .. e.npc .. ")|r" end
-                GameTooltip:AddLine(line, 0.9, 0.9, 0.9)
-            end
-        else
-            GameTooltip:AddLine(self.title, 1, 0.85, 0.30)   -- questnavn, fremhævet
-            if self.sub then GameTooltip:AddLine(self.sub, 0.75, 0.82, 0.95) end
-        end
-        if self.qid and (self.kind == "giver" or self.kind == "objective"
-                         or self.kind == "turnin") then
-            GameTooltip:AddLine("Klik: fokusér (pilen følger)", 0.45, 0.75, 0.5)
-        end
-        GameTooltip:Show()
-    end)
+    p:SetScript("OnEnter", function(self) showPinTooltip(self, true) end)
     p:SetScript("OnLeave", function() GameTooltip:Hide() end)
     -- Klik = gør questen til primær fokus (pilen følger den). Virker for både
     -- tilgængelige givere ("!" -> peger på giveren), aktive mål og afleveringer.
@@ -590,35 +625,7 @@ function Map:UpdateWorldMap()
             ic.kind == "giver" and questFlag(ic.qid) or nil)
         p:SetSize(base, base)
         p.base = base
-        -- Tandhjul (interager/saml) OG afleverings-"?" pulserer, så de skiller sig
-        -- ud i en tæt by; sværd/"!" står stille.
-        p.pulse = ic.kind == "turnin"
-            or ((ic.kind == "objective") and not isSlay(ic.otype))
-        p.title = ic.title
-        p.qid = ic.qid
-        p.kind = ic.kind
-        p.entries = ic.entries
-        p.count = ic.entries and #ic.entries or 1
-        if ic.kind == "turnin" then
-            p.sub = "Aflever" .. (ic.npc and (" hos " .. ic.npc) or " her")
-        elseif ic.kind == "giver" then
-            local fl = questFlag(ic.qid)
-            local tag = fl == "pvp" and "PvP-quest" or fl == "repeat" and "Gentagelig quest"
-                or "Tilgængelig quest"
-            p.sub = tag .. (ic.npc and (" · " .. ic.npc) or "")
-        elseif ic.kind == "flightmaster" then
-            local fac = ic.horde and "Horde" or "neutral"
-            p.sub = ic.known and ("Flyvemester (" .. fac .. ")")
-                or ("Ny flyvemester her (" .. fac .. ") · mangler")
-        elseif ic.kind == "innkeeper" then
-            p.sub = "Kroværter (sæt hearthstone)"
-        elseif ic.kind == "mailbox" then
-            p.sub = "Postkasse"
-        elseif ic.item then   -- per-mål-markør: dræb-mål (sværd) eller saml-item
-            p.sub = (isSlay(ic.otype) and "Dræb: " or "Saml: ") .. ic.item
-        else   -- objektiv (dræb/interager): vis mob-navne hvis vi har dem
-            p.sub = objectiveSub(ic.qid, ic.otype)
-        end
+        applyPinMeta(p, ic)
         p:ClearAllPoints()
         p:SetPoint("CENTER", canvas, "TOPLEFT", (ic.x / 100) * w, -(ic.y / 100) * h)
         p:Show()
@@ -706,6 +713,10 @@ end
 local minimapPins = {}
 local mmFrame = CreateFrame("Frame", "QeasyMinimapPins", Minimap)
 mmFrame:SetAllPoints(Minimap)
+-- Løft pin-laget over minimappets egen kunst, så hover rammer pin'ene.
+if mmFrame.SetFrameLevel and Minimap.GetFrameLevel then
+    mmFrame:SetFrameLevel((Minimap:GetFrameLevel() or 0) + 8)
+end
 
 local function worldPos(mapID, x, y)
     if not (C_Map and C_Map.GetWorldPosFromMapPos and CreateVector2D) then return nil end
@@ -714,9 +725,16 @@ local function worldPos(mapID, x, y)
     return cont, wp.x, wp.y
 end
 
+-- Minimap-pin: en muse-aktiveret ramme med en tekstur, så man kan holde musen
+-- over den og se questen (ikke klikbar - kun hover, jf. ønske).
 local function getMMPin(i)
     if minimapPins[i] then return minimapPins[i] end
-    local t = mmFrame:CreateTexture(nil, "OVERLAY")
+    local t = CreateFrame("Frame", nil, mmFrame)
+    t.tex = t:CreateTexture(nil, "OVERLAY")
+    t.tex:SetAllPoints(t)
+    t:EnableMouse(true)
+    t:SetScript("OnEnter", function(self) showPinTooltip(self, false) end)
+    t:SetScript("OnLeave", function() GameTooltip:Hide() end)
     minimapPins[i] = t
     return t
 end
@@ -786,10 +804,11 @@ mmFrame:SetScript("OnUpdate", function(_, dt)
                 local base = (ic.kind == "flightmaster") and (ic.known and 10 or 12)
                     or (ic.kind == "objective") and (isSlay(ic.otype) and 12 or 11)
                     or (ic.kind == "innkeeper" or ic.kind == "mailbox") and 13 or 12
-                styleIcon(t, ic.kind, base, ic.otype, ic.known,
+                styleIcon(t.tex, ic.kind, base, ic.otype, ic.known,
                     ic.kind == "giver" and questFlag(ic.qid) or nil)
+                t:SetSize(base, base)
                 t.base = base
-                t.pulse = (ic.kind == "objective") and not isSlay(ic.otype)
+                applyPinMeta(t, ic)   -- title/sub/kind/qid til hover-tooltip
                 -- nord = op (+y), vest = venstre (-x)
                 local sx = -(dW / radius) * half
                 local sy = (dN / radius) * half

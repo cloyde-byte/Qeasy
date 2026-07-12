@@ -102,7 +102,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.30.0' end
+function GetAddOnMetadata() return '0.30.1' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -822,6 +822,15 @@ lua.eval("""function() QLOG = { { title='Spectrecles', questID=10625,
 ns.Map.UpdateWorldMap(ns.Map)
 check("kort tegner patrulje-rute (opat) uden fejl", True)
 lua.execute("WorldMapFrame = nil")
+
+# minimap-pins er nu muse-aktiverede rammer (hover-tooltip) - OnUpdate-tegningen
+# må ikke fejle med rammer i stedet for teksturer.
+lua.execute("PSTATE.map=1951; PSTATE.x=0.618; PSTATE.y=0.626; PSTATE.level=70; QLOG={}; FLAGGED={}")
+lua.eval("""function() QLOG = { { title='Clefthoof Mastery', questID=9789, complete=false,
+  objectives = { { text='Clefthoof slain: 0/30', done=false } } } } end""")()
+ns.Map.Rebuild(ns.Map)
+g.QeasyMinimapPins.scripts.OnUpdate(g.QeasyMinimapPins, 0.2)
+check("minimap-pins (hover-rammer) tegnes uden fejl", True)
 
 # ---- session-statistik (XP/time) ----
 lua.execute("PSTATE.level=65; PSTATE.xp=1000; PSTATE.xpmax=10000; PSTATE.time=0")
