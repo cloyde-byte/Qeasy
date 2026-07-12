@@ -13,6 +13,12 @@ local _, ns = ...
 -- tilføj frit - nøglen er quest-id'et (samme som i QuestDB).
 -- =========================================================================
 
+-- Delt tip til de mange "Shutting Down Manaforge X"-quests (samme mekanik).
+local MANAFORGE = {
+    "Dræb Overseer'en for at få manaforgens 'Access Crystal' - brug så krystallen på Control Console for at lukke den ned. Selve nedlukningen sker med det UDLEVEREDE item, ikke ved at dræbe alt.",
+    "Der findes en Aldor- OG en Scryer-version af hver manaforge; tag kun den fra din egen fraktions questgiver (den anden sænker din modsatte rep).",
+}
+
 ns.QuestTips = {
     -- ===================== Hellfire Peninsula =====================
     [10792] = {  -- Zeth'Gor Must Burn!
@@ -140,6 +146,28 @@ ns.QuestTips = {
     -- ===================== Netherstorm =====================
     [10243] = {  -- Naaru Technology
         "Aflever ved 'B'naar Control Console' (et objekt, ikke en NPC) inde i Manaforge B'naar - brug konsollen.",
+    },
+    -- Manaforge-nedlukninger: Aldor-linjen (Anchorite Karja) ...
+    [10299] = MANAFORGE,  -- B'naar
+    [10321] = MANAFORGE,  -- Coruu
+    [10322] = MANAFORGE,  -- Duro
+    [10323] = MANAFORGE,  -- Ara
+    -- ... og Scryer-linjen (Spymaster Thalodien / Caledis Brightdawn).
+    [10329] = MANAFORGE,  -- B'naar
+    [10330] = MANAFORGE,  -- Coruu
+    [10338] = MANAFORGE,  -- Duro
+    [10365] = MANAFORGE,  -- Ara
+    [10855] = {  -- Fel Reavers, No Thanks! (+ Nether Gas In a Fel Fire Engine)
+        "Dræb Gan'arg Mekgineers for 'Condensed Nether Gas', og HÆLD den så i en 'Inactive Fel Reaver' (brug item'et på reaveren) - forkert brændstof saboterer den. Du skal ikke nedkæmpe reaveren.",
+    },
+    [10426] = {  -- Flora of the Eco-Domes
+        "Brug det udleverede redskab på planterne inde i Eco-Dome'erne (Biodome-kuplerne) - du skal samle prøver, ikke slås.",
+    },
+    [10427] = {  -- Creatures of the Eco-Domes
+        "Samme kupler som 'Flora of the Eco-Domes': brug det udleverede redskab på skabningerne indenfor - tag begge quests i én tur.",
+    },
+    [10385] = {  -- Potential for Brain Damage = High
+        "Gruppe-quest (level 70): Nexus-King Salhadaar og hans Ethereum-vagter ved Staging Grounds er elite - tag en gruppe med.",
     },
     [10439] = {  -- Dimensius the All-Devouring
         "Dimensius er en stor gruppe-kamp: du hjælper Captain Saeed og hans styrke. Vær flere (eller kom tilbage på max level) og følg Saeed, når han rykker frem.",

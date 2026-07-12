@@ -673,6 +673,10 @@ check("håndskrevet tip findes for quest 9788",
 check("Nagrand Cherry-tip sidder på dykker-questen (9804)",
       ns.QuestTips[9804] is not None
       and any("Nagrand Cherry" in t for t in list(ns.QuestTips[9804].values())))
+# de mange manaforge-quests deler ét tip (Access Crystal) - tjek at delt reference virker
+check("manaforge-nedlukning deler Access Crystal-tip (10321)",
+      ns.QuestTips[10321] is not None
+      and any("Access Crystal" in t for t in list(ns.QuestTips[10321].values())))
 ns.Q.char.ui.trackerFocus = lua.eval("{}")
 ns.Q.char.ui.primaryFocus = None
 
