@@ -682,6 +682,8 @@ check("manaforge-nedlukning deler Access Crystal-tip (10321)",
 # stedet for at behandle questen som klar-til-aflevering.
 check("On Spirit's Wings har objektiv-koordinat (ikke kun aflevering)",
       ns.QuestDB[10714] is not None and ns.QuestDB[10714].o is not None)
+check("Gather the Orbs har objektiv-koordinat (ikke kun aflevering)",
+      ns.QuestDB[10859] is not None and ns.QuestDB[10859].o is not None)
 ns.Q.char.ui.trackerFocus = lua.eval("{}")
 ns.Q.char.ui.primaryFocus = None
 

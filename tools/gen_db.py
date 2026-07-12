@@ -58,6 +58,10 @@ OBJ_OVERRIDE = {
     # "[DND]Bloodmaul Chatter Credit"-trigger uden spawns; det par man skal aflytte
     # (Bloodmaul Taskmaster + Soothsayer) står i den østlige kløft ~(58,31).
     10714: (1949, 57.8, 31.1, "o"),
+    # Gather the Orbs: saml Razaani Light Orbs. Objektiv-enheden er "Trapping the
+    # Light Kill Credit Trigger" uden spawns; selve orb-NPC'en (unit 20635) står
+    # tæt samlet ~(66.8,41.7) i Razaani-området (øst, mod Bash'ir Landing).
+    10859: (1949, 66.8, 41.7, "o"),
 }
 
 # Manuelle PER-STED-markører (op) for quests med FLERE mål på hvert sit sted,

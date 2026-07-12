@@ -141,6 +141,9 @@ ns.QuestTips = {
     [10714] = {  -- On Spirit's Wings
         "Aflytnings-quest: find et par Bloodmaul-ogrer (Taskmaster + Soothsayer) i den østlige kløft nord for Circle of Blood (~58,31), og brug 'Rexxar's Whistle' for at sende Spirit ud og lytte. Der er ikke noget at dræbe.",
     },
+    [10859] = {  -- Gather the Orbs
+        "Razaani Light Orbs står tæt samlet i Razaani-området øst i zonen (~66,42, mod Bash'ir Landing) - de er interaktive 'lys', ikke mobs. Følg pilen til klyngen.",
+    },
     -- T'chali-kæden (Thunderlord-outpost, sydvest): 10542 -> 10545 -> 10543 -> 10544.
     [10543] = {  -- Grimnok and Korgaah, I Am For You!
         "To navngivne Bladespire-ogrer på HVER sit sted i Bladespire Hold (Grimnok mod syd, Korgaah mod nord) - dræb begge. De står ikke sammen.",
