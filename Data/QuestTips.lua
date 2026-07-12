@@ -144,6 +144,9 @@ ns.QuestTips = {
     [10859] = {  -- Gather the Orbs
         "Razaani Light Orbs står tæt samlet i Razaani-området øst i zonen (~66,42, mod Bash'ir Landing) - de er interaktive 'lys', ikke mobs. Følg pilen til klyngen.",
     },
+    [10867] = {  -- There Can Be Only One Response
+        "Dræb de samme Razaani-ethereals som i 'Gather the Orbs' (~66,42), indtil en boss spawner og dropper 'Collection of Souls'. Saml den og aflever hos Spiritcaller Dohgar.",
+    },
     -- T'chali-kæden (Thunderlord-outpost, sydvest): 10542 -> 10545 -> 10543 -> 10544.
     [10543] = {  -- Grimnok and Korgaah, I Am For You!
         "To navngivne Bladespire-ogrer på HVER sit sted i Bladespire Hold (Grimnok mod syd, Korgaah mod nord) - dræb begge. De står ikke sammen.",

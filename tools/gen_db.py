@@ -62,6 +62,10 @@ OBJ_OVERRIDE = {
     # Light Kill Credit Trigger" uden spawns; selve orb-NPC'en (unit 20635) står
     # tæt samlet ~(66.8,41.7) i Razaani-området (øst, mod Bash'ir Landing).
     10859: (1949, 66.8, 41.7, "o"),
+    # There Can Be Only One Response: dræb de samme Razaani-ethereals som i
+    # 'Gather the Orbs', til en boss spawner og dropper 'Collection of Souls'
+    # (item-kilde = objekt 185033 uden spawns). Samme sted ~(66.8,41.7).
+    10867: (1949, 66.8, 41.7, "u"),
 }
 
 # Manuelle PER-STED-markører (op) for quests med FLERE mål på hvert sit sted,
@@ -344,6 +348,11 @@ def main():
         # koordinater (usynlige credit-triggers). Markér quest'en, så kortet og
         # pilen ikke fejlagtigt viser den som klar-til-aflevering, mens den er i
         # gang (item-mål 'I' uden sted er derimod ofte vendor/craft -> afl. er ok).
+        # Dræb ('U') / interager ('O')-mål findes i pfQuest, men uden koordinater.
+        # Item-mål ('I') flages IKKE: de dropper oftest fra dungeon-bosser eller
+        # købes/craftes, hvor afleverings-ikonet ER det rigtige kortpunkt. De få
+        # åben-verden item-quests (fx 'Collection of Souls') fikses med
+        # OBJ_OVERRIDE i stedet.
         noloc = False
         if obj is None and not op_manual:
             oo = q["obj"]

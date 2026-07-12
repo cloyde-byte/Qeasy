@@ -702,6 +702,11 @@ check("On Spirit's Wings har objektiv-koordinat (ikke kun aflevering)",
       ns.QuestDB[10714] is not None and ns.QuestDB[10714].o is not None)
 check("Gather the Orbs har objektiv-koordinat (ikke kun aflevering)",
       ns.QuestDB[10859] is not None and ns.QuestDB[10859].o is not None)
+# 'There Can Be Only One Response': item-mål (Collection of Souls) hvis kilde-
+# objekt mangler koordinater -> OBJ_OVERRIDE giver den orb-stedet, ikke noloc.
+check("There Can Be Only One Response har objektiv-koordinat",
+      ns.QuestDB[10867] is not None and ns.QuestDB[10867].o is not None
+      and ns.QuestDB[10867].noloc is None)
 ns.Q.char.ui.trackerFocus = lua.eval("{}")
 ns.Q.char.ui.primaryFocus = None
 
