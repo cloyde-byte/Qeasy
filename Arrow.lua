@@ -92,7 +92,9 @@ function Arrow:FocusTarget()
     local function turnin() if d.e then coords, kind = { map = d.e[1], x = d.e[2], y = d.e[3] }, "turnin" end end
     local function objective() if d.o then coords, kind = { map = d.o[1], x = d.o[2], y = d.o[3] }, "do" end end
     if complete then turnin(); if not coords then objective() end
-    else objective(); if not coords then turnin() end end
+    -- Har questen et objektiv-mål uden kendt sted (noloc), skal pilen IKKE pege
+    -- på afleveringen, mens den er i gang - fald hellere tilbage til ruten.
+    else objective(); if not coords and not d.noloc then turnin() end end
     if not coords then return nil end
 
     local c, wx, wy = WorldPos(coords.map, coords.x, coords.y)

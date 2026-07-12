@@ -99,7 +99,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.29.0' end
+function GetAddOnMetadata() return '0.29.1' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -547,6 +547,24 @@ cu = [i for i in ns.Map.IconsForMap(ns.Map, 1949).values()
       if i.kind == "objective" and int(i.qid) == 10544]
 check("færdigt sted fjernes, kun resterende bygnings-sted vises",
       len(cu) == 1 and cu[0].item == "Bloodmaul Outpost building")
+
+# noloc: quest med dræb/interager-mål UDEN kendt sted (usynlig credit-trigger)
+# må IKKE vises som klar-til-aflevering mens den er i gang (regression: 'On
+# Spirit's Wings'/'Gather the Orbs'/'Shattering the Veil' viste afl.-ikon).
+check("9849 Shattering the Veil er markeret noloc", ns.QuestDB[9849].noloc is not None)
+lua.eval("""function() QLOG = { { title='Shattering the Veil', questID=9849, complete=false,
+  objectives={ {text='Minion of Gurok slain: 0/8', done=false} } } } end""")()
+lua.execute("PSTATE.level=70; FLAGGED={}")
+noloc_turnin = [i for i in ns.Map.IconsForMap(ns.Map, 1951).values()
+                if i.kind == "turnin" and int(i.qid) == 9849]
+check("noloc-quest viser IKKE aflevering mens den er i gang", len(noloc_turnin) == 0)
+# men ægte leverings-/opsøg-NPC-quest (ingen objektiv, ingen noloc) SKAL vise afl.
+lua.eval("""function() QLOG = { { title='Whispers on the Wind', questID=10614, complete=false,
+  objectives={} } } end""")()
+seek_turnin = [i for i in ns.Map.IconsForMap(ns.Map, 1949).values()
+               if i.kind == "turnin" and int(i.qid) == 10614]
+check("leverings-quest viser stadig aflevering mens den er i gang", len(seek_turnin) == 1)
+
 zicons = list(ns.Map.IconsForMap(ns.Map, 1946).values())
 telredor_giver = any(i.kind == "giver" and 66 <= i.x <= 70 and 47 <= i.y <= 52 for i in zicons)
 check("ingen giver-ikoner ved Telredor på kortet", not telredor_giver)

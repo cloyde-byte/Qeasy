@@ -340,6 +340,15 @@ def main():
                 mx = round(sum(p[2] for p in pts_ov) / len(pts_ov), 1)
                 my = round(sum(p[3] for p in pts_ov) / len(pts_ov), 1)
                 obj = (pts_ov[0][1], mx, my)
+        # Objektiv-mål (dræb 'U' / interager 'O') findes i pfQuest, men UDEN
+        # koordinater (usynlige credit-triggers). Markér quest'en, så kortet og
+        # pilen ikke fejlagtigt viser den som klar-til-aflevering, mens den er i
+        # gang (item-mål 'I' uden sted er derimod ofte vendor/craft -> afl. er ok).
+        noloc = False
+        if obj is None and not op_manual:
+            oo = q["obj"]
+            if T(oo) == "table" and (oo["U"] or oo["O"]):
+                noloc = True
         # medtag kun quests med mindst én Outland-koordinat
         if not (giver or turnin or obj):
             continue
@@ -380,6 +389,8 @@ def main():
                 pairs = ",".join('["%s"]="%s"' % (esc(m), esc(i))
                                  for m, i in sorted(omap.items()))
                 parts.append("om={%s}" % pairs)
+        if noloc:
+            parts.append("noloc=1")
         # oi = item-id'er man skal samle (til quest-info i item-tooltips)
         objx = q["obj"]
         if T(objx) == "table" and objx["I"]:
