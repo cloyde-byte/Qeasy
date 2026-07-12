@@ -411,9 +411,27 @@ local function getWorldPin(i, canvas)
             GameTooltip:AddLine(self.title, 1, 0.85, 0.30)   -- questnavn, fremhævet
             if self.sub then GameTooltip:AddLine(self.sub, 0.75, 0.82, 0.95) end
         end
+        if self.qid and (self.kind == "giver" or self.kind == "objective"
+                         or self.kind == "turnin") then
+            GameTooltip:AddLine("Klik: fokusér (pilen følger)", 0.45, 0.75, 0.5)
+        end
         GameTooltip:Show()
     end)
     p:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    -- Klik = gør questen til primær fokus (pilen følger den). Virker for både
+    -- tilgængelige givere ("!" -> peger på giveren), aktive mål og afleveringer.
+    p:RegisterForClicks("LeftButtonUp")
+    p:SetScript("OnClick", function(self)
+        local qid = self.qid
+        if not qid or not (self.kind == "giver" or self.kind == "objective"
+                           or self.kind == "turnin") then return end
+        if not (ns.ObjTracker and ns.ObjTracker.SetFocusPrimary) then return end
+        ns.ObjTracker:SetFocusPrimary(qid)
+        ns.ObjTracker:Update()
+        if ns.Arrow then ns.Arrow:UpdateTarget() end
+        if ns.Guide then ns.Guide:Update() end
+        ns.Map:UpdateWorldMap()
+    end)
     worldPins[i] = p
     return p
 end
@@ -565,6 +583,9 @@ function Map:UpdateWorldMap()
             or (ic.kind == "innkeeper" or ic.kind == "mailbox") and 14
             or (ic.kind == "turnin") and 16   -- afleverings-"?" større: let at finde
             or 13
+        -- Den quest man har i primær fokus fremhæves med et større ikon.
+        local isFocus = ic.qid and ns.Q.char.ui.primaryFocus == ic.qid
+        if isFocus then base = math.floor(base * 1.5) end
         styleIcon(p.tex, ic.kind, base, ic.otype, ic.known,
             ic.kind == "giver" and questFlag(ic.qid) or nil)
         p:SetSize(base, base)

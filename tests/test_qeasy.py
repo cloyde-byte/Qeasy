@@ -102,7 +102,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.29.1' end
+function GetAddOnMetadata() return '0.30.0' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -721,6 +721,35 @@ check("håndskrevet tip findes for quest 9788",
 check("Nagrand Cherry-tip sidder på dykker-questen (9804)",
       ns.QuestTips[9804] is not None
       and any("Nagrand Cherry" in t for t in list(ns.QuestTips[9804].values())))
+
+# ---- fokusér quest ved klik på kort-ikon ----
+# Available quest (ikke i loggen): sætter primær fokus (så pilen peger på
+# questgiveren), men fylder IKKE tracker-fokus-listen.
+lua.eval("function() QLOG = {} end")()
+lua.execute("FLAGGED={}")
+ns.Q.char.ui.trackerFocus = lua.eval("{}")
+ns.Q.char.ui.primaryFocus = None
+ns.ObjTracker.SetFocusPrimary(ns.ObjTracker, 9789)   # Clefthoof Mastery, ikke i loggen
+check("klik på available quest sætter primær men ikke tracker-liste",
+      int(ns.Q.char.ui.primaryFocus) == 9789
+      and len(list(ns.Q.char.ui.trackerFocus.values())) == 0)
+ft = ns.Arrow.FocusTarget(ns.Arrow)
+check("fokus på available quest peger pilen på questgiveren (accept)",
+      ft is not None and ft.kind == "accept")
+# tag questen -> aktiv -> pilen peger på objektivet
+lua.eval("""function() QLOG = { { title='Clefthoof Mastery', questID=9789, complete=false,
+  objectives={{text='Clefthoof slain: 0/30', done=false}} } } end""")()
+ft2 = ns.Arrow.FocusTarget(ns.Arrow)
+check("da questen er taget peger pilen på objektivet (do)",
+      ft2 is not None and ft2.kind == "do")
+# afleveret (flagget færdig) -> primær fokus ryddes automatisk
+lua.eval("function() QLOG = {} end")()
+lua.execute("FLAGGED={[9789]=true}")
+check("afleveret primær-fokus ryddes automatisk",
+      ns.Arrow.FocusTarget(ns.Arrow) is None and ns.Q.char.ui.primaryFocus is None)
+lua.execute("FLAGGED={}")
+ns.Q.char.ui.trackerFocus = lua.eval("{}")
+ns.Q.char.ui.primaryFocus = None
 # de mange manaforge-quests deler ét tip (Access Crystal) - tjek at delt reference virker
 check("manaforge-nedlukning deler Access Crystal-tip (10321)",
       ns.QuestTips[10321] is not None

@@ -76,25 +76,47 @@ local target = nil
 -- aflevering, peges der på afleverings-NPC'en (d.e); ellers på objektiv-området
 -- (d.o). Returnerer nil hvis intet er manuelt fokuseret -> pilen falder tilbage
 -- til ruten.
+local function flaggedDone(qid)
+    if C_QuestLog and C_QuestLog.IsQuestFlaggedCompleted then
+        return C_QuestLog.IsQuestFlaggedCompleted(qid)
+    end
+    if IsQuestFlaggedCompleted then return IsQuestFlaggedCompleted(qid) end
+    return false
+end
+
 function Arrow:FocusTarget()
-    if not (ns.ObjTracker and ns.QuestDB and ns.QuestLog) then return nil end
-    local qid = ns.ObjTracker:PrimaryFocusID()
+    if not (ns.QuestDB and ns.QuestLog) then return nil end
+    -- Den primære fokus-quest kan være valgt i trackeren ELLER ved klik på et
+    -- kort-ikon (fx et "!"). Den behøver ikke være i loggen endnu: så peger
+    -- pilen på questgiveren, så man kan gå hen og tage den.
+    local qid = ns.Q.char.ui.primaryFocus
+    if qid and (not ns.QuestDB[qid] or flaggedDone(qid)) then
+        ns.Q.char.ui.primaryFocus = nil        -- afleveret/ugyldig: ryd
+        qid = nil
+    end
+    if not qid and ns.ObjTracker then
+        qid = ns.ObjTracker:PrimaryFocusID()   -- fallback: in-log manuel fokus
+    end
     if not qid then return nil end
     local d = ns.QuestDB[qid]
     if not d then return nil end
 
-    local complete = false
+    -- Tilstand: ikke i loggen / aktiv / complete.
+    local state
     for _, e in ipairs(ns.QuestLog:Scan()) do
-        if e.questID == qid then complete = e.isComplete break end
+        if e.questID == qid then state = e.isComplete and "complete" or "active" break end
     end
 
     local coords, kind
-    local function turnin() if d.e then coords, kind = { map = d.e[1], x = d.e[2], y = d.e[3] }, "turnin" end end
-    local function objective() if d.o then coords, kind = { map = d.o[1], x = d.o[2], y = d.o[3] }, "do" end end
-    if complete then turnin(); if not coords then objective() end
-    -- Har questen et objektiv-mål uden kendt sted (noloc), skal pilen IKKE pege
-    -- på afleveringen, mens den er i gang - fald hellere tilbage til ruten.
-    else objective(); if not coords and not d.noloc then turnin() end end
+    local function at(t, k) if t then coords, kind = { map = t[1], x = t[2], y = t[3] }, k end end
+    if state == nil then
+        at(d.g, "accept")                      -- endnu ikke taget: peg på giver
+    elseif state == "complete" then
+        at(d.e, "turnin"); if not coords then at(d.o, "do") end
+    else                                        -- aktiv: peg på objektivet
+        at(d.o, "do")
+        if not coords and not d.noloc then at(d.e, "turnin") end
+    end
     if not coords then return nil end
 
     local c, wx, wy = WorldPos(coords.map, coords.x, coords.y)

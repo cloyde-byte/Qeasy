@@ -172,6 +172,17 @@ end
 -- Er den allerede primær, fjernes den fra fokus igen. Er den ny, tilføjes den
 -- til fokus (max 3, ældste ryger ud) og bliver primær.
 function Tracker:SetFocusPrimary(qid)
+    -- Kun quests i loggen hører til i tracker-fokus-listen (op til 3, blå
+    -- områder + ▶). En AVAILABLE quest (fx klik på "!" på kortet) sætter kun den
+    -- primære fokus, så pilen fører hen til questgiveren. Klik igen = ryd.
+    local inLog = false
+    for _, e in ipairs(ns.QuestLog:Scan()) do
+        if e.questID == qid then inLog = true break end
+    end
+    if not inLog then
+        ns.Q.char.ui.primaryFocus = (ns.Q.char.ui.primaryFocus ~= qid) and qid or nil
+        return
+    end
     local f = focusRaw()
     local idx
     for i, q in ipairs(f) do if q == qid then idx = i break end end
