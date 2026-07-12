@@ -584,6 +584,21 @@ lua.execute("REPSTANDING={[935]=7}")   # Revered
 check("rep-gated quest vises ved Revered+", len(sha_giver()) == 1)
 lua.execute("REPSTANDING={}")
 
+# Aldor/Scryer: valg-questsene auto-flagger HINANDEN som fuldført i spillet, så
+# et prereq-tjek alene viser Scryer-opfølgeren for Aldor-spillere. Rygtet (den
+# valgte side har højere standing) afgør det korrekt. (Reproducerer bug'en:
+# Aldor så 'Voren'thal the Seer'.)
+lua.execute("PSTATE.map=1955; PSTATE.level=70; QLOG={}; "
+            "FLAGGED={[10210]=true,[10211]=true,[10551]=true,[10552]=true}")
+def khadgar_follow():
+    return sorted(int(i.qid) for i in ns.Map.IconsForMap(ns.Map, 1955).values()
+                  if i.kind == "giver" and int(i.qid) in (10553, 10554))
+lua.execute("REPSTANDING={[932]=6,[934]=1}")   # Aldor-aligned
+check("Aldor-spiller ser Ishanah, ikke Voren'thal the Seer", khadgar_follow() == [10554])
+lua.execute("REPSTANDING={[932]=1,[934]=6}")   # Scryer-aligned
+check("Scryer-spiller ser Voren'thal the Seer, ikke Ishanah", khadgar_follow() == [10553])
+lua.execute("REPSTANDING={}; FLAGGED={}")
+
 # en available giver-quest må ikke længere vises som giver når den er i loggen
 some = int(next(i.qid for i in icons if i.kind == "giver"))
 title = ns.QuestDB[some].t

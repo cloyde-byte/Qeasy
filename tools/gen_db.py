@@ -82,6 +82,18 @@ REP_REQUIRE = {
     10560: (935, 7),
 }
 
+# Aldor/Scryer-tilhørsforhold: de gensidigt udelukkende valg-quests (Allegiance
+# to the Aldor/Scryers) auto-flagger HINANDEN som "fuldført" i spillet, så et
+# prereq-tjek alene kan ikke se hvilken side man valgte. Kun rygtet afslører det
+# (den valgte faction har højere standing). { questID: "aldor" | "scryer" }.
+ALIGN_REQUIRE = {
+    10553: "scryer",  # Voren'thal the Seer (Khadgar) - Scryer-opfølger
+    10416: "scryer",  # Synthesis of Power (Voren'thal)
+    10419: "scryer",  # Arcane Tomes (Voren'thal)
+    10507: "scryer",  # Turning Point (Voren'thal)
+    10554: "aldor",   # Ishanah (Khadgar) - Aldor-opfølger
+}
+
 # Manuelle PER-STED-markører (op) for quests med FLERE mål på hvert sit sted,
 # hvor pfQuest ikke kan udlede stederne (trigger-enheder uden spawns).
 # { questID: (otype, [(navn, map, x, y), ...]) }. `navn` skal matche STARTEN af
@@ -428,6 +440,8 @@ def main():
             parts.append("pre={%s}" % ",".join(str(p) for p in pre))
         if qid in REP_REQUIRE:
             parts.append("rq={%d,%d}" % REP_REQUIRE[qid])
+        if qid in ALIGN_REQUIRE:
+            parts.append('align="%s"' % ALIGN_REQUIRE[qid])
         # cl = "close"-gruppe (WoW ExclusiveGroup): gensidigt udelukkende quests
         # / breadcrumbs. Har du fuldført ÉN af dem, tilbydes de andre ikke mere,
         # så vi kan skjule det falske "!" (fx Old Oroks Area 52-breadcrumb).

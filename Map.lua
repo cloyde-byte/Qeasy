@@ -101,6 +101,14 @@ local function giverAvailable(qid, d, inLog)
         local st = repStanding(d.rq[1])
         if not st or st < d.rq[2] then return false end
     end
+    -- Aldor/Scryer: den valgte side har højere standing. Før valget (lige
+    -- standing) skjules begge sider. Løser at valg-quests auto-flagger hinanden.
+    if d.align then
+        local aldor = repStanding(932) or 4
+        local scryer = repStanding(934) or 4
+        if d.align == "scryer" and scryer <= aldor then return false end
+        if d.align == "aldor" and aldor <= scryer then return false end
+    end
     -- Sæson-event: skjul quest-giveren uden for eventets datovindue.
     if d.ev and ns.Seasonal and not ns.Seasonal:IsActive(d.ev) then return false end
     if d.lvl and playerLevel() < d.lvl then return false end
