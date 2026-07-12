@@ -13,6 +13,16 @@ local _, ns = ...
 -- tilføj frit - nøglen er quest-id'et (samme som i QuestDB).
 -- =========================================================================
 
+-- Delt tip til "Enraged Spirits of X"-quests (Shadowmoon, samme mekanik).
+local ENRAGED_SPIRITS = {
+    "Læg 'Totem of Spirits' på jorden TÆT på den vrede elemental og dræb den så inden for totem'ets rækkevidde - kun da fanges dens sjæl. Dræber du den uden totem i nærheden, tæller den ikke.",
+}
+
+-- Delt tip til Teron Gorefiend-divinations-quests (Shadowmoon).
+local GOREFIEND_DIV = {
+    "Du kan KUN se og ramme spøgelserne mens du bærer den aske-fyldte hjelm fra 'Teron Gorefiend - Lore and Legend'. Tag hjelmen på, før du leder efter målet.",
+}
+
 -- Delt tip til de mange "Shutting Down Manaforge X"-quests (samme mekanik).
 local MANAFORGE = {
     "Dræb Overseer'en for at få manaforgens 'Access Crystal' - brug så krystallen på Control Console for at lukke den ned. Selve nedlukningen sker med det UDLEVEREDE item, ikke ved at dræbe alt.",
@@ -31,6 +41,19 @@ ns.QuestTips = {
         "Dræb FØRST Warbringer Arix'Amal ved Invasion Point: Annihilator (nord for Thrallmar) for at få 'Burning Legion Gate Key'.",
         "Brug så nøglen på 'Rune of Spite' ved portalen - det er selve mål-objektet pilen fører dig til.",
     },
+    [10087] = {  -- Burn It Up... For the Horde!
+        "Brug 'Flaming Torch' på den vestlige OG den østlige Alliance Cannon på Path of Glory - du skal bruge det udleverede item på begge kanoner.",
+    },
+    [9447] = {  -- Administering the Salve
+        "Brug det udleverede salve-item på de sårede 'Debilitated Mag'har Grunt' (venlige, ikke fjender) - du helbreder dem, du dræber dem ikke.",
+    },
+    -- Arelion-kæden (Falcon Watch): spion-historie med to item-/duel-trin.
+    [9472] = {  -- Arelion's Mistress
+        "Lok Viera Sunwhisper væk fra lejren med cenarion-vin (hentes ved Cenarion Refuge), og brug så 'Carinda's Scroll of Retribution' på hende.",
+    },
+    [10286] = {  -- Arelion's Secret
+        "Magister Aledis rider rundt på vejen mellem Falcon Watch og Zangarmarsh. Snak med ham ved fuldt liv - det starter en duel; få ham under 30% liv for at fuldføre.",
+    },
 
     -- ===================== Zangarmarsh =====================
     [9785] = {  -- Blessings of the Ancients
@@ -39,6 +62,9 @@ ns.QuestTips = {
     },
     [9738] = {  -- Lost in Action
         "Dungeon-quest: de fire savnede (Rayge, Bite, Greenthumb, Claw) findes INDE i Slave Pens og Underbog (Coilfang-instanserne) - ikke ude i det fri. Tag den med, når du kører de dungeons.",
+    },
+    [9701] = {  -- Observing the Sporelings (kæde-start)
+        "Start på sporeling-kæden fra Watcher Leesa'oh (Cenarion Watchpost): flere korte quests i træk om sporelingerne, bog lords og Ango'rosh-ograne - tag dem samlet, det er samme område.",
     },
 
     [9788] = {  -- A Damp, Dark Place
@@ -62,6 +88,12 @@ ns.QuestTips = {
     [10922] = {  -- Digging Through Bones
         "Forsvars-quest: beskyt Chief Archaeologist Letoll og hans grave-hold mod en bone worm, mens de graver lidt nord for Sha'tari-lejren.",
         "Ingen af holdet må dø - hold dig tæt på dem. Aflever hos Dwarfowitz, når udgravningen er færdig.",
+    },
+    [11029] = {  -- A Shabby Disguise (Skettis)
+        "Tag forklædningen PÅ og snak med arakkoa-skriveren Sahaak på Terokk's Rest (midterøen i Skettis). Forklædningen narrer KUN Sahaak - de andre arakkoa gennemskuer dig, så hold afstand.",
+    },
+    [11085] = {  -- Escape from Skettis
+        "Escort/daily: befri Skyguard-fangen fra hans bur i en af Skettis' veils - han går derefter langsomt mod en bro. Beskyt ham hele vejen og rapportér til Sky Sergeant Doryn.",
     },
 
     -- ===================== Nagrand =====================
@@ -185,6 +217,24 @@ ns.QuestTips = {
     },
     [11544] = {  -- Ata'mal Armaments (+ The Ata'mal Terrace)
         "Ata'mal Terrace ligger øst i Shadowmoon - tag 'The Ata'mal Terrace' med samtidig (samme område). Pas på Shadowlord Deathwail; han er en mini-boss.",
+    },
+    -- Enraged Spirits (Earthmender Torlok): totem-fangst.
+    [10458] = ENRAGED_SPIRITS,  -- Fire and Earth
+    [10480] = ENRAGED_SPIRITS,  -- Water
+    [10481] = ENRAGED_SPIRITS,  -- Air
+    -- Teron Gorefiend-kæden: aske-hjelm gør spøgelserne synlige.
+    [10633] = {  -- Teron Gorefiend - Lore and Legend
+        "Questen giver dig en aske-fyldt hjelm - tag den PÅ for at kunne se Shadowmoons spøgelser. Uden hjelmen er målene til de tre 'Divination'-quests usynlige.",
+    },
+    [10634] = GOREFIEND_DIV,  -- Gorefiend's Armor
+    [10635] = GOREFIEND_DIV,  -- Gorefiend's Cloak
+    [10636] = GOREFIEND_DIV,  -- Gorefiend's Truncheon
+    -- Netherwing-intro (level 70, kræver flyvemount).
+    [10836] = {  -- Infiltrating Dragonmaw Fortress
+        "Dræb 15 Dragonmaw-orker inde i Dragonmaw Fortress (sydøst, ~66,60). Ingen forklædning - bare ryd igennem.",
+    },
+    [10837] = {  -- To Netherwing Ledge!
+        "Flyv ud til Netherwing Ledge - den svævende ø mod syd (kræver flyvemount). Loot 'Nethervine Crystal' fra de tornede ranker ved de store krystal-klynger.",
     },
 
     -- ===================== Shattrath / Lower City-bounties =====================
