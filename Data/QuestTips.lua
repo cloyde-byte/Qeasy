@@ -138,6 +138,9 @@ ns.QuestTips = {
     [10614] = {  -- Whispers on the Wind
         "Ren leverings-quest: der er intet at dræbe. Løb østpå til Leoroxx i Mok'Nathal Village og aflever. Derfor vises den ikke med mål-ikoner på kortet.",
     },
+    [10682] = {  -- A Time for Negotiation...
+        "Forhandlings-quest: snak med Overseer Nuaar (~60,34, nord for Tree Warden Chawn) - der er ikke noget at dræbe. Følg pilen til ham.",
+    },
     [10714] = {  -- On Spirit's Wings
         "Aflytnings-quest: find et par Bloodmaul-ogrer (Taskmaster + Soothsayer) i den østlige kløft nord for Circle of Blood (~58,31), og brug 'Rexxar's Whistle' for at sende Spirit ud og lytte. Der er ikke noget at dræbe.",
     },

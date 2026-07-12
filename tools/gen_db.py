@@ -66,6 +66,10 @@ OBJ_OVERRIDE = {
     # 'Gather the Orbs', til en boss spawner og dropper 'Collection of Souls'
     # (item-kilde = objekt 185033 uden spawns). Samme sted ~(66.8,41.7).
     10867: (1949, 66.8, 41.7, "u"),
+    # A Time for Negotiation...: forhandl med Overseer Nuaar. pfQuest har SLET
+    # intet objektiv registreret (kun start/end hos Tree Warden Chawn), så
+    # peg på Nuaar selv (unit 21981) ~(60.4,34.3).
+    10682: (1949, 60.4, 34.3, "o"),
 }
 
 # Manuelle PER-STED-markører (op) for quests med FLERE mål på hvert sit sted,

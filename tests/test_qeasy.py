@@ -707,6 +707,10 @@ check("Gather the Orbs har objektiv-koordinat (ikke kun aflevering)",
 check("There Can Be Only One Response har objektiv-koordinat",
       ns.QuestDB[10867] is not None and ns.QuestDB[10867].o is not None
       and ns.QuestDB[10867].noloc is None)
+# 'A Time for Negotiation...': pfQuest havde slet intet objektiv -> OBJ_OVERRIDE
+# peger på Overseer Nuaar, så kortet ikke bare viser aflevering.
+check("A Time for Negotiation har objektiv-koordinat (Overseer Nuaar)",
+      ns.QuestDB[10682] is not None and ns.QuestDB[10682].o is not None)
 ns.Q.char.ui.trackerFocus = lua.eval("{}")
 ns.Q.char.ui.primaryFocus = None
 
