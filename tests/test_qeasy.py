@@ -92,6 +92,9 @@ end
 function GetQuestDifficultyColor(level) return { r = 1, g = 1, b = 0 } end
 C_QuestLog = { IsQuestFlaggedCompleted = function(id) return FLAGGED[id] or false end }
 function UnitFactionGroup() return PSTATE.faction end
+-- Rygte-standing pr. faction (styr med REPSTANDING[factionID]); default Neutral(4).
+REPSTANDING = {}
+function GetFactionInfoByID(id) return 'Faction', '', (REPSTANDING[id] or 4) end
 function UnitLevel() return PSTATE.level end
 function UnitXP() return PSTATE.xp or 0 end
 function UnitXPMax() return PSTATE.xpmax or 0 end
@@ -568,6 +571,18 @@ check("leverings-quest viser stadig aflevering mens den er i gang", len(seek_tur
 zicons = list(ns.Map.IconsForMap(ns.Map, 1946).values())
 telredor_giver = any(i.kind == "giver" and 66 <= i.x <= 70 and 47 <= i.y <= 52 for i in zicons)
 check("ingen giver-ikoner ved Telredor på kortet", not telredor_giver)
+
+# rep-gate: 'Revered Among the Sha'tar' (10560) skjules til man er Revered (7)
+# med The Sha'tar (935). pfQuest mangler rep-krav -> kurateret rq-felt.
+check("10560 har rep-krav (rq)", ns.QuestDB[10560].rq is not None)
+lua.execute("PSTATE.map=1955; PSTATE.level=70; FLAGGED={}; QLOG={}; REPSTANDING={}")  # Neutral
+def sha_giver():
+    return [i for i in ns.Map.IconsForMap(ns.Map, 1955).values()
+            if i.kind == "giver" and int(i.qid) == 10560]
+check("rep-gated quest skjult under Revered", len(sha_giver()) == 0)
+lua.execute("REPSTANDING={[935]=7}")   # Revered
+check("rep-gated quest vises ved Revered+", len(sha_giver()) == 1)
+lua.execute("REPSTANDING={}")
 
 # en available giver-quest må ikke længere vises som giver når den er i loggen
 some = int(next(i.qid for i in icons if i.kind == "giver"))

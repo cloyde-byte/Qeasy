@@ -72,6 +72,16 @@ OBJ_OVERRIDE = {
     10682: (1949, 60.4, 34.3, "o"),
 }
 
+# Rygte-krav (reputation): pfQuest gemmer IKKE rep-krav, så nogle quests vises
+# som tilgængelige selv om de er rep-gatede. Kurateret liste: { questID:
+# (factionID, minStanding) }. standing: 4=Neutral 5=Friendly 6=Honored
+# 7=Revered 8=Exalted. Klienten skjuler giveren, hvis spillerens standing er
+# lavere (tjekkes med GetFactionInfoByID).
+REP_REQUIRE = {
+    # Revered Among the Sha'tar (A'dal): kræver Revered med The Sha'tar (935).
+    10560: (935, 7),
+}
+
 # Manuelle PER-STED-markører (op) for quests med FLERE mål på hvert sit sted,
 # hvor pfQuest ikke kan udlede stederne (trigger-enheder uden spawns).
 # { questID: (otype, [(navn, map, x, y), ...]) }. `navn` skal matche STARTEN af
@@ -416,6 +426,8 @@ def main():
             parts.append("race=%d" % race)
         if pre:
             parts.append("pre={%s}" % ",".join(str(p) for p in pre))
+        if qid in REP_REQUIRE:
+            parts.append("rq={%d,%d}" % REP_REQUIRE[qid])
         # cl = "close"-gruppe (WoW ExclusiveGroup): gensidigt udelukkende quests
         # / breadcrumbs. Har du fuldført ÉN af dem, tilbydes de andre ikke mere,
         # så vi kan skjule det falske "!" (fx Old Oroks Area 52-breadcrumb).

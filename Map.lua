@@ -84,9 +84,23 @@ local function flagged(qid)
     return false
 end
 
+-- Spillerens standing med en faction (1=Hadet .. 4=Neutral .. 8=Ophøjet), eller
+-- nil hvis ukendt/ikke mødt. Bruges til rep-gatede quests (fx Sha'tar Revered).
+local function repStanding(factionID)
+    if not (GetFactionInfoByID and factionID) then return nil end
+    local _, _, standingID = GetFactionInfoByID(factionID)
+    return standingID
+end
+
 local function giverAvailable(qid, d, inLog)
     if flagged(qid) then return false end             -- allerede klaret
     if atAllianceHub(d) then return false end         -- Alliance-by (Telredor/Orebor)
+    -- Rep-gate: skjul til spilleren har den krævede standing (pfQuest mangler
+    -- rep-krav, så kun kuraterede quests har d.rq). Ukendt standing => skjul.
+    if d.rq then
+        local st = repStanding(d.rq[1])
+        if not st or st < d.rq[2] then return false end
+    end
     -- Sæson-event: skjul quest-giveren uden for eventets datovindue.
     if d.ev and ns.Seasonal and not ns.Seasonal:IsActive(d.ev) then return false end
     if d.lvl and playerLevel() < d.lvl then return false end
