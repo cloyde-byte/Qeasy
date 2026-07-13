@@ -586,6 +586,19 @@ oi_turnin = [i for i in ns.Map.IconsForMap(ns.Map, 1955).values()
              if i.kind == "turnin" and int(i.qid) == 9831]
 check("oi-quest viser IKKE aflevering mens den er i gang", len(oi_turnin) == 0)
 
+# 'Meeting at the Blackwing Coven' (10722): "overvær mødet"-mål ved Coven uden
+# dræb-lokation -> markeret noloc, så den ikke fejlvises som klar-til-aflevering
+# hos Tree Warden Chawn mens man stadig mangler at overvære mødet.
+check("10722 Meeting at the Blackwing Coven er markeret noloc",
+      ns.QuestDB[10722].noloc is not None
+      and ns.QuestDB[10722].o is None and ns.QuestDB[10722].oi is None)
+lua.eval("""function() QLOG = { { title='Meeting at the Blackwing Coven', questID=10722,
+  complete=false, objectives={ {text='Attend the meeting: 0/1', done=false} } } } end""")()
+lua.execute("PSTATE.level=70; FLAGGED={}")
+meet_turnin = [i for i in ns.Map.IconsForMap(ns.Map, 1949).values()
+               if i.kind == "turnin" and int(i.qid) == 10722]
+check("noloc-event-quest viser IKKE aflevering mens den er i gang", len(meet_turnin) == 0)
+
 zicons = list(ns.Map.IconsForMap(ns.Map, 1946).values())
 telredor_giver = any(i.kind == "giver" and 66 <= i.x <= 70 and 47 <= i.y <= 52 for i in zicons)
 check("ingen giver-ikoner ved Telredor på kortet", not telredor_giver)
