@@ -54,17 +54,22 @@ local function buildIndex()
 end
 
 -- Slå et navn op og returnér et klikbart link (eller nil hvis ukendt).
--- Tolererer Questie-varianter med en efterstillet parentes, fx
--- "Quest-navn (Level 65)" -> matcher "Quest-navn".
+-- Tolererer Questie-varianter:
+--   * efterstillet parentes, fx "Quest-navn (Level 65)" -> "Quest-navn"
+--   * indlejrede farvekoder, fx "|cff40c7ebQuest-navn|r" (Questie farver
+--     quest-navne efter sværhedsgrad, når de deles i chatten).
 local function linkify(inner)
     local idx = buildIndex()
-    local e = idx[inner:lower()]
+    -- Fjern farvekoder/tekstur-escapes og trim, så det rå navn kan slås op.
+    local clean = inner:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|[rR]", "")
+    clean = clean:gsub("|T.-|t", ""):gsub("^%s+", ""):gsub("%s+$", "")
+    local e = idx[clean:lower()]
     if not e then
-        local base = inner:match("^(.-)%s*%b()%s*$")   -- fjern " (...)" til sidst
+        local base = clean:match("^(.-)%s*%b()%s*$")   -- fjern " (...)" til sidst
         if base and base ~= "" then e = idx[base:lower()] end
     end
     if not e then return nil end
-    return Links:QuestLink(e.id, inner, e.level)        -- behold synlig tekst
+    return Links:QuestLink(e.id, clean, e.level)        -- vis det rensede navn
 end
 
 -- Erstat "[Kendt quest]" med et link i et stykke REN tekst (uden hyperlinks).

@@ -102,7 +102,7 @@ function UnitName(u) return PSTATE.unitName end
 function GetPlayerFacing() return PSTATE.facing end
 function IsShiftKeyDown() return PSTATE.shift end
 function IsControlKeyDown() return PSTATE.ctrl end
-function GetAddOnMetadata() return '0.30.1' end
+function GetAddOnMetadata() return '0.30.2' end
 -- Quest-item-knap (secure) + kamp-gate
 function InCombatLockdown() return PSTATE.combat end
 function GetQuestLogSpecialItemInfo(i)
@@ -343,6 +343,12 @@ check("Rewrite ødelægger ikke eksisterende hyperlinks",
 # et level-suffiks - Qeasy skal stadig genkende og linke quest-navnet.
 rwq = ns.Links.Rewrite(ns.Links, "LFG [War on the Warmaul (Level 67)] pls")
 check("Rewrite læser Questie-link med (Level XX)", "Hqeasy:9945" in rwq)
+# Questie farver quest-navne efter sværhedsgrad -> farvekoder INDE i [ ].
+# Qeasy skal stadig kunne genkende og linke navnet.
+rwc = ns.Links.Rewrite(ns.Links, "kom [|cff40c7ebWar on the Warmaul|r]")
+check("Rewrite læser Questie-link med farvekoder i []", "Hqeasy:9945" in rwc)
+rwc2 = ns.Links.Rewrite(ns.Links, "[|cffff8040War on the Warmaul (Level 67)|r]?")
+check("Rewrite læser farvet Questie-link med level", "Hqeasy:9945" in rwc2)
 
 # ---- party quest-sync ('snakke med Questie') ----
 lua.execute("PSTATE.unitName='Me'; PSTATE.inGroup=true")
