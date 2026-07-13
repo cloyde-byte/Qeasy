@@ -45,6 +45,15 @@ local function itemName(link)
     return link and link:match("%[(.-)%]") or "item"
 end
 
+-- Ren item-reference til en secure "item"-attribut. GetQuestLogSpecialItemInfo
+-- giver et FARVEKODET hyperlink ("|cff..|Hitem:32149:..|h[Navn]|h|r"), og de
+-- |c/|H-escapes kan /use ikke parse pålideligt (klikket gør så ingenting).
+-- Træk item-id'et ud og send "item:<id>" i stedet - det virker altid.
+local function secureItem(link)
+    local id = link and link:match("item:(%d+)")
+    return id and ("item:" .. id) or link
+end
+
 local container = CreateFrame("Frame", "QeasyItemBar", UIParent)
 container:SetSize(SIZE, SIZE)
 container:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 300, -200)
@@ -115,7 +124,7 @@ function ItemBar:Update()
         local b = getButton(shown)
         b.link = it.link
         b.qtitle = it.title
-        b:SetAttribute("item", it.link)
+        b:SetAttribute("item", secureItem(it.link))
         b.icon:SetTexture(it.icon)
         b.count:SetText((it.charges and it.charges > 1) and it.charges or "")
         if GetQuestLogSpecialItemCooldown and b.cd then
@@ -260,7 +269,7 @@ function ItemBar:UpdateHero()
 
     local h = getHero()
     if best then
-        if h.link ~= best.link then h:SetAttribute("item", best.link) end
+        if h.link ~= best.link then h:SetAttribute("item", secureItem(best.link)) end
         h.link = best.link
         h.icon:SetTexture(best.icon)
         h.count:SetText((best.charges and best.charges > 1) and best.charges or "")

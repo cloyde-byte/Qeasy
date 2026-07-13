@@ -949,6 +949,11 @@ PSTATE.map = 1951; PSTATE.x = 0.718; PSTATE.y = 0.523
 ns.ItemBar.UpdateHero(ns.ItemBar)
 check("hero-knap vises tæt på quest-item-målet", g.QeasyHeroButton.shown == True)
 check("hero-knap har rigtigt item (Living Fire)", "Living Fire" in (g.QeasyHeroButton.link or ""))
+# Secure "item"-attributten skal være en ren "item:<id>"-reference - IKKE det
+# farvekodede hyperlink, som /use ikke kan parse (så knappen ikke gør noget).
+_hsa = g.QeasyHeroButton._SetAttribute
+check("hero-knap: secure item-attribut er ren item:id (klikbar)",
+      _hsa[1] == "item" and _hsa[2] == "item:30813")
 lua.execute("PSTATE.x = 0.10; PSTATE.y = 0.10")
 ns.ItemBar.UpdateHero(ns.ItemBar)
 check("hero-knap skjules væk fra målet", g.QeasyHeroButton.shown == False)
