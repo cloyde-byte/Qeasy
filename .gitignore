@@ -1,0 +1,4 @@
+# pfQuest-database (klones lokalt til rute-generering, se tools/README.md)
+tools/pfquest/
+__pycache__/
+*.pyc

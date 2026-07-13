@@ -1,0 +1,99 @@
+local _, ns = ...
+local L = ns.L
+
+-- =========================================================================
+-- Qeasy Tooltips: tilføjer linjer til mob/NPC-tooltips, der viser hvilke af
+-- DINE aktive quests skabningen tæller til, med fremgang - a la Questie.
+-- Matcher skabningens navn mod dine quest-objectives (ingen database behov).
+-- =========================================================================
+
+local Tooltips = {}
+ns.Tooltips = Tooltips
+
+local lastUnitName = nil
+
+local function addQuestLines(tooltip, name)
+    if not ns.Q.char.ui.tooltipsEnabled then return end
+    if not name or name == "" then return end
+    local shown = false
+
+    -- 1) Aktive quests denne skabning tæller til (med fremgang).
+    local hits = ns.QuestLog:MobObjectives(name)
+    if #hits > 0 then
+        tooltip:AddLine(" ")
+        for _, h in ipairs(hits) do
+            local r, g, b = ns.QuestLog:DiffColor(h.level)
+            tooltip:AddLine(string.format("|cff69ccf0Qeasy|r [%d] %s", h.level, h.title), r, g, b)
+            -- Objektiv-tekst indeholder typisk "Navn slain: 4/10" - vis den grå.
+            tooltip:AddLine("   " .. h.text, 0.85, 0.85, 0.85)
+        end
+        shown = true
+    end
+
+    -- 2) Tilgængelige quests DENNE NPC giver (så man kan se hvad de har uden at
+    --    åbne kortet). Farvet efter type: PvP=rød, gentagelig=blå, ellers guld.
+    local avail = ns.Map and ns.Map.AvailableQuestsForGiver and ns.Map:AvailableQuestsForGiver(name)
+    if avail and #avail > 0 then
+        tooltip:AddLine(" ")
+        tooltip:AddLine("|cff69ccf0Qeasy|r har quests:", 1, 0.82, 0)
+        for _, q in ipairs(avail) do
+            local col = q.flag == "pvp" and "|cffff4040"
+                or q.flag == "repeat" and "|cff4d9bff" or "|cffffd100"
+            tooltip:AddLine(string.format("   %s[%d] %s|r", col, q.level, q.title))
+        end
+        shown = true
+    end
+
+    if shown then tooltip:Show() end
+end
+
+local function onUnit(tooltip)
+    if tooltip ~= GameTooltip then return end
+    local _, unit = tooltip:GetUnit()
+    local name = unit and UnitName(unit) or lastUnitName
+    if not name and tooltip.GetUnit then
+        name = select(1, tooltip:GetUnit())
+    end
+    addQuestLines(tooltip, name)
+end
+
+-- Item-tooltip: vis hvilke aktive quests der skal bruge dette item.
+local function onItem(tooltip)
+    if tooltip ~= GameTooltip then return end
+    if not ns.Q.char.ui.tooltipsEnabled then return end
+    if not tooltip.GetItem then return end
+    local iname, link = tooltip:GetItem()
+    if not link then return end
+    local id = tonumber(link:match("item:(%d+)"))
+    if not id then return end
+    local hits = ns.QuestLog:ItemObjectives(id, iname)
+    if #hits == 0 then return end
+    tooltip:AddLine(" ")
+    for _, h in ipairs(hits) do
+        local r, g, b = ns.QuestLog:DiffColor(h.level)
+        tooltip:AddLine(string.format("|cff69ccf0Qeasy|r [%d] %s", h.level, h.title), r, g, b)
+        tooltip:AddLine("   " .. h.text, 0.85, 0.85, 0.85)
+    end
+    tooltip:Show()
+end
+
+function Tooltips:Init()
+    if self.hooked then return end
+    self.hooked = true
+    if not GameTooltip then return end
+
+    -- Moderne: OnTooltipSetUnit. Ældre klienter: samme script findes i TBC.
+    if GameTooltip.HookScript then
+        GameTooltip:HookScript("OnTooltipSetUnit", onUnit)
+        GameTooltip:HookScript("OnTooltipSetItem", onItem)
+    end
+
+    -- Fallback: fang navnet via GameTooltip:SetUnit-hook (nogle klienter).
+    if hooksecurefunc then
+        hooksecurefunc(GameTooltip, "SetUnit", function(self)
+            local name = self.GetUnit and select(1, self:GetUnit())
+            lastUnitName = name
+            addQuestLines(self, name)
+        end)
+    end
+end
