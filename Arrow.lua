@@ -115,7 +115,10 @@ function Arrow:FocusTarget()
         at(d.e, "turnin"); if not coords then at(d.o, "do") end
     else                                        -- aktiv: peg på objektivet
         at(d.o, "do")
-        if not coords and not d.noloc then at(d.e, "turnin") end
+        -- Peg kun på afleveringen mens aktiv, hvis der IKKE er et uafsluttet
+        -- mål: `noloc` (dræb/interager uden kendt sted) og `oi` (samle-item
+        -- uden kendt sted, fx 'Entry Into Karazhan') udelukker det.
+        if not coords and not d.noloc and not d.oi then at(d.e, "turnin") end
     end
     if not coords then return nil end
 

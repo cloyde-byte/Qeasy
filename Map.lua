@@ -181,10 +181,13 @@ function Map:IconsForMap(mapID)
             -- Aflever når færdig. MEN "find NPC"-quests (ingen objektiv - fx
             -- "Whispers on the Wind": opsøg Leoroxx) har afleverings-NPC'en som
             -- selve målet, så vis den også mens questen er i gang. `noloc` = der
-            -- ER et dræb/interager-mål i verden (vi kender bare ikke stedet), så
-            -- den skal IKKE vises som klar-til-aflevering endnu.
+            -- ER et dræb/interager-mål i verden (vi kender bare ikke stedet), og
+            -- `oi` = quest'en kræver et samle-item (fx 'Entry Into Karazhan':
+            -- The Master's Key) uden kendt sted - begge skal IKKE vises som
+            -- klar-til-aflevering endnu, da der stadig er et mål at fuldføre.
             show = (state == "complete")
-                or (state == "active" and not d.o and not d.op and not d.noloc)
+                or (state == "active" and not d.o and not d.op and not d.noloc
+                    and not d.oi)
             npc = d.en
         elseif e.kind == "objective" then
             show = (state == "active")                          -- i gang

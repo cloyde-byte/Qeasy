@@ -574,6 +574,18 @@ seek_turnin = [i for i in ns.Map.IconsForMap(ns.Map, 1949).values()
                if i.kind == "turnin" and int(i.qid) == 10614]
 check("leverings-quest viser stadig aflevering mens den er i gang", len(seek_turnin) == 1)
 
+# oi: quest med samle-item UDEN kendt sted (fx 'Entry Into Karazhan' -> The
+# Master's Key) må IKKE vises som klar-til-aflevering mens den er i gang - der
+# er stadig et item at skaffe (regression: viste afl.-ikon hos Khadgar).
+check("9831 Entry Into Karazhan har oi (samle-item uden sted)",
+      ns.QuestDB[9831].oi is not None and ns.QuestDB[9831].o is None)
+lua.eval("""function() QLOG = { { title='Entry Into Karazhan', questID=9831, complete=false,
+  objectives={ {text='The Master\\'s Key: 0/1', done=false} } } } end""")()
+lua.execute("PSTATE.level=70; FLAGGED={}")
+oi_turnin = [i for i in ns.Map.IconsForMap(ns.Map, 1955).values()
+             if i.kind == "turnin" and int(i.qid) == 9831]
+check("oi-quest viser IKKE aflevering mens den er i gang", len(oi_turnin) == 0)
+
 zicons = list(ns.Map.IconsForMap(ns.Map, 1946).values())
 telredor_giver = any(i.kind == "giver" and 66 <= i.x <= 70 and 47 <= i.y <= 52 for i in zicons)
 check("ingen giver-ikoner ved Telredor på kortet", not telredor_giver)
