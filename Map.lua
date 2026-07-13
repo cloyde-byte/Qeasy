@@ -17,8 +17,10 @@ local ICON_FLIGHT = "Interface\\Icons\\Ability_Mount_Gryphon_01"
 local ICON_INN    = "Interface\\Minimap\\Tracking\\Innkeeper"
 local ICON_MAIL   = "Interface\\Minimap\\Tracking\\Mailbox"
 
--- Zoom-radius i yards (udendørs) pr. Minimap:GetZoom()-trin.
-local MM_RADIUS = { [0] = 466.6, [1] = 400.0, [2] = 333.3, [3] = 266.6, [4] = 200.0, [5] = 133.3 }
+-- Minimap-RADIUS i yards (centrum -> kant, udendørs) pr. Minimap:GetZoom()-trin.
+-- = halvdelen af de kendte diameter-værdier (466.6, 400, ...), fordi vi
+-- projicerer med `half` = pixel-radius (Minimap-bredde/2), ikke fuld bredde.
+local MM_RADIUS = { [0] = 233.3, [1] = 200.0, [2] = 166.6, [3] = 133.3, [4] = 100.0, [5] = 66.6 }
 
 -- ---------------------------------------------------------------------
 -- Indeks: map -> liste af { qid, kind, x, y } (bygges én gang)
@@ -732,7 +734,7 @@ end
 -- over den og se questen (ikke klikbar - kun hover, jf. ønske).
 local function getMMPin(i)
     if minimapPins[i] then return minimapPins[i] end
-    local t = CreateFrame("Frame", nil, mmFrame)
+    local t = CreateFrame("Frame", "QeasyMinimapPin" .. i, mmFrame)
     t.tex = t:CreateTexture(nil, "OVERLAY")
     t.tex:SetAllPoints(t)
     t:EnableMouse(true)
@@ -781,7 +783,7 @@ mmFrame:SetScript("OnUpdate", function(_, dt)
     if not pwx then return end
 
     local zoom = Minimap.GetZoom and Minimap:GetZoom() or 3
-    local radius = MM_RADIUS[zoom] or 266.6
+    local radius = MM_RADIUS[zoom] or 133.3
     local half = (Minimap:GetWidth() or 140) / 2
     local rotate = GetCVar and GetCVar("rotateMinimap") == "1"
     local facing = rotate and GetPlayerFacing and GetPlayerFacing() or 0

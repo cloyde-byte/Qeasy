@@ -863,6 +863,22 @@ ns.Map.Rebuild(ns.Map)
 g.QeasyMinimapPins.scripts.OnUpdate(g.QeasyMinimapPins, 0.2)
 check("minimap-pins (hover-rammer) tegnes uden fejl", True)
 
+# Minimap-projektion: en NPC i præcis kant-afstand (radius yards, zoom 3 => 133.3)
+# skal placeres ved minimap-kanten (offset ~ half = width/2 = 100), IKKE i halv
+# afstand (~50). Regression: MM_RADIUS holdt diameteren og gav pins i halv afstand,
+# så '?' viste sig for tæt på spilleren og "krøb" ud til NPC'en efterhånden.
+lua.execute("PSTATE.map=1951; PSTATE.x=0.5; PSTATE.y=0.5; PSTATE.facing=0")
+ns.Map.zoneMap = 1951
+# NPC 133.3 mock-yards mod nord (dN), 0 mod vest (dW): ic.x=50 => dW=0,
+# ic.y=48.667 => dN=133.3 med testens verdenskoordinat-mock.
+ns.Map.zoneIcons = lua.eval(
+    '{ { qid=9789, kind="giver", x=50, y=48.667, title="EdgeNPC" } }')
+g.QeasyMinimapPins.scripts.OnUpdate(g.QeasyMinimapPins, 0.2)
+_mp = g.QeasyMinimapPin1._SetPoint
+_sx, _sy = _mp[4], _mp[5]
+check("minimap-pin i kant-afstand lander ved kanten (ikke halv afstand)",
+      abs(_sx) < 1 and 90 <= _sy <= 105)
+
 # ---- session-statistik (XP/time) ----
 lua.execute("PSTATE.level=65; PSTATE.xp=1000; PSTATE.xpmax=10000; PSTATE.time=0")
 ns.Session.Init(ns.Session)
